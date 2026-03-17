@@ -43,13 +43,15 @@ class CustomTextField extends StatelessWidget {
               filled: true,
               // 填充背景颜色
               fillColor: const Color(0xFFEDF2F9),
+              // 缩小输入框高度，让输入框更紧凑
+              isDense: true,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
                 borderSide: BorderSide.none, // 去除边框
               ),
               //设置输入框内部内容的内边距（padding）
               contentPadding:
-                  const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
             ),
           ),
         ),

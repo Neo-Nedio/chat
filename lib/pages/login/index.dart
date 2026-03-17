@@ -19,6 +19,13 @@ class _LoginPageState extends State<LoginPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   //登录校验
   Future<void> _login() async {
     String username = _usernameController.text;
@@ -72,60 +79,92 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 /*
-  ─────────────────────────────────────────────────┐
-│  🌈 渐变背景：从左上浅蓝 → 中间白 → 右下淡蓝       │
+┌─────────────────────────────────────────────────┐
+│  🌈 渐变背景：左上浅蓝 → 中间白 → 右下淡蓝        │
 │  (Color(0xFFBED7F6) → 白色 → Color(0xFFDFF4FF)) │
 │═════════════════════════════════════════════════│
-│                                                 │
+│  ↑ SafeArea (避开状态栏/刘海屏)                   │
 │  ┌─────────────────────────────────────────┐   │
 │  │  Padding (四周16px)                      │   │
-│  │                                         │   │
-│  │           ┌─────────────────┐           │   │
-│  │           │                 │           │   │
-│  │           │   🖼️  Logo       │           │   │
-│  │           │   (宽度30%屏幕)   │           │   │
-│  │           │                 │           │   │
-│  │           └─────────────────┘           │   │
-│  │                                         │   │
-│  │              📱 聊天                      │   │
-│  │         (字体30，字重900)                  │   │
-│  │                                         │   │
-│  │           ← 间距32px →                   │   │
-│  │                                         │   │
-│  │   ┌─────────────────────────────────┐   │   │
-│  │   │  白色卡片背景                      │   │   │
-│  │   │  (白色，圆角10px，灰色边框)         │   │   │
-│  │   │  padding: 上下30px, 左右20px      │   │   │
-│  │   │                                 │   │   │
-│  │   │   账号                            │   │   │
-│  │   │   ┌─────────────────────────┐   │   │   │
-│  │   │   │ 请输入内容              │   │   │   │
-│  │   │   │ (背景色 #EDF2F9)        │   │   │   │
-│  │   │   └─────────────────────────┘   │   │   │
-│  │   │                                 │   │   │
-│  │   │         ← 间距15px →             │   │   │
-│  │   │                                 │   │   │
-│  │   │   密码                            │   │   │
-│  │   │   ┌─────────────────────────┐   │   │   │
-│  │   │   │ 请输入内容              │   │   │   │
-│  │   │   │ (密码模式)              │   │   │   │
-│  │   │   └─────────────────────────┘   │   │   │
-│  │   │                                 │   │   │
-│  │   │         ← 间距20px →             │   │   │
-│  │   │                                 │   │   │
-│  │   │      ┌───────────────────┐      │   │   │
-│  │   │      │     登  录        │      │   │   │
-│  │   │      │   (宽度80%，蓝色)  │      │   │   │
-│  │   │      └───────────────────┘      │   │   │
-│  │   │                                 │   │   │
-│  │   └─────────────────────────────────┘   │   │
-│  │                                         │   │
-│  │                                         │   │
-│  │  ← 底部留空 20% 屏幕高度 →                │   │
-│  │                                         │   │
+│  │  ┌───────────────────────────────────┐  │   │
+│  │  │  Column (垂直布局)                 │  │   │
+│  │  │                                     │  │   │
+│  │  │  ← Spacer (flex:1) →                │  │   │
+│  │  │  (占剩余空间的 25%)                  │  │   │
+│  │  │                                     │  │   │
+│  │  │        ┌─────────────────┐          │  │   │
+│  │  │        │                 │          │  │   │
+│  │  │        │   🖼️  Logo       │          │  │   │
+│  │  │        │   (宽度25%屏幕)   │          │  │   │
+│  │  │        │                 │          │  │   │
+│  │  │        └─────────────────┘          │  │   │
+│  │  │                                     │  │   │
+│  │  │            📱 聊天                    │  │   │
+│  │  │       (字体30，字重900)               │  │   │
+│  │  │                                     │  │   │
+│  │  │         ← 间距20px →                 │  │   │
+│  │  │                                     │  │   │
+│  │  │   ┌─────────────────────────────┐   │  │   │
+│  │  │   │  白色卡片背景                 │   │  │   │
+│  │  │   │  (圆角10px，灰色边框)         │   │  │   │
+│  │  │   │  padding: 上下20px, 左右20px │   │  │   │
+│  │  │   │                             │   │  │   │
+│  │  │   │   ┌─────────────────────┐   │   │  │   │
+│  │  │   │   │  账号输入框          │   │   │  │   │
+│  │  │   │   │  (背景色#EDF2F9)     │   │   │  │   │
+│  │  │   │   └─────────────────────┘   │   │  │   │
+│  │  │   │                             │   │  │   │
+│  │  │   │         ← 间距15px →         │   │  │   │
+│  │  │   │                             │   │  │   │
+│  │  │   │   ┌─────────────────────┐   │   │  │   │
+│  │  │   │   │  密码输入框          │   │   │  │   │
+│  │  │   │   │  (密码模式)          │   │   │  │   │
+│  │  │   │   └─────────────────────┘   │   │  │   │
+│  │  │   │                             │   │  │   │
+│  │  │   │         ← 间距20px →         │   │  │   │
+│  │  │   │                             │   │  │   │
+│  │  │   │   ┌─────────────────────┐   │   │  │   │
+│  │  │   │   │    [登录按钮]        │   │   │  │   │
+│  │  │   │   │   (宽度80%，蓝色)     │   │   │  │   │
+│  │  │   │   │    "登  录"          │   │   │  │   │
+│  │  │   │   └─────────────────────┘   │   │  │   │
+│  │  │   │                             │   │  │   │
+│  │  │   └─────────────────────────────┘   │  │   │
+│  │  │                                     │  │   │
+│  │  │  ← Spacer (flex:3) →                │  │   │
+│  │  │  (占剩余空间的 75%)                  │  │   │
+│  │  │                                     │  │   │
+│  │  └───────────────────────────────────┘  │   │
 │  └─────────────────────────────────────────┘   │
 │                                                 │
+│  ↓ SafeArea (避开底部手势区域)                   │
 └─────────────────────────────────────────────────┘
+
+📊 布局比例分析：
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Spacer (flex:1)  ── 25%  │
+  Logo + 标题      ── 固定高度 │
+  白色卡片         ── 自适应高度 │
+  Spacer (flex:3)  ── 75%  │
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+/*
+
+  没有 Spacer (严格居中)：          有 Spacer (内容偏上，视觉更舒适)：
+
+  ┌────────────────────┐          ┌────────────────────┐
+  │                    │          │                    │
+  │                    │          │    Logo            │← 顶部 Spacer flex:1
+  │                    │          │    聊天            │   占据1份空间
+  │    Logo            │          │  ┌──────────────┐  │
+  │    聊天            │          │  │  登录框      │  │
+  │  ┌──────────────┐  │          │  └──────────────┘  │
+  │  │  登录框      │  │          │                    │
+  │  └──────────────┘  │          │                    │
+  │                    │          │                    │← 底部 Spacer flex:3
+  │                    │          │                    │   占据3份空间
+  │                    │          │                    │   (让内容偏上)
+  └────────────────────┘          └────────────────────┘
 */
 
   @override
@@ -134,8 +173,8 @@ class _LoginPageState extends State<LoginPage> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      // 设置为false时，键盘弹出时页面不会自动调整
-      resizeToAvoidBottomInset: false,
+      // 用于控制当键盘弹出时，页面是否自动调整大小以避免键盘遮挡输入框。
+      resizeToAvoidBottomInset: true,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -144,92 +183,94 @@ class _LoginPageState extends State<LoginPage> {
             end: Alignment.bottomRight,    // 渐变终点：右下角
           ),
         ),
-        child: Padding(
-          padding:
-              //底部预留空间
-              EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.2),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,//大体居中
-              children: <Widget>[
-                // 应用 Logo
-                Image.asset(
-                  'assets/images/logo.png', // 确保在pubspec.yaml中添加了logo图片路径
-                  height: screenWidth * 0.3,
-                  width: screenWidth * 0.3,
-                ),
-                //应用名称
-                const Text(
-                  "聊天",
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
+        child: SafeArea(
+            child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,//大体居中
+                  children: <Widget>[
+                    //Spacer 是一个弹性空间占位符，它会自动填充 Row 或 Column 中的空白区域。
+                    const Spacer(flex: 1),
 
-                //间隔
-                const SizedBox(height: 32.0),
-
-                //白色卡片背景
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 20.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10.0),
-                    border: Border.all(
-                      color: const Color(0xFFF2F2F2), // 边框颜色
-                      width: 1.0, // 边框宽度
+                    // 应用 Logo
+                    Image.asset(
+                      'assets/images/logo.png', // 确保在pubspec.yaml中添加了logo图片路径
+                      height: screenWidth * 0.25,
+                      width: screenWidth * 0.25,
                     ),
-                  ),
-                  child: Column(
-                    children: <Widget>[
-                      // 账号输入框
-                      CustomTextField(
-                        labelText: "账号",
-                        controller: _usernameController,
+                    //应用名称
+                    const Text(
+                      "聊天",
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.w900,
                       ),
-                      //间隔
-                      const SizedBox(height: 15.0),
-                      //密码输入框
-                      CustomTextField(
-                        labelText: "密码",
-                        controller: _passwordController,
-                        obscureText: true, // 密码输入框
-                      ),
-                      //间隔
-                      const SizedBox(height: 20.0),
+                    ),
 
-                      //可以让子组件按照父容器尺寸的一定比例来设置大小
-                      FractionallySizedBox(
-                        widthFactor: 0.8,
-                        child: ElevatedButton(
-                          onPressed: _login,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 10),
-                            //backgroundColor = 按钮的背景颜色
-                            backgroundColor: const Color(0xFF4C9BFF),
-                            //foregroundColor = 按钮上所有内容（文字、图标）的颜色
-                            foregroundColor: Colors.white,
-                          ),
-                          child: const Text(
-                            "登  录",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                    //间隔
+                    const SizedBox(height: 20.0),
+
+                    //白色卡片背景
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10.0),
+                        border: Border.all(
+                          color: const Color(0xFFF2F2F2), // 边框颜色
+                          width: 1.0, // 边框宽度
                         ),
-                      )
-                    ],
-                  ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          // 账号输入框
+                          CustomTextField(
+                            labelText: "账号",
+                            controller: _usernameController,
+                          ),
+                          //间隔
+                          const SizedBox(height: 15.0),
+                          //密码输入框
+                          CustomTextField(
+                            labelText: "密码",
+                            controller: _passwordController,
+                            obscureText: true, // 密码输入框
+                          ),
+                          //间隔
+                          const SizedBox(height: 20.0),
+
+                          //可以让子组件按照父容器尺寸的一定比例来设置大小
+                          FractionallySizedBox(
+                            widthFactor: 0.8,
+                            child: ElevatedButton(
+                              onPressed: _login,
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 5),
+                                //backgroundColor = 按钮的背景颜色
+                                backgroundColor: const Color(0xFF4C9BFF),
+                                //foregroundColor = 按钮上所有内容（文字、图标）的颜色
+                                foregroundColor: Colors.white,
+                              ),
+                              child: const Text(
+                                "登  录",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    const Spacer(flex: 3),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
+        )
     );
   }
 }
