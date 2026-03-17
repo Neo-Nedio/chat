@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/user_api.dart';
 import '../../components/custom_text_field/index.dart';
-import '../chat_list/index.dart';
+import '../navigation/index.dart';
 
 //用户登录的api
 final _useApi = UserApi();
@@ -76,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('x-token', loginResult['data']['token']);
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => ChatListPage()),
+        MaterialPageRoute(builder: (context) =>  CustomBottomNavigationBar()),
             (route) => false,
       );
     } else {
@@ -248,6 +248,7 @@ class _LoginPageState extends State<LoginPage> {
                           //可以让子组件按照父容器尺寸的一定比例来设置大小
                           FractionallySizedBox(
                             widthFactor: 0.8,
+                            //todo 给登录按钮加一个点击效果
                             child: ElevatedButton(
                               onPressed: _login,
                               style: ElevatedButton.styleFrom(

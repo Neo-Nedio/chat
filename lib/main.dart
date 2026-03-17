@@ -1,5 +1,6 @@
-import 'package:chat_mobile/pages/chat_list/index.dart';
+
 import 'package:chat_mobile/pages/login/index.dart';
+import 'package:chat_mobile/pages/navigation/index.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,7 +11,7 @@ Future<void> main() async {
   //获取token,并判断是否1需要登录
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('x-token');
-  runApp(MyApp(initialPage: token != null ? ChatListPage() : LoginPage()));
+  runApp(MyApp(initialPage: token != null ? const CustomBottomNavigationBar() : LoginPage()));
 }
 
 class MyApp extends StatelessWidget {
