@@ -1,9 +1,11 @@
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter/material.dart';
 import 'package:pointycastle/asymmetric/api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/user_api.dart';
 import '../../components/custom_text_field/index.dart';
+import '../chat_list/index.dart';
 
 //用户登录的api
 final _useApi = UserApi();
@@ -26,10 +28,33 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  //封装弹窗功能
+  void _showDialog(String content, [String title = '登录失败']) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("确定"),
+          ),
+        ],
+      ),
+    );
+  }
+
   //登录校验
   Future<void> _login() async {
     String username = _usernameController.text;
     String password = _passwordController.text;
+
+    //输入验证
+    if (username.isEmpty || password.isEmpty) {
+      _showDialog("用户名或密码不能为空~");
+      return;
+    }
 
     //获取加密公钥
     final publicKeyResult = await _useApi.publicKey();
@@ -48,34 +73,14 @@ class _LoginPageState extends State<LoginPage> {
 
     //登录逻辑
     if (loginResult['code'] == 0) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text("登录成功"),
-          content: Text("欢迎，${loginResult['data']}!"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("确定"),
-            ),
-          ],
-        ),
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('x-token', loginResult['data']['token']);
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => ChatListPage()),
+            (route) => false,
       );
     } else {
-      showDialog(
-        context: context,
-        builder: (context) =>
-            AlertDialog(
-              title: Text("登录失败"),
-              content: Text("用户名或密码错误，请重试"),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text("确定"),
-                ),
-              ],
-            ),
-      );
+      _showDialog("用户名或密码错误，请重试尝试~");
     }
   }
 /*

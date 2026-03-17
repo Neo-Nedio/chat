@@ -1,14 +1,23 @@
+import 'package:chat_mobile/pages/chat_list/index.dart';
 import 'package:chat_mobile/pages/login/index.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  // 确保Flutter框架初始化完成,才能继续工作
+  WidgetsFlutterBinding.ensureInitialized();
+
+  //获取token,并判断是否1需要登录
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? token = prefs.getString('x-token');
+  runApp(MyApp(initialPage: token != null ? ChatListPage() : LoginPage()));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Widget initialPage;
 
-  // This widget is the root of your application.
+  const MyApp({super.key, required this.initialPage});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -26,7 +35,7 @@ class MyApp extends StatelessWidget {
           //启用 Material Design 3(另一种风格)
         useMaterial3: true,
       ),
-        home: LoginPage(),
+      home: initialPage,
     );
   }
 }
