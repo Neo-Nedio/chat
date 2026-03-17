@@ -1,6 +1,12 @@
+import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter/material.dart';
+import 'package:pointycastle/asymmetric/api.dart';
 
+import '../../api/user_api.dart';
 import '../../components/custom_text_field/index.dart';
+
+//用户登录的api
+final _useApi = UserApi();
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,17 +20,32 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
 
   //登录校验
-  void _login() {
+  Future<void> _login() async {
     String username = _usernameController.text;
     String password = _passwordController.text;
 
-    if (username == "admin" && password == "123456") {
+    //获取加密公钥
+    final publicKeyResult = await _useApi.publicKey();
+    if (publicKeyResult['code'] != 0) {}
+    String key = publicKeyResult['data'];
+
+    //解析公钥字符串为RSA公钥对象
+    final parsedKey = encrypt.RSAKeyParser().parse(key) as RSAPublicKey;
+    //创建RSA加密器
+    final encrypter = encrypt.Encrypter(encrypt.RSA(publicKey: parsedKey));
+    //加密密码并转为Base64字符串
+    final encryptedPassword = encrypter.encrypt(password).base64;
+
+    //获取登录结果
+    final loginResult = await _useApi.login(username, encryptedPassword);
+
+    //登录逻辑
+    if (loginResult['code'] == 0) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text("登录成功"),//
-          content: Text("欢迎，$username!"),
-          //选择按钮
+          title: Text("登录成功"),
+          content: Text("欢迎，${loginResult['data']}!"),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -36,16 +57,17 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: Text("登录失败"),
-          content: Text("用户名或密码错误，请重试"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("确定"),
+        builder: (context) =>
+            AlertDialog(
+              title: Text("登录失败"),
+              content: Text("用户名或密码错误，请重试"),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("确定"),
+                ),
+              ],
             ),
-          ],
-        ),
       );
     }
   }
