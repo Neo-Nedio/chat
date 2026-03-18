@@ -69,7 +69,6 @@ class _ChatListPageState extends State<ChatListPage> {
     }
     //获取搜索结果
     _friendApi.search(friendInfo).then((res) {
-      print(res);
       if (res['code'] == 0) {
         setState(() {
           _searchList = res['data'];
