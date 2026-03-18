@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/user_api.dart';
 import '../../components/custom_material_button/index.dart';
+import '../../components/custom_portrait/index.dart';
 import '../login/index.dart';
 
 final _userApi = UserApi();
@@ -111,28 +112,10 @@ class _MinePageState extends State<Mine> {
                     ),
                     borderRadius: BorderRadius.circular(35),
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(35),
-                    child: CachedNetworkImage(
-                      imageUrl: currentUserInfo['portrait'] ?? '', // 头像URL
-                      fit: BoxFit.cover,
-                      // 加载中的占位图
-                      placeholder: (context, url) => Container(
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            color: Color(0xffffffff),
-                            strokeWidth: 2,
-                          ),
-                        ),
-                      ),
-                      // 加载失败的占位图
-                      errorWidget: (context, url, error) => Container(
-                        color: Colors.grey[300],
-                        child:
-                            Image.asset('assets/images/default-portrait.jpeg'),
-                      ),
-                    ),
-                  ),
+                  child: CustomPortrait(
+                      url: currentUserInfo['portrait'] ?? '',
+                      size: 70,
+                      radius: 35),
                 ),
 
                 //分割

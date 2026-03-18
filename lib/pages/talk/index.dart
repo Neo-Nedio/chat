@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../api/talk_api.dart';
 import '../../api/user_api.dart';
+import '../../components/custom_portrait/index.dart';
 import '../../components/custom_text_button/index.dart';
 import '../../utils/date.dart';
 
@@ -219,31 +220,7 @@ class _TalkPageState extends State<Talk> {
                   Row(
                     children: [
                       // 头像部分
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(25),
-                        child: CachedNetworkImage(
-                          imageUrl: talk['portrait'] ?? '',
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                          // 加载中显示进度圈
-                          placeholder: (context, url) => Container(
-                            color: Colors.grey[300],
-                            child: const Center(
-                              child: CircularProgressIndicator(
-                                color: Color(0xffffffff),
-                                strokeWidth: 2,
-                              ),
-                            ),
-                          ),
-                          // 加载失败显示默认头像
-                          errorWidget: (context, url, error) => Container(
-                            color: Colors.grey[300],
-                            child: Image.asset(
-                                'assets/images/default-portrait.jpeg'),
-                          ),
-                        ),
-                      ),
+                      CustomPortrait(url: talk['portrait'] ?? ''),
 
                       // 头像和文字的间距
                       const SizedBox(width: 10),

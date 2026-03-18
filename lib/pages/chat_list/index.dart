@@ -4,6 +4,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 import '../../api/chat_list_api.dart';
 import '../../api/friend_api.dart';
+import '../../components/custom_portrait/index.dart';
 import '../../components/custom_search_box/index.dart';
 import '../../utils/date.dart';
 
@@ -413,34 +414,7 @@ class _ChatListPageState extends State<ChatListPage> {
             child: Row( // 水平排列
               children: [
                 // 圆角头像
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(25),  // 圆角25（圆形）
-                  child: CachedNetworkImage(  // 缓存网络图片
-                    imageUrl: chat['portrait'],     // 头像URL
-                    width: 50,                  // 宽50
-                    height: 50,                 // 高50
-                    fit: BoxFit.cover,          // 图片铺满整个区域
-                    // 图片加载时的占位组件
-                    placeholder: (context, url) => Container(
-                      width: 50,
-                      height: 50,
-                      color: Colors.grey[300],  // 灰色背景
-                      child: const Center(       // 居中显示
-                        child: CircularProgressIndicator(  // 圆形进度条
-                          color: Color(0xffffffff),        // 白色
-                          strokeWidth: 2,                   // 线条粗细2
-                        ),
-                      ),
-                    ),
-                    // 图片加载失败时的占位组件
-                    errorWidget: (context, url, error) => Container(
-                      width: 50,
-                      height: 50,
-                      color: Colors.grey[300],  // 灰色背景
-                      child: Image.asset('assets/images/default-portrait.jpeg'), // 默认头像
-                    ),
-                  ),
-                ),
+                CustomPortrait(url: chat['portrait']),
 
                 // 间距12
                 const SizedBox(width: 12),
