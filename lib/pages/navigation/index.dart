@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../chat_list/index.dart';
+import '../mine/mine.dart';
 
 //主页导航栏
 class CustomBottomNavigationBar extends StatefulWidget {
@@ -66,7 +67,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
           ChatListPage(),
           Center(child: Text('通讯列表', style: TextStyle(fontSize: 24))),
           Center(child: Text('说说', style: TextStyle(fontSize: 24))),
-          Center(child: Text('我的', style: TextStyle(fontSize: 24))),
+          Mine(),
         ]
       ),
 

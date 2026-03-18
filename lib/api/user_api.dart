@@ -39,4 +39,10 @@ class UserApi {
       rethrow;
     }
   }
+
+  //获取用户信息
+  Future<Map<String, dynamic>> info() async {
+    final response = await _dio.get('/v1/api/user/info');
+    return response.data;
+  }
 }
