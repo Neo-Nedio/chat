@@ -45,4 +45,13 @@ class UserApi {
     final response = await _dio.get('/v1/api/user/info');
     return response.data;
   }
+
+  //获取图片预览 URL
+  Future<Map<String, dynamic>> getImg(String fileName, String targetId) async {
+    final response = await _dio.get(
+      '/v1/api/user/get/img',
+      queryParameters: {'fileName': fileName, 'targetId': targetId},
+    );
+    return response.data;
+  }
 }
