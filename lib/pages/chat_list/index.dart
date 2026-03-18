@@ -164,12 +164,7 @@ class _ChatListPageState extends State<ChatListPage> {
         backgroundColor: const Color(0xFFF9FBFF),
         // 应用栏右侧的操作按钮
         actions: [
-          Theme( // 包裹PopupMenuButton，自定义主题
-            data: Theme.of(context).copyWith(
-              splashColor: const Color(0xFFEAEAEA),// 点击波纹效果的颜色
-              highlightColor: const Color(0xFFEAEAEA), // 高亮颜色
-            ),
-            child: PopupMenuButton(
+                PopupMenuButton(
               icon: const Icon(Icons.add, size: 32),  // 按钮图标：加号，大小32
               offset: const Offset(0, 50),            // 菜单偏移量：x=0, y=50（向下偏移50）
               shape: RoundedRectangleBorder(           // 菜单形状
@@ -193,15 +188,7 @@ class _ChatListPageState extends State<ChatListPage> {
                 ),
 
                 //分割线
-                PopupMenuItem<int>(
-                  enabled: false,
-                  height: 1, // 禁用这个菜单项，以显示为分割线
-                  child: Container(
-                    height: 1,
-                    padding: const EdgeInsets.all(0),
-                    color: Colors.grey[300], // 设置分割线的颜色
-                  ),
-                ),
+                _buildPopupDivider(),
 
                 //添加好友
                 PopupMenuItem(
@@ -219,16 +206,7 @@ class _ChatListPageState extends State<ChatListPage> {
                 ),
 
                 //分割线
-                PopupMenuItem<int>(
-                  enabled: false,
-                  height: 1,
-                  child: Container(
-                    height: 1,
-                    padding: const EdgeInsets.all(0),
-                    color: Colors.grey[300],
-                  ),
-                ),
-
+                _buildPopupDivider(),
                 //创建群聊
                 PopupMenuItem(
                   value: 2,
@@ -245,7 +223,6 @@ class _ChatListPageState extends State<ChatListPage> {
                 ),
               ],
             ),
-          ),
         ],
       ),
 
@@ -394,10 +371,8 @@ class _ChatListPageState extends State<ChatListPage> {
         // InkWell 必须放在 Material 内才能工作
         child: InkWell( //点击波纹
           borderRadius: BorderRadius.circular(12),  // 和Material一致的圆角
-          splashColor: const Color(0xFFEAEAEA),     // 点击波纹颜色（浅灰）
-          highlightColor: const Color(0xFFEAEAEA),  // 点击高亮颜色（浅灰）
           child:  Container(
-        padding: const EdgeInsets.symmetric(vertical: 10.0),  // 上下内边距10
+          padding: const EdgeInsets.symmetric(vertical: 10.0),  // 上下内边距10
           decoration: BoxDecoration(  // 容器装饰
             borderRadius: BorderRadius.circular(12.0),  // 圆角12
             border: Border(
@@ -527,6 +502,19 @@ class _ChatListPageState extends State<ChatListPage> {
     );
   }
 
+  //弹出菜单分割线
+  PopupMenuEntry<int> _buildPopupDivider() {
+    return PopupMenuItem<int>(
+      enabled: false,
+      height: 1,
+      child: Container(
+        height: 1,
+        padding: const EdgeInsets.all(0),
+        color: Colors.grey[200],
+      ),
+    );
+  }
+
  /*
   ┌─────────────────────────────────────────────────┐
   │  Material (圆角12, 白色背景)                      │
@@ -562,8 +550,6 @@ class _ChatListPageState extends State<ChatListPage> {
           // 添加点击事件
         },
         borderRadius: BorderRadius.circular(12),  // 和Material一致的圆角
-        splashColor: const Color(0xFFEAEAEA),     // 点击波纹颜色（浅灰）
-        highlightColor: const Color(0xFFEAEAEA),  // 点击高亮颜色（浅灰）
 
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10.0),  // 上下内边距10
