@@ -12,9 +12,9 @@ class Http {
   // 私有的命名构造函数
   Http._internal() {
     dio = Dio(BaseOptions(
-      //baseUrl: 'http://localhost:9200',
+      baseUrl: 'http://localhost:9200',
       //baseUrl: 'http://192.168.61.202:9200',
-      baseUrl: 'http://172.16.7.235:9200',
+      //baseUrl: 'http://172.16.7.233:9200',
       //连接超时20秒
       connectTimeout: const Duration(seconds: 20),
       //接收超时20秒
