@@ -239,74 +239,97 @@ class _ChatListPageState extends State<ChatListPage> {
                 _onSearchFriend(value);
               },
             ),
+            if(_searchList.isNotEmpty ||
+              _topList.isNotEmpty ||
+              _otherList.isNotEmpty)
             // Expanded让ListView填充剩余空间
-            Expanded(
-              //下拉刷新组件
-              child: RefreshIndicator(
-                onRefresh: () async {  // 下拉刷新时触发的回调函数
-                  _onGetChatList();    // 调用API重新获取聊天列表
-                  return Future.delayed(const Duration(milliseconds: 700)); // 延迟700ms返回
-                },
+              Expanded(
+                //下拉刷新组件
+                  child: RefreshIndicator(
+                    onRefresh: () async {  // 下拉刷新时触发的回调函数
+                      _onGetChatList();    // 调用API重新获取聊天列表
+                      return Future.delayed(const Duration(milliseconds: 700)); // 延迟700ms返回
+                    },
 
-                child: ListView(
+                    child: ListView(
+                      children: [
+
+                        if (_searchList.isNotEmpty) ...[
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              "搜索结果",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF4C9BFF),
+                              ),
+                            ),
+                          ),
+                          //List 不能直接作为 child,所以要加上...展开成多个 Widget
+                          ..._searchList.map((friend) =>
+                              _buildSearchItem(friend, friend['friendId'])),
+                        ],
+
+                        if (_topList.isNotEmpty) ...[
+                          const Padding(
+                            // 显示"置顶"标题
+                            padding: EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              "置顶",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF4C9BFF),
+                              ),
+                            ),
+                          ),
+                          // 遍历topList，为每个chat创建列表项
+                          // 使用展开操作符...将生成的组件列表展开
+                          ..._topList
+                              .map((chat) => _buildChatItem(chat, chat['id'])),
+                        ],
+
+                        if (_otherList.isNotEmpty) ...[
+                          const Padding(
+                            // "全部"标题
+                            padding: EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              "全部",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF4C9BFF),
+                              ),
+                            ),
+                          ),
+                          ..._otherList
+                              .map((chat) => _buildChatItem(chat, chat['id'])),
+                        ],
+                      ],
+                    ),
+                  )
+              ),
+
+            if (_searchList.isEmpty && _otherList.isEmpty && _topList.isEmpty)
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-
-                      if (_searchList.isNotEmpty) ...[
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text(
-                            "搜索结果",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF4C9BFF),
-                            ),
-                          ),
-                        ),
-                        //List 不能直接作为 child,所以要加上...展开成多个 Widget
-                        ..._searchList.map((friend) =>
-                            _buildSearchItem(friend, friend['friendId'])),
-                      ],
-
-                      if (_topList.isNotEmpty) ...[
-                        const Padding(
-                          // 显示"置顶"标题
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text(
-                            "置顶",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF4C9BFF),
-                            ),
-                          ),
-                        ),
-                        // 遍历topList，为每个chat创建列表项
-                        // 使用展开操作符...将生成的组件列表展开
-                        ..._topList
-                            .map((chat) => _buildChatItem(chat, chat['id'])),
-                      ],
-
-                      if (_otherList.isNotEmpty) ...[
-                        const Padding(
-                          // "全部"标题
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text(
-                            "全部",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF4C9BFF),
-                            ),
-                          ),
-                        ),
-                        ..._otherList
-                            .map((chat) => _buildChatItem(chat, chat['id'])),
-                      ],
+                      Image.asset(
+                        'assets/images/empty-bg.png',
+                        width: 100,
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        '暂无聊天记录~',
+                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                      ),
                     ],
                   ),
-              )
-            ),
+                ),
+              ),
           ],
         ),
       ),
