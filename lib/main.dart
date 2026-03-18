@@ -33,6 +33,8 @@ class MyApp extends StatelessWidget {
           surface: const Color(0xFFFFFFFF), // 表面颜色：卡片背景、对话框
           onSurface: Colors.black,          // 在表面上的内容：卡片上的文字
         ),
+        splashColor: const Color(0x80EAEAEA),    // 点击波纹颜色 (半透明浅灰)
+        highlightColor: const Color(0x80EAEAEA), // 点击高亮颜色 (半透明浅灰)
           //启用 Material Design 3(另一种风格)
         useMaterial3: true,
       ),
