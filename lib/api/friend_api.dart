@@ -16,7 +16,7 @@ class FriendApi {
 
   //好友列表（按分组等）
   Future<Map<String, dynamic>> list() async {
-    final response = await _dio.get('/v1/api/chat-list/list');
+    final response = await _dio.get('/v1/api/friend/list');
     return response.data;
   }
 
