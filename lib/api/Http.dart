@@ -25,6 +25,7 @@ class Http {
     dio.interceptors
         .add(InterceptorsWrapper(onRequest: (options, handler) async {
       // 从本地存储获取token
+      //todo 全局变量储存token,防止每次都获取
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
       final token = prefs.getString('x-token');

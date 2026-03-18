@@ -5,6 +5,14 @@ import 'Http.dart';
 //用户登录的api
 class UserApi {
   final Dio _dio = Http().dio;
+  //构建单例
+  static final UserApi _instance = UserApi._internal();
+
+  UserApi._internal();
+
+  factory UserApi() {
+    return _instance;
+  }
 
   // 登录接口
   Future<Map<String, dynamic>> login(String account, String password) async {
