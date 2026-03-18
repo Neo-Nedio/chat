@@ -207,6 +207,7 @@ class _ChatListPageState extends State<ChatListPage> {
 
                 //分割线
                 _buildPopupDivider(),
+
                 //创建群聊
                 PopupMenuItem(
                   value: 2,
