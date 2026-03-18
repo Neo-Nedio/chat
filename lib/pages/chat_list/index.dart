@@ -2,28 +2,16 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
+import '../../api/chat_list_api.dart';
+import '../../api/friend_api.dart';
 import '../../components/custom_search_box/index.dart';
+import '../../utils/date.dart';
 
 
-// 用户聊天信息模型
-class ChatInfo {
-  final String avatar;
-  final String name;
-  final String lastMessage;
-  final String lastTime;
-  final int unreadCount;
-  bool isTop;
+final _chatListApi = ChatListApi();
+final _friendApi = FriendApi();
 
-  ChatInfo({
-    required this.avatar,
-    required this.name,
-    required this.lastMessage,
-    required this.lastTime,
-    required this.unreadCount,
-    this.isTop = false,
-  });
-}
-
+//聊天主页面
 class ChatListPage extends StatefulWidget {
   const ChatListPage({super.key});
 
@@ -33,203 +21,136 @@ class ChatListPage extends StatefulWidget {
 
 class _ChatListPageState extends State<ChatListPage> {
 
-  final List<ChatInfo> _chatList = [ChatInfo(
-    avatar:
-    "",
-    name: "张三",
-    lastMessage: "今天晚上有空吗？",
-    lastTime: "12:30",
-    unreadCount: 2,
-    isTop: true,
-  ),
-    ChatInfo(
-      avatar:
-      "",
-      name: "李四",
-      lastMessage: "项目进展如何？",
-      lastTime: "11:20",
-      unreadCount: 0,
-      isTop: true,
-    ),
-    ChatInfo(
-      avatar:
-      "",
-      name: "王五",
-      lastMessage: "好的，收到了",
-      lastTime: "昨天",
-      unreadCount: 1,
-    ),
-    ChatInfo(
-      avatar:
-      "",
-      name: "张三",
-      lastMessage: "今天晚上有空吗？",
-      lastTime: "12:30",
-      unreadCount: 2,
-      isTop: true,
-    ),
-    ChatInfo(
-      avatar:
-      "",
-      name: "李四",
-      lastMessage: "项目进展如何？",
-      lastTime: "11:20",
-      unreadCount: 0,
-      isTop: true,
-    ),
-    ChatInfo(
-      avatar:
-      "",
-      name: "王五",
-      lastMessage: "好的，收到了",
-      lastTime: "昨天",
-      unreadCount: 1,
-    ),
-    ChatInfo(
-      avatar:
-      "",
-      name: "张三",
-      lastMessage: "今天晚上有空吗？",
-      lastTime: "12:30",
-      unreadCount: 2,
-      isTop: true,
-    ),
-    ChatInfo(
-      avatar:
-      "",
-      name: "李四",
-      lastMessage: "项目进展如何？",
-      lastTime: "11:20",
-      unreadCount: 0,
-      isTop: true,
-    ),
-    ChatInfo(
-      avatar:
-      "",
-      name: "王五",
-      lastMessage: "好的，收到了",
-      lastTime: "昨天",
-      unreadCount: 1,
-    ),
-    ChatInfo(
-      avatar:
-      "",
-      name: "张三",
-      lastMessage: "今天晚上有空吗？",
-      lastTime: "12:30",
-      unreadCount: 2,
-      isTop: true,
-    ),
-    ChatInfo(
-      avatar:
-      "",
-      name: "李四",
-      lastMessage: "项目进展如何？",
-      lastTime: "11:20",
-      unreadCount: 0,
-      isTop: true,
-    ),
-    ChatInfo(
-      avatar:
-      "=",
-      name: "王五",
-      lastMessage: "好的，收到了",
-      lastTime: "昨天",
-      unreadCount: 1,
-    ),
-    ChatInfo(
-      avatar:
-      "",
-      name: "张三",
-      lastMessage: "今天晚上有空吗？",
-      lastTime: "12:30",
-      unreadCount: 2,
-      isTop: true,
-    ),
-    ChatInfo(
-      avatar:
-          "",
-      name: "李四",
-      lastMessage: "项目进展如何？",
-      lastTime: "11:20",
-      unreadCount: 0,
-      isTop: true,
-    ),
-    ChatInfo(
-      avatar:
-          "",
-      name: "王五",
-      lastMessage: "好的，收到了",
-      lastTime: "昨天",
-      unreadCount: 1,
-    ),];
+  late List<dynamic> _topList = [];     // 置顶聊天列表
+  late List<dynamic> _otherList = [];   // 其他聊天列表
+  late List<dynamic> _searchList = [];  // 搜索结果列表
 
-  void _toggleTopStatus(int index) {
-    setState(() {  // 触发UI重建
-      _chatList[index].isTop = !_chatList[index].isTop;  // 切换置顶状态
-      _sortChatList();  // 重新排序
+  @override
+  void initState() {
+    super.initState();
+    _onGetChatList();
+  }
+
+  void _onGetChatList() {
+    //获取列表
+    _chatListApi.list().then((res) {
+      if (res['code'] == 0) {
+        setState(() {
+          _topList = res['data']['tops'];
+          _otherList = res['data']['others'];
+        });
+      }
     });
   }
 
-  void _deleteChat(int index) {
-    setState(() {
-      _chatList.removeAt(index);  // 从列表中移除指定项
+  void _onTopStatus(String id, bool isTop) {
+    // 传入相反的状态更新指定状态
+    _chatListApi.top(id, !isTop).then((res) {
+      if (res['code'] == 0) {
+        _onGetChatList(); // 重新获取最新列表
+      }
     });
   }
 
-  void _sortChatList() {
-    _chatList.sort((a, b) {  // 排序规则：置顶的排前面
-      if (a.isTop && !b.isTop) return -1;  // a置顶b不置顶，a在前
-      if (!a.isTop && b.isTop) return 1;   // a不置顶b置顶，b在前
-      return 0;  // 状态相同，保持原顺序
+  void _onDeleteChatList(String id) {
+    _chatListApi.delete(id).then((res) {
+      if (res['code'] == 0) {
+        _onGetChatList(); // 重新获取最新列表
+      }
+    });
+  }
+
+  void _onSearchFriend(String friendInfo) {
+    if (friendInfo.trim() == '') { // 搜索框为空
+      setState(() {
+        _searchList = []; // 清空搜索结果
+      });
+      return;
+    }
+    //获取搜索结果
+    _friendApi.search(friendInfo).then((res) {
+      print(res);
+      if (res['code'] == 0) {
+        setState(() {
+          _searchList = res['data'];
+        });
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // 从_chatList中筛选出所有isTop为true的聊天，转换成新列表
-    List<ChatInfo> topList = _chatList.where((chat) => chat.isTop).toList();
-    // 从_chatList中筛选出所有isTop为false的聊天，转换成新列表
-    List<ChatInfo> normalList = _chatList.where((chat) => !chat.isTop).toList();
 
 /*
-    ┌─────────────────────────────────────────────────┐
-    │  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  +   │  ← AppBar
-    │                                                  │    标题+添加按钮
-    ├─────────────────────────────────────────────────┤
-    │                                                  │
-    │  🔍 搜索                                        │  ← 搜索框
-    │                                                  │
-    │  置顶                                            │  ← 分组标题
-    │                                                  │
-    │  ┌───────────────────────────────────────────┐  │
-    │  │  ●●●  张三                      14:30     │  │  ← 置顶聊天项1
-    │  │       最后一条消息内容...           󰀃      │  │    （有未读红点）
-    │  └───────────────────────────────────────────┘  │
-    │                                                  │
-    │  ┌───────────────────────────────────────────┐  │
-    │  │  ●●●  李四                      昨天      │  │  ← 置顶聊天项2
-    │  │       你好，在吗？                         │  │    （无未读）
-    │  └───────────────────────────────────────────┘  │
-    │                                                  │
-    │  其他                                            │  ← 分组标题
-    │                                                  │
-    │  ┌───────────────────────────────────────────┐  │
-    │  │  ●●●  王五                      12:05     │  │  ← 普通聊天项1
-    │  │       周末有空吗？                   󰀃      │  │    （有未读红点）
-    │  └───────────────────────────────────────────┘  │
-    │                                                  │
-    │  ┌───────────────────────────────────────────┐  │
-    │  │  ●●●  赵六                      昨天      │  │  ← 普通聊天项2
-    │  │       图片                                 │  │    （无未读）
-    │  └───────────────────────────────────────────┘  │
-    │                                                  │
-    │  ┌───────────────────────────────────────────┐  │
-    │  │  ●●●  钱七                      周一      │  │  ← 普通聊天项3
-    │  │       收到，谢谢！                         │  │    （无未读）
-    │  └───────────────────────────────────────────┘  │
-    │                                                  │
-    └─────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────┐
+│  AppBar 顶部导航栏                                │
+│  ┌─────────────────────────────────────────────┐ │
+│  │             聊天列表                    +   │ │
+│  └─────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────┤
+│  Padding (上下5px, 左右16px)                      │
+│  ┌─────────────────────────────────────────────┐ │
+│  │  Column 垂直布局                             │ │
+│  │  ┌───────────────────────────────────────┐ │ │
+│  │  │  CustomSearchBox 搜索框                │ │ │
+│  │  │  ┌───────────────────────────────────┐ │ │ │
+│  │  │  │  🔍 搜索...                        │ │ │ │
+│  │  │  └───────────────────────────────────┘ │ │ │
+│  │  └───────────────────────────────────────┘ │ │
+│  │                                             │ │
+│  │  Expanded (填充剩余空间)                     │ │
+│  │  ┌───────────────────────────────────────┐ │ │
+│  │  │  RefreshIndicator 下拉刷新             │ │ │
+│  │  │  ┌───────────────────────────────────┐ │ │ │
+│  │  │  │  ListView 可滚动列表               │ │ │ │
+│  │  │  │  ┌───────────────────────────────┐ │ │ │ │
+│  │  │  │  │                               │ │ │ │ │
+│  │  │  │  │  ═════ 搜索结果 ═════         │ │ │ │ │
+│  │  │  │  │  ┌─────────────────────────┐  │ │ │ │ │
+│  │  │  │  │  │  👤 张三 (好友)          │  │ │ │ │ │
+│  │  │  │  │  └─────────────────────────┘  │ │ │ │ │
+│  │  │  │  │  ┌─────────────────────────┐  │ │ │ │ │
+│  │  │  │  │  │  👤 李四 (同事)          │  │ │ │ │ │
+│  │  │  │  │  └─────────────────────────┘  │ │ │ │ │
+│  │  │  │  │                               │ │ │ │ │
+│  │  │  │  │  ═════ 置顶 ═══════           │ │ │ │ │
+│  │  │  │  │  ┌─────────────────────────┐  │ │ │ │ │
+│  │  │  │  │  │  📌 👤 产品群    15:30   │  │ │ │ │ │
+│  │  │  │  │  │     3条新消息      󰀃 3   │  │ │ │ │ │
+│  │  │  │  │  └─────────────────────────┘  │ │ │ │ │
+│  │  │  │  │  ┌─────────────────────────┐  │ │ │ │ │
+│  │  │  │  │  │  📌 👤 技术群    14:20   │  │ │ │ │ │
+│  │  │  │  │  │     代码已合并           │  │ │ │ │ │
+│  │  │  │  │  └─────────────────────────┘  │ │ │ │ │
+│  │  │  │  │                               │ │ │ │ │
+│  │  │  │  │  ═════ 全部 ═══════           │ │ │ │ │
+│  │  │  │  │  ┌─────────────────────────┐  │ │ │ │ │
+│  │  │  │  │  │  👤 测试群    13:45      │  │ │ │ │ │
+│  │  │  │  │  │     测试通过             │  │ │ │ │ │
+│  │  │  │  │  └─────────────────────────┘  │ │ │ │ │
+│  │  │  │  │  ┌─────────────────────────┐  │ │ │ │ │
+│  │  │  │  │  │  👤 设计群    12:10      │  │ │ │ │ │
+│  │  │  │  │  │     设计稿已更新   󰀃 2   │  │ │ │ │ │
+│  │  │  │  │  └─────────────────────────┘  │ │ │ │ │
+│  │  │  │  └───────────────────────────────┘ │ │ │ │
+│  │  │  └───────────────────────────────────┘ │ │ │
+│  │  └───────────────────────────────────────┘ │ │
+│  └─────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────┘
+
+    点击加号后：
+┌─────────────────────────────────────┐
+│  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  󰀃  +   │
+│          聊天列表          ↑          │
+│                         偏移50       │
+│                        ┌─────────┐   │
+│                        │ 🔍 扫一扫│   │
+│                        ├─────────┤   │
+│                        │ 👤 添加好友│   │
+│                        ├─────────┤   │
+│                        │ 👥 创建群聊│   │
+│                        └─────────┘   │
+└─────────────────────────────────────┘
 
     图例：
     ●●● = 头像（圆形）
@@ -244,15 +165,92 @@ class _ChatListPageState extends State<ChatListPage> {
         backgroundColor: const Color(0xFFF9FBFF),
         // 应用栏右侧的操作按钮
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add, size: 32),
-            onPressed: () {
-              print('图标按钮被点击');
-            },
+          Theme( // 包裹PopupMenuButton，自定义主题
+            data: Theme.of(context).copyWith(
+              splashColor: const Color(0xFFEAEAEA),// 点击波纹效果的颜色
+              highlightColor: const Color(0xFFEAEAEA), // 高亮颜色
+            ),
+            child: PopupMenuButton(
+              icon: const Icon(Icons.add, size: 32),  // 按钮图标：加号，大小32
+              offset: const Offset(0, 50),            // 菜单偏移量：x=0, y=50（向下偏移50）
+              shape: RoundedRectangleBorder(           // 菜单形状
+                borderRadius: BorderRadius.circular(5), // 圆角5像素
+              ),
+              color: const Color(0xFFFFFFFF),          // 菜单背景色：白色
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
+                //扫一扫
+                PopupMenuItem(
+                  value: 1,           // 选中时的返回值
+                  height: 40,         // 菜单项高度40像素
+                  onTap: () {},       // 点击回调
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,  // Row宽度自适应内容
+                    children: [
+                      Icon(IconData(0xe61e, fontFamily: 'IconFont'), size: 20), // 自定义图标
+                      SizedBox(width: 12),  // 图标和文字间距12
+                      Text('扫一扫', style: TextStyle(fontSize: 14)),
+                    ],
+                  ),
+                ),
+
+                //分割线
+                PopupMenuItem<int>(
+                  enabled: false,
+                  height: 1, // 禁用这个菜单项，以显示为分割线
+                  child: Container(
+                    height: 1,
+                    padding: const EdgeInsets.all(0),
+                    color: Colors.grey[300], // 设置分割线的颜色
+                  ),
+                ),
+
+                //添加好友
+                PopupMenuItem(
+                  value: 1,           // 选中时的返回值
+                  height: 40,         // 菜单项高度40像素
+                  onTap: () {},       // 点击回调
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.person_add, size: 20),
+                      SizedBox(width: 12),
+                      Text('添加好友', style: TextStyle(fontSize: 14)),
+                    ],
+                  ),
+                ),
+
+                //分割线
+                PopupMenuItem<int>(
+                  enabled: false,
+                  height: 1,
+                  child: Container(
+                    height: 1,
+                    padding: const EdgeInsets.all(0),
+                    color: Colors.grey[300],
+                  ),
+                ),
+
+                //创建群聊
+                PopupMenuItem(
+                  value: 2,
+                  height: 40,
+                  onTap: () {},
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.group_add, size: 20),
+                      SizedBox(width: 12),
+                      Text('创建群聊', style: TextStyle(fontSize: 14)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
 
+      //主体内容：聊天列表
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 16.0),
         child: Column(
@@ -261,51 +259,77 @@ class _ChatListPageState extends State<ChatListPage> {
             CustomSearchBox(
               isCentered: false,
               onChanged: (value) {
-                print(value);
+                //更新搜索内容
+                _onSearchFriend(value);
               },
             ),
             // Expanded让ListView填充剩余空间
             Expanded(
-              child: ListView(
-                children: [
+              //下拉刷新组件
+              child: RefreshIndicator(
+                onRefresh: () async {  // 下拉刷新时触发的回调函数
+                  _onGetChatList();    // 调用API重新获取聊天列表
+                  return Future.delayed(const Duration(milliseconds: 700)); // 延迟700ms返回
+                },
 
-                  if (topList.isNotEmpty) ...[
-                    const Padding(
-                      // 显示"置顶"标题
-                      padding: EdgeInsets.symmetric(vertical: 8.0),
-                      child: Text(
-                        "置顶",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF4C9BFF),
-                        ),
-                      ),
-                    ),
-                    // 遍历topList，为每个chat创建列表项
-                    // 使用展开操作符...将生成的组件列表展开
-                    ...topList.map((chat) =>
-                        _buildChatItem(chat, _chatList.indexOf(chat))),
-                  ],
+                child: ListView(
+                    children: [
 
-                  if (normalList.isNotEmpty) ...[
-                    const Padding(
-                      // "其他"标题
-                      padding: EdgeInsets.symmetric(vertical: 8.0),
-                      child: Text(
-                        "其他",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF4C9BFF),
+                      if (_searchList.isNotEmpty) ...[
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Text(
+                            "搜索结果",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF4C9BFF),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    ...normalList.map((chat) =>
-                        _buildChatItem(chat, _chatList.indexOf(chat))),
-                  ],
-                ],
-              ),
+                        //List 不能直接作为 child,所以要加上...展开成多个 Widget
+                        ..._searchList.map((friend) =>
+                            _buildSearchItem(friend, friend['friendId'])),
+                      ],
+
+                      if (_topList.isNotEmpty) ...[
+                        const Padding(
+                          // 显示"置顶"标题
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Text(
+                            "置顶",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF4C9BFF),
+                            ),
+                          ),
+                        ),
+                        // 遍历topList，为每个chat创建列表项
+                        // 使用展开操作符...将生成的组件列表展开
+                        ..._topList
+                            .map((chat) => _buildChatItem(chat, chat['id'])),
+                      ],
+
+                      if (_otherList.isNotEmpty) ...[
+                        const Padding(
+                          // "全部"标题
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Text(
+                            "全部",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF4C9BFF),
+                            ),
+                          ),
+                        ),
+                        ..._otherList
+                            .map((chat) => _buildChatItem(chat, chat['id'])),
+                      ],
+                    ],
+                  ),
+              )
             ),
           ],
         ),
@@ -314,26 +338,28 @@ class _ChatListPageState extends State<ChatListPage> {
   }
 
 /*  正常状态（未滑动）：
-  ┌─────────────────────────────────────────────────┐
-  │  ┌───────────────────────────────────────────┐  │
-  │  │  ●●●  张三                      14:30     │  │
-  │  │       最后一条消息内容...           󰀃 3   │  │
-  │  └───────────────────────────────────────────┘  │
-  └─────────────────────────────────────────────────┘
-
-  向左滑动后（正确效果）：
-  ┌─────────────────────────────────────────────────┐
-  │  ┌───────────────────────────────────────────┐  │
-  │  │  ●●●  张三                      14:30     │  │  [置顶]  [删除]
-  │  │       最后一条消息内容...           󰀃 3   │  │  ← 按钮在右侧
-  │  └───────────────────────────────────────────┘  │
-  └─────────────────────────────────────────────────┘*/
+ ┌─────────────────────────────────────────────────┐
+│  开始滑动：                                       │
+│  ┌─────────────────────────────────────────┐     │
+│  │  ●●●  张三                      14:30  │  ▶  │
+│  └─────────────────────────────────────────┘     │
+│                                                   │
+│  滑动中：                                         │
+│  ┌───────────────────────────────────────┐  ┌─── │
+│  │  ●●●  张三                      14:30│  │置  │
+│  └───────────────────────────────────────┘  └─── │
+│                                                   │
+│  滑动完成：                                       │
+│  ┌─────────────────────────────────────┐  ┌────┬────┐
+│  │  ●●●  张三                      14:30│  │置顶│删除│
+│  └─────────────────────────────────────┘  └────┴────┘
+└─────────────────────────────────────────────────┘*/
 
   //构建可滑动的聊天项
-  Widget _buildChatItem(ChatInfo chat, int index) {
+  Widget _buildChatItem(dynamic chat, String id) {
     // 返回Slidable组件（可左右滑动的组件）
     return Slidable(
-      key: ValueKey(index),
+      key: ValueKey(id),
       // 结束滑动的操作面板（右滑菜单）
       endActionPane: ActionPane(
         motion: const ScrollMotion(),  // 滑动动画效果
@@ -342,18 +368,18 @@ class _ChatListPageState extends State<ChatListPage> {
           // 第一个滑动按钮
           SlidableAction(
             padding: const EdgeInsets.all(0),  // 内边距为0
-            onPressed: (context) => _toggleTopStatus(index),  // 点击调用置顶切换
-            backgroundColor: Color(0xFF4C9BFF),  // 蓝色背景
+            onPressed: (context) => _onTopStatus(id, chat['isTop']),  // 点击调用置顶切换
+            backgroundColor: const Color(0xFF4C9BFF),  // 蓝色背景
             foregroundColor: Colors.white,        // 白色图标和文字
             // 根据置顶状态显示不同的图标：置顶显示图钉，不置顶显示空心图钉
-            icon: chat.isTop ? Icons.push_pin_outlined : Icons.push_pin,
+            icon: chat['isTop'] ? Icons.push_pin_outlined : Icons.push_pin,
             // 根据置顶状态显示不同的文字
-            label: chat.isTop ? '取消置顶' : '置顶',
+            label: chat['isTop'] ? '取消置顶' : '置顶',
           ),
           // 第二个滑动按钮（删除）
           SlidableAction(
             padding: const EdgeInsets.all(0),
-            onPressed: (context) => _deleteChat(index),  // 点击调用删除
+            onPressed: (context) => _onDeleteChatList(id),  // 点击调用删除
             backgroundColor: const Color(0xFFFF4C4C),    // 红色背景
             foregroundColor: Colors.white,                // 白色图标和文字
             icon: Icons.delete,  // 垃圾桶图标
@@ -363,19 +389,27 @@ class _ChatListPageState extends State<ChatListPage> {
       ),
 
       // 列表项的主要内容
-      child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10.0),  // 上下内边距10
+      child: Material(
+        color: Colors.white,      // 白色背景
+        borderRadius: BorderRadius.circular(12.0),  // 圆角12
+        // InkWell 必须放在 Material 内才能工作
+        child: InkWell( //点击波纹
+          borderRadius: BorderRadius.circular(12),  // 和Material一致的圆角
+          splashColor: const Color(0xFFEAEAEA),     // 点击波纹颜色（浅灰）
+          highlightColor: const Color(0xFFEAEAEA),  // 点击高亮颜色（浅灰）
+          child:  Container(
+        padding: const EdgeInsets.symmetric(vertical: 10.0),  // 上下内边距10
           decoration: BoxDecoration(  // 容器装饰
-            color: Colors.white,      // 白色背景
             borderRadius: BorderRadius.circular(12.0),  // 圆角12
             border: Border(
               // 底部边框
               bottom: BorderSide(
-                color: Colors.grey[200]!,  // 浅灰色
-                width: 0.5,                // 边框宽度0.5
+                color: Colors.grey[100]!,  // 浅灰色
+                width: 1,                // 边框宽度0.5
               ),
             ),
           ),
+
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Row( // 水平排列
@@ -384,7 +418,7 @@ class _ChatListPageState extends State<ChatListPage> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(25),  // 圆角25（圆形）
                   child: CachedNetworkImage(  // 缓存网络图片
-                    imageUrl: chat.avatar,     // 头像URL
+                    imageUrl: chat['portrait'],     // 头像URL
                     width: 50,                  // 宽50
                     height: 50,                 // 高50
                     fit: BoxFit.cover,          // 图片铺满整个区域
@@ -423,14 +457,14 @@ class _ChatListPageState extends State<ChatListPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween, // 两端对齐
                         children: [
                           Text(  // 用户名
-                            chat.name,
+                            chat['remark'] ?? chat['name'],
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,  // 中等粗细
                             ),
                           ),
                           Text(  // 最后消息时间
-                            chat.lastTime,
+                            DateUtil.formatTime(chat['createTime']),
                             style: TextStyle(
                               fontSize: 10,
                               color: Colors.grey[500],  // 灰色文字
@@ -449,7 +483,7 @@ class _ChatListPageState extends State<ChatListPage> {
 //Expanded确保了消息文本和未读红点始终在同一行，且红点固定在右侧，消息文本自适应剩余宽度，不会破坏布局。
                           Expanded(  // 消息文本填充剩余空间
                             child: Text(
-                              chat.lastMessage,
+                              chat['lastMsgContent']['content'],
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey[500],  // 灰色文字
@@ -459,19 +493,152 @@ class _ChatListPageState extends State<ChatListPage> {
                             ),
                           ),
                           // 如果有未读消息
-                          if (chat.unreadCount > 0)
+                          if (chat['unreadNum']  > 0)
                             Container(
-                              padding: const EdgeInsets.all(6),  // 内边距6
+                              width: 16,
+                              height: 16,
+                              padding: const EdgeInsets.all(0),  // 内边距0
                               decoration: const BoxDecoration(
                                 color: Color(0xFFFF4C4C),  // 红色背景
                                 shape: BoxShape.circle,      // 圆形
                               ),
-                              child: Text(  // 显示未读数量
-                                chat.unreadCount.toString(),
-                                style: const TextStyle(
-                                  color: Colors.white,  // 白色文字
-                                  fontSize: 10,
+                              child: Center(//居中显示
+                                child: Text(  // 显示未读数量
+                                  chat['unreadNum'] < 99
+                                      ? chat['unreadNum'].toString()
+                                      : '99',
+                                  style: const TextStyle(
+                                    color: Colors.white,  // 白色文字
+                                    fontSize: 10,
+                                  ),
                                 ),
+                              )
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          )
+          ),
+        ),
+      ),
+    );
+  }
+
+ /*
+  ┌─────────────────────────────────────────────────┐
+  │  Material (圆角12, 白色背景)                      │
+  │  ┌─────────────────────────────────────────────┐ │
+  │  │  InkWell (点击波纹效果)                       │ │
+  │  │  ┌─────────────────────────────────────────┐ │ │
+  │  │  │  Container (上下内边距10)                │ │ │
+  │  │  │  ┌─────────────────────────────────────┐ │ │ │
+  │  │  │  │  Padding (左右内边距8)               │ │ │ │
+  │  │  │  │  ┌─────────────────────────────────┐ │ │ │ │
+  │  │  │  │  │  Row                            │ │ │ │ │
+  │  │  │  │  │  ┌───────────┐    ┌──────────┐ │ │ │ │ │
+  │  │  │  │  │  │           │    │          │ │ │ │ │ │
+  │  │  │  │  │  │   头像    │    │  姓名    │ │ │ │ │ │
+  │  │  │  │  │  │  50x50    │    │  备注    │ │ │ │ │ │
+  │  │  │  │  │  │  圆形     │    │          │ │ │ │ │ │
+  │  │  │  │  │  │           │    │          │ │ │ │ │ │
+  │  │  │  │  │  └───────────┘    └──────────┘ │ │ │ │ │
+  │  │  │  │  │  ←──间距12──→                    │ │ │ │ │
+  │  │  │  │  └─────────────────────────────────┘ │ │ │ │
+  │  │  │  └─────────────────────────────────────┘ │ │ │
+  │  │  └─────────────────────────────────────────┘ │ │
+  │  └─────────────────────────────────────────────┘ │
+  └─────────────────────────────────────────────────┘
+*/
+  Widget _buildSearchItem(dynamic friend, String id) {
+    return Material(
+      borderRadius: BorderRadius.circular(12),// 圆角12
+      color: Colors.white,                       // 白色背景
+      // InkWell 必须放在 Material 内才能工作
+      child: InkWell(
+        onTap: () {
+          // 添加点击事件
+        },
+        borderRadius: BorderRadius.circular(12),  // 和Material一致的圆角
+        splashColor: const Color(0xFFEAEAEA),     // 点击波纹颜色（浅灰）
+        highlightColor: const Color(0xFFEAEAEA),  // 点击高亮颜色（浅灰）
+
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10.0),  // 上下内边距10
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12.0), //// 圆角12
+            border: Border(
+              bottom: BorderSide( // 底部边框作为分割线
+                color: Colors.grey[200]!,
+                width: 0.5,
+              ),
+            ),
+          ),
+
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),  // 左右内边距8
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(25),// 圆角25（圆形，因为宽高50）
+                  child: CachedNetworkImage(
+                    imageUrl: friend['portrait'], // 从friend对象获取头像URL
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+
+                    // 加载中的占位图
+                    placeholder: (context, url) => Container(
+                      width: 50,
+                      height: 50,
+                      color: Colors.grey[300],  // 灰色背景
+                      child: const Center(
+                        child: CircularProgressIndicator(  // 旋转加载圈
+                          color: Color(0xffffffff),  // 白色
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    ),
+
+                    // 加载失败的占位图
+                    errorWidget: (context, url, error) => Container(
+                      width: 50,
+                      height: 50,
+                      color: Colors.grey[300],
+                      child: Image.asset('assets/images/default-portrait.jpeg'),  // 默认头像
+                    ),
+
+                  ),
+                ),
+
+                //分割线
+                const SizedBox(width: 12),
+
+                Expanded(  // 填充剩余所有空间
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,  // 左对齐
+                    children: [
+                      Row(  // 姓名和备注放在同一行
+                        children: [
+                          // 姓名
+                          Text(
+                            friend['name'],
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+
+                          // 如果有备注，显示在括号里
+                          if (friend['remark']!=null && friend['remark']?.toString().trim() != '')
+                            Text(
+                              '(${friend['remark']})',  // 格式： (备注)
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                         ],
@@ -481,7 +648,9 @@ class _ChatListPageState extends State<ChatListPage> {
                 ),
               ],
             ),
-          )),
+          ),
+        ),
+      ),
     );
   }
 }

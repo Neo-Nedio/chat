@@ -10,6 +10,7 @@ class ChatListApi {
 
   ChatListApi._internal();
 
+  //获取会话列表，返回 tops、others 等
   Future<Map<String, dynamic>> list() async {
     final response = await _dio.get('/v1/api/chat-list/list');
     return response.data;

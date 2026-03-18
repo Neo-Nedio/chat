@@ -24,7 +24,7 @@ class FriendApi {
   Future<Map<String, dynamic>> search(String friendInfo) async {
     final response = await _dio.post(
       '/v1/api/friend/search',
-      data: {'friendInfo': friendInfo},
+      data: {'searchInfo': friendInfo},
     );
     return response.data;
   }
