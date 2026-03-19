@@ -7,6 +7,8 @@ import '../../components/custom_search_box/index.dart';
 
 final _friendApi = FriendApi();
 
+
+//通讯
 class ContactsPage extends StatefulWidget {
   const ContactsPage({super.key});
 

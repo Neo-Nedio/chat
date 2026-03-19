@@ -4,10 +4,16 @@ import 'package:flutter/material.dart';
 class CustomTextButton extends StatelessWidget {
   final String value;
   final GestureTapCallback onTap;
+  final Color? textColor;
   final double fontSize;
 
-  const CustomTextButton(this.value,
-      {super.key, required this.onTap, this.fontSize = 12});
+  const CustomTextButton(
+      this.value, {
+        super.key,
+        required this.onTap,
+        this.fontSize = 12,
+        this.textColor = const Color(0xFF4C9BFF),
+      });
 
 /*  CustomTextButton
   ┌─────────────────────────────────────┐
@@ -25,7 +31,7 @@ class CustomTextButton extends StatelessWidget {
         value,
         style: TextStyle(
           fontSize: fontSize,
-          color: const Color(0xFF4C9BFF),//蓝色
+          color: textColor,
         ),
       ),
     );
