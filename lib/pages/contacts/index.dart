@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../api/chat_group_api.dart';
 import '../../api/friend_api.dart';
+import '../../api/notify_api.dart';
 import '../../components/custom_portrait/index.dart';
 import '../../components/custom_search_box/index.dart';
+import '../../components/custom_text_button/index.dart';
 
 
 final _friendApi = FriendApi();
+final _chatGroupApi = ChatGroupApi();
+final _notifyApi = NotifyApi();
 
-
-//通讯
+//通讯页面
 class ContactsPage extends StatefulWidget {
   const ContactsPage({super.key});
 
@@ -19,13 +24,23 @@ class ContactsPage extends StatefulWidget {
 class _ContactsPageState extends State<ContactsPage> {
   List<String> tabs = ['我的群聊', '我的好友', '好友通知'];  // 标签页
   int selectedIndex = 1;        // 当前选中的标签索引（默认选中"我的好友"）
+  String currentUserId = '';   //获取当前用户id
   List<dynamic> _friendList = []; // 好友列表数据（按分组）
+  List<dynamic> _chatGroupList = [];
+  List<dynamic> _notifyFriendList = [];
 
   @override
   void initState() {
     super.initState();
-    // 只在进入页面时拉取一次好友列表，不要放在 build/getContent 里，否则每次重建都会请求
+    SharedPreferences.getInstance().then((prefs) {
+      setState(() {
+        currentUserId = prefs.getString('userId') ?? '';
+      });
+    });
+    //不要放在 build/getContent 里，否则每次重建都会请求
+    _onChatGroupList();
     _onFriendList();
+    _onNotifyFriendList();
   }
 
   // 更新好友列表
@@ -34,6 +49,28 @@ class _ContactsPageState extends State<ContactsPage> {
       if (res['code'] == 0) {
         setState(() {
           _friendList = res['data'];
+        });
+      }
+    });
+  }
+
+  //群列表
+  void _onChatGroupList() {
+    _chatGroupApi.list().then((res) {
+      if (res['code'] == 0) {
+        setState(() {
+          _chatGroupList = res['data'];
+        });
+      }
+    });
+  }
+
+  //好友通知
+  void _onNotifyFriendList() {
+    _notifyApi.friendList().then((res) {
+      if (res['code'] == 0) {
+        setState(() {
+          _notifyFriendList = res['data'];
         });
       }
     });
@@ -49,15 +86,26 @@ class _ContactsPageState extends State<ContactsPage> {
   //页面
   Widget getContent(String tab) {
     switch (tab) {
+    // 用...将列表展开
       case '好友通知':
-        return Container(
-          color: Colors.red[100],
-          child: const Center(child: Text('好友通知内容')),
+        return ListView(
+          children: [
+            ..._notifyFriendList.map((notify) => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: _buildNotifyFriendItem(notify),
+            )),
+          ],
         );
       case '我的群聊':
-        return Container(
-          color: const Color(0xFFEDF2F9),
-          child: const Center(child: Text('我的群聊内容')),
+        return ListView(
+          children: [
+            ..._chatGroupList.map(
+                  (group) => Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: _buildChatGroupItem(group),
+              ),
+            ),
+          ],
         );
       case '我的好友':
         return ListView(
@@ -152,6 +200,258 @@ class _ContactsPageState extends State<ContactsPage> {
                               friend['remark']?.toString().trim() != '')
                             Text(
                               '(${friend['remark']})',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  //好友通知项
+  Widget _buildNotifyFriendItem(dynamic notify) {
+    //判断通知方向
+    bool isFromCurrentUser = currentUserId == notify['fromId'];
+
+    return Material(
+      borderRadius: BorderRadius.circular(12),
+      color: Colors.white,
+      child: InkWell(
+        onTap: () {
+          // 添加点击事件
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12.0),
+            border: Border(
+              bottom: BorderSide(
+                color: Colors.grey[200]!,
+                width: 0.5,
+              ),
+            ),
+          ),
+
+          //好友通知
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Row(
+              children: [
+                //头像
+                CustomPortrait(
+                    url: isFromCurrentUser
+                        ? notify['toPortrait'] // 我发起的 → 显示对方头像
+                        : notify['fromPortrait']),// 别人发来的 → 显示对方头像
+
+                //间隔
+                const SizedBox(width: 12),
+
+                //文字区域
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //用户名
+                      Row(
+                        children: [
+                          Text(
+                            isFromCurrentUser
+                                ? notify['toName']// 我发起的 → 显示对方名字
+                                : notify['fromName'], // 别人发来的 → 显示对方名字
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(width: 2),
+                          //时间
+                          // const SizedBox(width: 2),
+                          // Text(
+                          //   DateUtil.formatTime(notify['createTime']),
+                          //   style: TextStyle(
+                          //       fontSize: 12, color: Colors.grey[600]),
+                          // )
+                        ],
+                      ),
+
+                      //上下间隔
+                      const SizedBox(height: 2),
+
+                      //状态提示行
+                      Text(
+                        _getNotifyContentTip(
+                            notify['status'], isFromCurrentUser),
+                        style: const TextStyle(
+                            fontSize: 12, color: Color(0xFF4C9BFF)),
+                      ),
+
+                      //上下间隔
+                      const SizedBox(height: 2),
+
+
+                      //申请内容行
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween, // 两端对齐
+                        children: [
+                          Expanded(
+                            child: Text(
+                              overflow: TextOverflow.ellipsis,  // 超出显示省略号
+                              maxLines: 1,                       // 最多1行
+                              notify['content'],                  // 申请内容
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.grey[600]),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+
+                //左右间隔
+                const SizedBox(width: 20),
+
+                //操作区域
+                _getNotifyOperateTip(notify['status'], isFromCurrentUser),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  //获得状态提示
+  String _getNotifyContentTip(status, isFromCurrentUser) {
+    // 别人发来的请求（我是接收方）
+    if (!isFromCurrentUser) return "请求加你为好友";
+
+    switch (status) {
+      case "wait":
+        {
+          return "正在验证你的请求";
+        }
+      case "reject":
+        {
+          return "对方已拒绝你的请求";
+        }
+      case "agree":
+        {
+          return "对方已同意你的请求";
+        }
+    }
+    return "";
+  }
+
+  //获得操作提示
+  Widget _getNotifyOperateTip(status, isFromCurrentUser) {
+    // 情况1：别人发来的待处理请求 → 显示操作按钮
+    if (!isFromCurrentUser && status == "wait") {
+      return Row(
+        children: [
+          CustomTextButton("同意", onTap: () {}),
+
+          const SizedBox(width: 10),
+
+          CustomTextButton(
+            "取消",
+            onTap: () {},
+            textColor: Colors.grey[600],
+          ),
+          const SizedBox(width: 5), // 右边距
+        ],
+      );
+    }
+
+    // 情况2：我方请求 → 显示状态文字
+    switch (status) {
+      case "wait":
+        {
+          return Text(
+            "正在验证",
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          );
+        }
+      case "reject":
+        {
+          return Text(
+            "对方已拒绝",
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          );
+        }
+      case "agree":
+        {
+          return Text(
+            "对方已同意",
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          );
+        }
+    }
+    return const Text("");
+  }
+
+  Widget _buildChatGroupItem(dynamic group) {
+    return Material(
+      borderRadius: BorderRadius.circular(12),
+      color: Colors.white,
+      child: InkWell(
+        onTap: () {
+          // 添加点击事件
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12.0),
+            border: Border(
+              bottom: BorderSide(
+                color: Colors.grey[200]!,
+                width: 0.5,
+              ),
+            ),
+          ),
+
+          //主体内容
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Row(
+              children: [
+
+                //群头像
+                CustomPortrait(url: group['portrait']),
+
+                //固定间距
+                const SizedBox(width: 12),
+
+                //文字区域（填充剩余空间）
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            group['name'], // 群名称
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          if (group['groupRemark'] != null &&
+                              group['groupRemark']?.toString().trim() != '') // 群备注（条件显示）
+                            Text(
+                              '(${group['groupRemark']})',
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
