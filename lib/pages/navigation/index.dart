@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../chat_list/index.dart';
+import '../contacts/index.dart';
 import '../mine/mine.dart';
 import '../talk/index.dart';
 
@@ -66,7 +67,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
         },
         children: [
           ChatListPage(),
-          Center(child: Text('通讯列表', style: TextStyle(fontSize: 24))),
+          ContactsPage(),
           Talk(),
           Mine(),
         ]
