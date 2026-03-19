@@ -1,13 +1,11 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../api/user_api.dart';
 import '../../components/custom_material_button/index.dart';
 import '../../components/custom_portrait/index.dart';
-import '../login/index.dart';
 
-final _userApi = UserApi();
 
 //我的页面
 class Mine extends StatefulWidget {
@@ -40,10 +38,11 @@ class _MinePageState extends State<Mine> {
   void _handlerLogout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear(); // 清除所有本地数据
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => LoginPage()),
-      (route) => false,// 移除所有路由
-    );
+    // Navigator.of(context).pushAndRemoveUntil(
+    //   MaterialPageRoute(builder: (context) => LoginPage()),
+    //   (route) => false,
+    // );
+    Get.offAndToNamed('/login');
   }
 /*
   ┌─────────────────────────────────────┐
@@ -205,7 +204,9 @@ class _MinePageState extends State<Mine> {
                   const SizedBox(height: 2),
                   _primarySelectButton('系统通知', 'mine-notify.png', () {}),
                   const SizedBox(height: 30),
-                  _minorSelectButton('修改密码', 'mine-password.png', () {}),
+                  _minorSelectButton('修改密码', 'mine-password.png',  () {
+                    Get.toNamed('/update_password');
+                  }),
                   const SizedBox(height: 2),
                   _minorSelectButton('关于我们', 'mine-about.png', () {}),
                   const SizedBox(height: 2),
