@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../components/custom_material_button/index.dart';
+import '../../components/count_down_register/index.dart';
 import '../../components/custom_text_field/index.dart';
 import '../../utils/getx_config/config.dart';
 import 'logic.dart';

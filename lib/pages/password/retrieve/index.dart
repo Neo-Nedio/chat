@@ -1,5 +1,5 @@
 
-import '../../../components/custom_material_button/index.dart';
+import '../../../components/countdown_retrieve_password/index.dart';
 import '../../../components/custom_text_field/index.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
