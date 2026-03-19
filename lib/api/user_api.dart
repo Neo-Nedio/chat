@@ -14,6 +14,15 @@ class UserApi {
     return _instance;
   }
 
+  //扫码登录
+  Future<Map<String, dynamic>> qrLogin(String? key) async {
+    final response = await _dio.post(
+      '/v1/api/login/qr',
+      data: {'key': key},
+    );
+    return response.data;
+  }
+
   // 登录接口
   Future<Map<String, dynamic>> login(String account, String password) async {
     try {
@@ -65,7 +74,8 @@ class UserApi {
   }
 
   //用户注册
-  Future<Map<String, dynamic>> register(String username,String account,String password,String email,String code) async {
+  Future<Map<String, dynamic>> register(
+      String username,String account,String password,String email,String code) async {
     final response = await _dio.post(
       '/v1/api/user/register',
       data: {
@@ -80,7 +90,8 @@ class UserApi {
   }
 
   //忘记密码
-  Future<Map<String, dynamic>> forget(String account,String password,String email,String code) async {
+  Future<Map<String, dynamic>> forget(
+      String account,String password,String email,String code) async {
     final response = await _dio.post(
       '/v1/api/user/forget',
       data: {
@@ -94,7 +105,8 @@ class UserApi {
   }
 
   //修改密码
-  Future<Map<String, dynamic>> updatePassword(String oldPassword,String newPassword,String confirmPassword) async {
+  Future<Map<String, dynamic>> updatePassword(
+      String oldPassword,String newPassword,String confirmPassword) async {
     final response = await _dio.post(
       '/v1/api/user/update/password',
       data: {
