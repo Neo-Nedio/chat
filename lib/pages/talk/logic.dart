@@ -38,7 +38,7 @@ class TalkLogic extends GetxController {
     if (!hasMore || isLoading) return;  // 没有更多或正在加载时返回
 
     isLoading = true;  // 显示加载状态
-    update();
+    update([const Key("talk")]);
 
     _talkApi.list(index, 10).then((res) { // 每页10条
       if (res['code'] == 0) {
@@ -51,14 +51,14 @@ class TalkLogic extends GetxController {
           index += newTalks.length; // 更新索引
         }
         isLoading = false;
-        update();
+        update([const Key("talk")]);
       } else {
         isLoading = false;
-        update();
+        update([const Key("talk")]);
       }
     }).catchError((_) {
       isLoading = false; // 错误处理
-      update();
+      update([const Key("talk")]);
     });
   }
 
@@ -67,7 +67,7 @@ class TalkLogic extends GetxController {
     talkList.clear();  // 清空列表
     index = 0;         // 重置索引
     hasMore = true;    // 重置更多标志
-    update();
+    update([const Key("talk")]);
     onTalkList(); // 重新加载
   }
 

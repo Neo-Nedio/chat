@@ -9,21 +9,22 @@ import '../talk/index.dart';
 import 'logic.dart';
 
 //主页导航栏
-class NavigationPage extends CustomWidgetObx<NavigationLogic> {
-  const NavigationPage({required super.key});
+//把整体CustomWidgetObx包括改为上下部分单独Obx，优化性能
+class NavigationPage extends CustomWidget<NavigationLogic> {
+  NavigationPage({required super.key});
 
   Widget _buildPage(int index) {
     switch (index) {
       case 0:
-        return ChatListPage();
+        return ChatListPage(key: const Key('chat_list'));
       case 1:
-        return ContactsPage();
+        return ContactsPage(key: const Key('contacts'));
       case 2:
-        return TalkPage();
+        return TalkPage(key: const Key('talk'));
       case 3:
-        return MinePage();
+        return MinePage(key: const Key('mine'));
       default:
-        return ChatListPage();
+        return ChatListPage(key: const Key('chat_list'));
     }
   }
 
@@ -34,30 +35,32 @@ class NavigationPage extends CustomWidgetObx<NavigationLogic> {
       body: Obx(() => _buildPage((controller.currentIndex.value))),
 
       // 下半部分：底部导航栏
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: controller.currentIndex.value,
-        onTap: controller.onTap,
+      bottomNavigationBar: Obx(
+          () =>BottomNavigationBar(
+            currentIndex: controller.currentIndex.value,
+            onTap: controller.onTap,
 
-        selectedItemColor: Theme.of(context).primaryColor,  // 选中文字颜色
-        unselectedItemColor: Colors.grey,  // 未选中文字颜色
-        showUnselectedLabels: true,  // 显示未选中标签
-        backgroundColor: const Color(0xFFEDF2F9),  // 背景色
-        type: BottomNavigationBarType.fixed,  // 固定类型（4个以上用fixed，切换时自有颜色变化，shifting有大小变化）
+            selectedItemColor: Theme.of(context).primaryColor,  // 选中文字颜色
+            unselectedItemColor: Colors.grey,  // 未选中文字颜色
+            showUnselectedLabels: true,  // 显示未选中标签
+            backgroundColor: const Color(0xFFEDF2F9),  // 背景色
+            type: BottomNavigationBarType.fixed,  // 固定类型（4个以上用fixed，切换时自有颜色变化，shifting有大小变化）
 
-        items: List.generate(controller.unselectedIcons.length, (index) {
-          return BottomNavigationBarItem(
-            // 根据选中状态显示不同图标
-            icon: Image.asset(
-              controller.currentIndex.value == index
-                  ? controller.selectedIcons[index]
-                  : controller.unselectedIcons[index],
-              width: 26,
-              height: 26,
-            ),
-            label: controller.name[index],
-          );
-        }),
-      ),
+            items: List.generate(controller.unselectedIcons.length, (index) {
+              return BottomNavigationBarItem(
+                // 根据选中状态显示不同图标
+                icon: Image.asset(
+                  controller.currentIndex.value == index
+                      ? controller.selectedIcons[index]
+                      : controller.unselectedIcons[index],
+                  width: 26,
+                  height: 26,
+                ),
+                label: controller.name[index],
+              );
+            }),
+          ),
+      )
     );
   }
 }

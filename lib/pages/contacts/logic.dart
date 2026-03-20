@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,7 +22,7 @@ class ContactsLogic extends GetxController {
   void init() {
     SharedPreferences.getInstance().then((prefs) {
       currentUserId = prefs.getString('userId') ?? '';
-      update();
+      update([const Key("contacts")]);
     });
     //不要放在getContent里面，不然会无限刷新
     onNotifyFriendList();
@@ -34,7 +35,7 @@ class ContactsLogic extends GetxController {
     _friendApi.list().then((res) {
       if (res['code'] == 0) {
         friendList = res['data'];
-        update();
+        update([const Key("contacts")]);
       }
     });
   }
@@ -44,7 +45,7 @@ class ContactsLogic extends GetxController {
     _chatGroupApi.list().then((res) {
       if (res['code'] == 0) {
         chatGroupList = res['data'];
-        update();
+        update([const Key("contacts")]);
       }
     });
   }
@@ -54,7 +55,7 @@ class ContactsLogic extends GetxController {
     _notifyApi.friendList().then((res) {
       if (res['code'] == 0) {
         notifyFriendList = res['data'];
-        update();
+        update([const Key("contacts")]);
       }
     });
   }
@@ -62,6 +63,6 @@ class ContactsLogic extends GetxController {
   // 标签切换
   void handlerTabTapped(int index) {
     selectedIndex = index;
-    update();
+    update([const Key("contacts")]);
   }
 }

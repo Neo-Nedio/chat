@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -49,7 +50,7 @@ class QRCodeScanLogic extends GetxController {
     // 2. 更新UI状态
     qrText = code; // 保存扫描结果
     isScanning = false; // 停止扫描
-    update();
+    update([const Key("qr_code_scan")]);
 
     // 3. 暂停摄像头（节省资源）
     await scannerController.pause();
@@ -74,7 +75,7 @@ class QRCodeScanLogic extends GetxController {
   void restartScanning() {
     qrText = null; // 清空扫描结果
     isScanning = true; // 恢复扫描状态
-    update();
+    update([const Key("qr_code_scan")]);
     unawaited(scannerController.start()); // 重新启动摄像头
   }
 

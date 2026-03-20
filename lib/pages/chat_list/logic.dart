@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
 import '../../api/chat_list_api.dart';
@@ -16,7 +17,7 @@ class ChatListLogic extends GetxController {
       if (res['code'] == 0) {
         topList = res['data']['tops'];
         otherList = res['data']['others'];
-        update();
+        update([const Key("chat_list")]);
       }
     });
   }
@@ -41,14 +42,14 @@ class ChatListLogic extends GetxController {
   void onSearchFriend(String friendInfo) {
     if (friendInfo.trim() == '') { // 搜索框为空
       searchList = [];  // 清空搜索结果
-      update();
+      update([const Key("chat_list")]);
       return;
     }
     //获取搜索结果
     _friendApi.search(friendInfo).then((res) {
       if (res['code'] == 0) {
         searchList = res['data'];
-        update();
+      update([const Key("chat_list")]);
       }
     });
   }
