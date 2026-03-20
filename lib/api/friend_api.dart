@@ -28,4 +28,13 @@ class FriendApi {
     );
     return response.data;
   }
+
+  //扫码添加好友
+  Future<Map<String, dynamic>> addFriendByQr(String qrCode) async {
+    final response = await _dio.post(
+      '/v1/api/friend/add/qr',
+      data: {'qrCode': qrCode},
+    );
+    return response.data;
+  }
 }

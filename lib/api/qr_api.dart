@@ -18,4 +18,11 @@ class QrApi {
     final response = await _dio.get('/qr/code/status', data: {'key': key});
     return response.data;
   }
+
+  //获取二维码 key
+  Future<Map<String, dynamic>> code() async {
+    final response =
+    await _dio.get('/qr/code', queryParameters: {'action': 'mine'});
+    return response.data;
+  }
 }
