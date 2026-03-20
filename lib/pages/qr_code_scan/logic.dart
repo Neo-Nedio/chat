@@ -14,6 +14,13 @@ class QRCodeScanLogic extends GetxController {
   bool isScanning = true; // 是否正在扫描（防重复扫描）
 
   @override
+  void onInit() {
+    super.onInit();
+    //初始化控制器
+    scannerController = MobileScannerController();
+  }
+
+  @override
   void onReady() {
     super.onReady();
     if (GetPlatform.isAndroid) {
@@ -23,10 +30,11 @@ class QRCodeScanLogic extends GetxController {
       unawaited(// 不等待Future完成，避免阻塞UI
          scannerController.stop()// 先停止摄像头
              .then((_) => scannerController.start())); // 停止后再启动
-    }
-    /*iOS 的摄像头系统设计更加容错
+    }else {//else防止重复启动
+      /*iOS 的摄像头系统设计更加容错
       支持"优雅恢复"：热重载后能自动重建连接*/
-    unawaited(scannerController.start()); // 非Android平台直接启动
+      unawaited(scannerController.start()); // 非Android平台直接启动
+    }
   }
 
   //检测扫描结果
