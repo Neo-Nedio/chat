@@ -16,7 +16,12 @@ import 'ControllerBinding.dart';
 
 class AppRoutes {
   static List<GetPage> pageRoute = [
-    GetPage(name: '/', page: () => const CustomBottomNavigationBar()),
+    GetPage(
+      name: '/',
+      page: () =>  NavigationPage(
+        key: const Key('main'),
+      ),
+    ),
     GetPage(
       name: '/login',
       page: () => LoginPage(
