@@ -7,6 +7,7 @@ import '../../api/friend_api.dart';
 import '../../components/custom_portrait/index.dart';
 import '../../components/custom_search_box/index.dart';
 import '../../utils/date.dart';
+import '../qr_code_scan/index.dart';
 
 
 final _chatListApi = ChatListApi();
@@ -177,7 +178,14 @@ class _ChatListPageState extends State<ChatListPage> {
                 PopupMenuItem(
                   value: 1,           // 选中时的返回值
                   height: 40,         // 菜单项高度40像素
-                  onTap: () {},       // 点击回调
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const QRCodeScannerPage(),
+                      ),
+                    );
+                  },
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,  // Row宽度自适应内容
                     children: [

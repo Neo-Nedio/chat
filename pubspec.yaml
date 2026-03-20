@@ -85,6 +85,8 @@ dependencies:
   intl: ^0.20.2
   web_socket_channel: ^3.0.1
 
+  audioplayers: ^6.1.0
+
 
 
 dev_dependencies:
@@ -113,6 +115,7 @@ flutter:
   assets:
     - assets/
     - assets/images/
+    - assets/sounds/
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
