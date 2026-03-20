@@ -7,6 +7,7 @@ import '../../pages/chat_list/logic.dart';
 import '../../pages/contacts/logic.dart';
 import '../../pages/login/logic.dart';
 import '../../pages/mine/logic.dart';
+import '../../pages/mine/mine_qr_code/logic.dart';
 import '../../pages/navigation/logic.dart';
 import '../../pages/password/retrieve/logic.dart';
 import '../../pages/password/update/logic.dart';
@@ -30,5 +31,6 @@ class ControllerBinding extends Bindings {
     Get.lazyPut(() => QRCodeScanLogic());
     Get.lazyPut(() => QRLoginAffirmLogic());
     Get.lazyPut(() => NavigationLogic());
+    Get.lazyPut(() => MineQRCodeLogic());
   }
 }

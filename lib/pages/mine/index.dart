@@ -157,8 +157,11 @@ class MinePage extends CustomWidget<MineLogic> {
                       ),
 
                       //右侧图标
-                      const Icon(IconData(0xe615, fontFamily: 'IconFont'),
-                          size: 45)
+                      CustomMaterialButton(
+                          child: const Icon(
+                              IconData(0xe615, fontFamily: 'IconFont'),
+                              size: 45),
+                          onTap: () => Get.toNamed('/mine_qr_code'))
                     ],
                   ),
                 ),
