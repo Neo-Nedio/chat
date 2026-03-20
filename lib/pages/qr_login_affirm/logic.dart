@@ -32,8 +32,9 @@ class QRLoginAffirmLogic extends GetxController {
             fontSize: 16.0);
       }
 
-      // 无论成功失败，都跳转到首页，并清除所有历史路由
-      Get.offAllNamed("/");
+      // Get.offAllNamed("/");无论成功失败，都跳转到首页，并清除所有历史路由
+      //一直回退到跟路由
+      Get.until((route) => Get.currentRoute == "/");
     });
   }
 }

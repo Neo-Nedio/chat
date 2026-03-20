@@ -23,6 +23,10 @@ class ContactsLogic extends GetxController {
       currentUserId = prefs.getString('userId') ?? '';
       update();
     });
+    //不要放在getContent里面，不然会无限刷新
+    onNotifyFriendList();
+    onChatGroupList();
+    onFriendList();
   }
 
   // 更新好友列表

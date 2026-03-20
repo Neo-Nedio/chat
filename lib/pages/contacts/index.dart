@@ -15,10 +15,6 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
   @override
   init(BuildContext context) {
     controller.init();
-    //不要放在getContent里面，不然会无限刷新
-    controller.onNotifyFriendList();
-    controller.onChatGroupList();
-    controller.onFriendList();
   }
 
   //页面
