@@ -1,48 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../components/custom_material_button/index.dart';
 import '../../components/custom_portrait/index.dart';
+import '../../utils/getx_config/config.dart';
+import 'logic.dart';
 
 
 //我的页面
-class Mine extends StatefulWidget {
-  const Mine({super.key});
+class MinePage extends CustomWidget<MineLogic> {
+  MinePage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _MinePageState();
-}
-
-class _MinePageState extends State<Mine> {
-  late dynamic currentUserInfo = {};
-
-  @override
-  void initState() {
-    super.initState();
-    _onGetCurrentUserInfo();
-  }
-
-  //获取用户信息
-  void _onGetCurrentUserInfo() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      currentUserInfo['name'] = prefs.getString('username');
-      currentUserInfo['portrait'] = prefs.getString('portrait');
-      currentUserInfo['account'] = prefs.getString('account');
-    });
-  }
-
-  //退出登录
-  void _handlerLogout() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // 清除所有本地数据
-    // Navigator.of(context).pushAndRemoveUntil(
-    //   MaterialPageRoute(builder: (context) => LoginPage()),
-    //   (route) => false,
-    // );
-    Get.offAndToNamed('/login');
+  void init(BuildContext context) {
+    controller.init();
   }
 /*
   ┌─────────────────────────────────────┐
@@ -78,7 +50,7 @@ class _MinePageState extends State<Mine> {
   └─────────────────────────────────────┘
   */
   @override
-  Widget build(BuildContext context) {
+  Widget buildWidget(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FBFF), // 浅蓝色背景
       body: Column(
@@ -112,7 +84,7 @@ class _MinePageState extends State<Mine> {
                     borderRadius: BorderRadius.circular(35),
                   ),
                   child: CustomPortrait(
-                      url: currentUserInfo['portrait'] ?? '',
+                      url: controller.currentUserInfo['portrait'] ?? '',
                       size: 70,
                       radius: 35),
                 ),
@@ -157,7 +129,7 @@ class _MinePageState extends State<Mine> {
                                     child: Opacity(
                                       opacity: 0,  // 完全透明
                                       child: Text(  // 透明文字
-                                        currentUserInfo['name'] ?? '',
+                                        controller.currentUserInfo['name'] ?? '',
                                         style: const TextStyle(fontSize: 16),
                                       ),
                                     ),
@@ -166,7 +138,7 @@ class _MinePageState extends State<Mine> {
                               ),
                               // 实际显示的文字
                               Text(
-                                currentUserInfo['name'] ?? '',
+                                controller.currentUserInfo['name'] ?? '',
                                 style: const TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold),
                               ),
@@ -177,7 +149,7 @@ class _MinePageState extends State<Mine> {
 
                           //账号信息
                           Text(
-                            '账号：${currentUserInfo['account'] ?? ''}',
+                            '账号：${controller.currentUserInfo['account'] ?? ''}',
                             style: TextStyle(
                                 fontSize: 12, color: Colors.grey[700]),
                           ),
@@ -215,7 +187,7 @@ class _MinePageState extends State<Mine> {
                   _leastSelectButton('切换账号', () {}),
                   const SizedBox(height: 2),
                   _leastSelectButton(
-                      '退出', color: const Color(0xfffff4c4c), _handlerLogout),
+                      '退出', color: const Color(0xfffff4c4c), controller.handlerLogout),
                 ],
               ),
             ),

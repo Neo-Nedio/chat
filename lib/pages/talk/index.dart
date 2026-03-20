@@ -1,101 +1,24 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import '../../api/talk_api.dart';
-import '../../api/user_api.dart';
 import '../../components/custom_portrait/index.dart';
 import '../../components/custom_text_button/index.dart';
 import '../../utils/date.dart';
+import '../../utils/getx_config/config.dart';
+import 'logic.dart';
 
 
-final _talkApi = TalkApi();
-final _userApi = UserApi();
-
-class Talk extends StatefulWidget {
-  const Talk({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _TalkPageState();
-}
-
-class _TalkPageState extends State<Talk> {
-  final List<dynamic> _talkList = [];  // 说说列表数据
-  int _index = 0;                       // 分页索引
-  bool _hasMore = true;                  // 是否还有更多数据
-  bool _isLoading = false;               // 是否正在加载
-  final ScrollController _scrollController = ScrollController(); // 滚动控制器
+class TalkPage extends CustomWidget<TalkLogic> {
+  TalkPage({super.key});
 
   @override
-  void initState() {
-    super.initState();
-    _onTalkList();           // 首次加载数据
-    _scrollController.addListener(_scrollListener); // 添加滚动监听
+  void init(BuildContext context) {
+    controller.init();
   }
+
 
   @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  //监听器
-  void _scrollListener() {
-    // 当滚动到底部时
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
-      _onTalkList();  // 加载更多数据
-    }
-  }
-
-  void _onTalkList() {
-    if (!_hasMore || _isLoading) return;  // 没有更多或正在加载时返回
-
-    setState(() {
-      _isLoading = true;  // 显示加载状态
-    });
-
-    _talkApi.list(_index, 10).then((res) {  // 每页10条
-      if (res['code'] == 0) {
-        final List<dynamic> newTalks = res['data'];
-
-        setState(() {
-          if (newTalks.isEmpty) {
-            _hasMore = false;  // 没有更多数据
-          } else {
-            _talkList.addAll(newTalks);  // 追加新数据
-            _index += newTalks.length;   // 更新索引
-          }
-          _isLoading = false;
-        });
-      } else {
-        setState(() { _isLoading = false; });
-      }
-    }).catchError((_) {
-      setState(() { _isLoading = false; });  // 错误处理
-    });
-  }
-
-  //下拉刷新
-  Future<void> _refreshData() async {
-    setState(() {
-      _talkList.clear();  // 清空列表
-      _index = 0;         // 重置索引
-      _hasMore = true;    // 重置更多标志
-    });
-    _onTalkList();        // 重新加载
-  }
-
-  // 获取图片URL
-  Future<String> _onGetImg(String fileName, String userId) async {
-    dynamic res = await _userApi.getImg(fileName, userId);
-    if (res['code'] == 0) {
-      return res['data'];  // 返回图片URL
-    }
-    return '';  // 失败返回空字符串
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget buildWidget(BuildContext context) {
   /*
     ┌─────────────────────────────────────┐
     │  ← 说说                    发表 ▶  │ ← AppBar
@@ -141,13 +64,13 @@ class _TalkPageState extends State<Talk> {
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         //刷新组件
         child: RefreshIndicator(
-          onRefresh: _refreshData,
+          onRefresh: controller.refreshData,
           child: ListView.builder(
-            controller: _scrollController,
-            itemCount: _talkList.length + 1, // +1 用于底部footer
+            controller: controller.scrollController,
+            itemCount: controller.talkList.length + 1, // +1 用于底部footer
             itemBuilder: (context, index) {
-              if (index < _talkList.length) {
-                return _buildTalkItem(_talkList[index]); // 说说项
+              if (index < controller.talkList.length) {
+                return _buildTalkItem(controller.talkList[index]); // 说说项
               } else {
                 return _buildFooter(); // 底部加载更多
               }
@@ -160,7 +83,7 @@ class _TalkPageState extends State<Talk> {
 
   //底部Footer（加载更多/没有更多）
   Widget _buildFooter() {
-    if (_isLoading) {
+    if (controller.isLoading) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 16),
         child: Center(
@@ -175,7 +98,7 @@ class _TalkPageState extends State<Talk> {
           ),
         ),
       );
-    } else if (!_hasMore) {
+    } else if (!controller.hasMore) {
       // 没有更多数据
       return Padding(
         padding: const EdgeInsets.only(bottom: 30),
@@ -332,7 +255,7 @@ class _TalkPageState extends State<Talk> {
     return Container(
       padding: const EdgeInsets.all(2.0),
       child: FutureBuilder<String>(
-        future: _onGetImg(imageStr, userId),  // 异步获取图片URL
+        future: controller.onGetImg(imageStr, userId),  // 异步获取图片URL
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return CachedNetworkImage(// 显示图片

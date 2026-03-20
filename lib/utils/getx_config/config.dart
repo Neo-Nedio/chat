@@ -1,15 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
-import '../../pages/login/index.dart';
-import '../../pages/login/logic.dart';
-import '../../pages/navigation/index.dart';
-import '../../pages/password/retrieve/index.dart';
-import '../../pages/password/retrieve/logic.dart';
-import '../../pages/password/update/index.dart';
-import '../../pages/password/update/logic.dart';
-import '../../pages/register/index.dart';
-import '../../pages/register/logic.dart';
+import 'route.dart';
+
 
 
 typedef InitFunc = void Function();          // 初始化函数
@@ -17,65 +10,13 @@ typedef CloseFunc = void Function();         // 关闭函数
 typedef CallbackFunc = void Function();      // 回调函数
 typedef FilterFunc<T> = Object Function(T value);  // 过滤器函数
 
-
-//依赖注入(这样不用每个页面都要寻找自己的控制器)
-class ControllerBinding extends Bindings {
-  @override
-  void dependencies() {
-    // 懒加载方式创建控制器实例
-    Get.lazyPut(() => LoginPageLogic());        // 登录页控制器
-    Get.lazyPut(() => RegisterPageLogic());     // 注册页控制器
-    Get.lazyPut(() => RetrievePasswordLogic()); // 找回密码控制器
-    Get.lazyPut(() => UpdatePasswordLogic());   // 修改密码控制器
-  }
-}
-
 //路由配置
 // 进入路由时，GetX会自动：
 // 1. 执行 ControllerBinding().dependencies()
 // 2. 注册所有需要的控制器
 // 3. 然后才创建 Page
 // 4. 页面中直接 Get.find() 就能拿到
-List<GetPage> pageRoute = [
-  // 首页（底部导航）
-  GetPage(name: '/', page: () => const CustomBottomNavigationBar()),
-
-  // 登录页
-  GetPage(
-    name: '/login',
-    page: () => LoginPage(
-      key: const Key('login'),
-    ),
-    binding: ControllerBinding(),
-  ),
-
-  // 注册页
-  GetPage(
-    name: '/register',
-    page: () => RegisterPage(
-      key: const Key('register'),
-    ),
-    binding: ControllerBinding(),
-  ),
-
-  // 找回密码页
-  GetPage(
-    name: '/retrieve_password',
-    page: () => RetrievePassword(
-      key: const Key('retrieve_password'),
-    ),
-    binding: ControllerBinding(),
-  ),
-
-  // 修改密码页
-  GetPage(
-    name: '/update_password',
-    page: () => UpdatePasswordPage(
-      key: const Key('update_password'),
-    ),
-    binding: ControllerBinding(),
-  ),
-];
+List<GetPage> pageRoute =AppRoutes.pageRoute;
 
 //路由监听
 void routingCallback(router) {

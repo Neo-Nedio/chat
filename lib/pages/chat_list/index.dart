@@ -1,86 +1,30 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 
-import '../../api/chat_list_api.dart';
-import '../../api/friend_api.dart';
 import '../../components/custom_portrait/index.dart';
 import '../../components/custom_search_box/index.dart';
 import '../../utils/date.dart';
-import '../qr_code_scan/index.dart';
+import '../../utils/getx_config/config.dart';
+import 'logic.dart';
 
-
-final _chatListApi = ChatListApi();
-final _friendApi = FriendApi();
 
 //聊天主页面
-class ChatListPage extends StatefulWidget {
-  const ChatListPage({super.key});
+
+class ChatListPage extends CustomWidget<ChatListLogic> {
+  ChatListPage({super.key});
+
 
   @override
-  State<StatefulWidget> createState() => _ChatListPageState();
-}
+  init(BuildContext context) {
+    controller.onGetChatList();
+  }
 
-class _ChatListPageState extends State<ChatListPage> {
-
-  late List<dynamic> _topList = [];     // 置顶聊天列表
-  late List<dynamic> _otherList = [];   // 其他聊天列表
-  late List<dynamic> _searchList = [];  // 搜索结果列表
 
   @override
-  void initState() {
-    super.initState();
-    _onGetChatList();
-  }
-
-  void _onGetChatList() {
-    //获取列表
-    _chatListApi.list().then((res) {
-      if (res['code'] == 0) {
-        setState(() {
-          _topList = res['data']['tops'];
-          _otherList = res['data']['others'];
-        });
-      }
-    });
-  }
-
-  void _onTopStatus(String id, bool isTop) {
-    // 传入相反的状态更新指定状态
-    _chatListApi.top(id, !isTop).then((res) {
-      if (res['code'] == 0) {
-        _onGetChatList(); // 重新获取最新列表
-      }
-    });
-  }
-
-  void _onDeleteChatList(String id) {
-    _chatListApi.delete(id).then((res) {
-      if (res['code'] == 0) {
-        _onGetChatList(); // 重新获取最新列表
-      }
-    });
-  }
-
-  void _onSearchFriend(String friendInfo) {
-    if (friendInfo.trim() == '') { // 搜索框为空
-      setState(() {
-        _searchList = []; // 清空搜索结果
-      });
-      return;
-    }
-    //获取搜索结果
-    _friendApi.search(friendInfo).then((res) {
-      if (res['code'] == 0) {
-        setState(() {
-          _searchList = res['data'];
-        });
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget buildWidget(BuildContext context) {
 
 /*
 ┌─────────────────────────────────────────────────┐
@@ -178,14 +122,7 @@ class _ChatListPageState extends State<ChatListPage> {
                 PopupMenuItem(
                   value: 1,           // 选中时的返回值
                   height: 40,         // 菜单项高度40像素
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const QRCodeScannerPage(),
-                      ),
-                    );
-                  },
+                  onTap: () => Get.toNamed('/qr_code_scan'),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,  // Row宽度自适应内容
                     children: [
@@ -246,25 +183,25 @@ class _ChatListPageState extends State<ChatListPage> {
               isCentered: false,
               onChanged: (value) {
                 //更新搜索内容
-                _onSearchFriend(value);
+                controller.onSearchFriend(value);
               },
             ),
-            if(_searchList.isNotEmpty ||
-              _topList.isNotEmpty ||
-              _otherList.isNotEmpty)
+            if(controller.searchList.isNotEmpty ||
+                controller.otherList.isNotEmpty ||
+                controller.topList.isNotEmpty)
             // Expanded让ListView填充剩余空间
               Expanded(
                 //下拉刷新组件
                   child: RefreshIndicator(
                     onRefresh: () async {  // 下拉刷新时触发的回调函数
-                      _onGetChatList();    // 调用API重新获取聊天列表
+                      controller.onGetChatList();    // 调用API重新获取聊天列表
                       return Future.delayed(const Duration(milliseconds: 700)); // 延迟700ms返回
                     },
 
                     child: ListView(
                       children: [
 
-                        if (_searchList.isNotEmpty) ...[
+                        if (controller.searchList.isNotEmpty) ...[
                           const Padding(
                             padding: EdgeInsets.symmetric(vertical: 8.0),
                             child: Text(
@@ -277,11 +214,11 @@ class _ChatListPageState extends State<ChatListPage> {
                             ),
                           ),
                           //List 不能直接作为 child,所以要加上...展开成多个 Widget
-                          ..._searchList.map((friend) =>
+                          ...controller.searchList.map((friend) =>
                               _buildSearchItem(friend, friend['friendId'])),
                         ],
 
-                        if (_topList.isNotEmpty) ...[
+                        if (controller.topList.isNotEmpty) ...[
                           const Padding(
                             // 显示"置顶"标题
                             padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -296,11 +233,11 @@ class _ChatListPageState extends State<ChatListPage> {
                           ),
                           // 遍历topList，为每个chat创建列表项
                           // 使用展开操作符...将生成的组件列表展开
-                          ..._topList
+                          ...controller.topList
                               .map((chat) => _buildChatItem(chat, chat['id'])),
                         ],
 
-                        if (_otherList.isNotEmpty) ...[
+                        if (controller.otherList.isNotEmpty) ...[
                           const Padding(
                             // "全部"标题
                             padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -313,7 +250,7 @@ class _ChatListPageState extends State<ChatListPage> {
                               ),
                             ),
                           ),
-                          ..._otherList
+                          ...controller.otherList
                               .map((chat) => _buildChatItem(chat, chat['id'])),
                         ],
                       ],
@@ -321,7 +258,9 @@ class _ChatListPageState extends State<ChatListPage> {
                   )
               ),
 
-            if (_searchList.isEmpty && _otherList.isEmpty && _topList.isEmpty)
+            if (controller.searchList.isEmpty &&
+                controller.otherList.isEmpty &&
+                controller.topList.isEmpty)
               Expanded(
                 child: Center(
                   child: Column(
@@ -377,7 +316,7 @@ class _ChatListPageState extends State<ChatListPage> {
           // 第一个滑动按钮
           SlidableAction(
             padding: const EdgeInsets.all(0),  // 内边距为0
-            onPressed: (context) => _onTopStatus(id, chat['isTop']),  // 点击调用置顶切换
+            onPressed: (context) => controller.onTopStatus(id, chat['isTop']),  // 点击调用置顶切换
             backgroundColor: const Color(0xFF4C9BFF),  // 蓝色背景
             foregroundColor: Colors.white,        // 白色图标和文字
             // 根据置顶状态显示不同的图标：置顶显示图钉，不置顶显示空心图钉
@@ -388,7 +327,7 @@ class _ChatListPageState extends State<ChatListPage> {
           // 第二个滑动按钮（删除）
           SlidableAction(
             padding: const EdgeInsets.all(0),
-            onPressed: (context) => _onDeleteChatList(id),  // 点击调用删除
+            onPressed: (context) => controller.onDeleteChatList(id),  // 点击调用删除
             backgroundColor: const Color(0xFFFF4C4C),    // 红色背景
             foregroundColor: Colors.white,                // 白色图标和文字
             icon: Icons.delete,  // 垃圾桶图标

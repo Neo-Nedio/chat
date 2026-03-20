@@ -1,86 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../api/chat_group_api.dart';
-import '../../api/friend_api.dart';
-import '../../api/notify_api.dart';
 import '../../components/custom_portrait/index.dart';
 import '../../components/custom_search_box/index.dart';
 import '../../components/custom_text_button/index.dart';
+import '../../utils/getx_config/config.dart';
+import 'logic.dart';
 
 
-final _friendApi = FriendApi();
-final _chatGroupApi = ChatGroupApi();
-final _notifyApi = NotifyApi();
 
 //通讯页面
-class ContactsPage extends StatefulWidget {
-  const ContactsPage({super.key});
+class ContactsPage extends CustomWidget<ContactsLogic> {
+  ContactsPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _ContactsPageState();
-}
-
-class _ContactsPageState extends State<ContactsPage> {
-  List<String> tabs = ['我的群聊', '我的好友', '好友通知'];  // 标签页
-  int selectedIndex = 1;        // 当前选中的标签索引（默认选中"我的好友"）
-  String currentUserId = '';   //获取当前用户id
-  List<dynamic> _friendList = []; // 好友列表数据（按分组）
-  List<dynamic> _chatGroupList = [];
-  List<dynamic> _notifyFriendList = [];
-
-  @override
-  void initState() {
-    super.initState();
-    SharedPreferences.getInstance().then((prefs) {
-      setState(() {
-        currentUserId = prefs.getString('userId') ?? '';
-      });
-    });
-    //不要放在 build/getContent 里，否则每次重建都会请求
-    _onChatGroupList();
-    _onFriendList();
-    _onNotifyFriendList();
-  }
-
-  // 更新好友列表
-  void _onFriendList() {
-    _friendApi.list().then((res) {
-      if (res['code'] == 0) {
-        setState(() {
-          _friendList = res['data'];
-        });
-      }
-    });
-  }
-
-  //群列表
-  void _onChatGroupList() {
-    _chatGroupApi.list().then((res) {
-      if (res['code'] == 0) {
-        setState(() {
-          _chatGroupList = res['data'];
-        });
-      }
-    });
-  }
-
-  //好友通知
-  void _onNotifyFriendList() {
-    _notifyApi.friendList().then((res) {
-      if (res['code'] == 0) {
-        setState(() {
-          _notifyFriendList = res['data'];
-        });
-      }
-    });
-  }
-
-  // 标签切换
-  void handlerTabTapped(int index) {
-    setState(() {
-      selectedIndex = index;
-    });
+  init(BuildContext context) {
+    controller.init();
+    //不要放在getContent里面，不然会无限刷新
+    controller.onNotifyFriendList();
+    controller.onChatGroupList();
+    controller.onFriendList();
   }
 
   //页面
@@ -90,7 +28,7 @@ class _ContactsPageState extends State<ContactsPage> {
       case '好友通知':
         return ListView(
           children: [
-            ..._notifyFriendList.map((notify) => Container(
+            ...controller.notifyFriendList.map((notify) => Container(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: _buildNotifyFriendItem(notify),
             )),
@@ -99,7 +37,7 @@ class _ContactsPageState extends State<ContactsPage> {
       case '我的群聊':
         return ListView(
           children: [
-            ..._chatGroupList.map(
+            ...controller.chatGroupList.map(
                   (group) => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: _buildChatGroupItem(group),
@@ -111,7 +49,7 @@ class _ContactsPageState extends State<ContactsPage> {
         return ListView(
           children: [
             // 用...将列表展开
-            ..._friendList.map((group) {
+            ...controller.friendList.map((group) {
 //ExpansionTile 是 Flutter 中的可展开/折叠的列表项组件。它包含一个标题行，点击后可以展开显示更多的内容（通常是子列表）
               return ExpansionTile(
                 iconColor: const Color(0xFF4C9BFF),  // 箭头图标颜色（蓝色）
@@ -221,7 +159,7 @@ class _ContactsPageState extends State<ContactsPage> {
   //好友通知项
   Widget _buildNotifyFriendItem(dynamic notify) {
     //判断通知方向
-    bool isFromCurrentUser = currentUserId == notify['fromId'];
+    bool isFromCurrentUser = controller.currentUserId == notify['fromId'];
 
     return Material(
       borderRadius: BorderRadius.circular(12),
@@ -471,7 +409,7 @@ class _ContactsPageState extends State<ContactsPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildWidget(BuildContext context) {
 /*
     ┌─────────────────────────────────────────────────────────────┐
     │  Scaffold (页面骨架)                                          │
@@ -620,26 +558,26 @@ class _ContactsPageState extends State<ContactsPage> {
             //分类
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween, // 两端对齐
-              children: List.generate(tabs.length, (index) {
+              children: List.generate(controller.tabs.length, (index) {
                 return Expanded( // 每个标签平均分配宽度
                   child: AnimatedAlign(
                     duration: const Duration(milliseconds: 300),  // 动画时长300ms
                     alignment: Alignment.center,                  // 居中对齐
                     child: GestureDetector(
-                      onTap: () => handlerTabTapped(index), // 点击时调用切换方法
+                      onTap: () => controller.handlerTabTapped(index), // 点击时调用切换方法
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 300),  // 动画时长
                         curve: Curves.easeInOut,                      // 动画曲线：缓入缓出
                         padding: const EdgeInsets.all(5),              // 内边距5px
                         margin: EdgeInsets.symmetric(
-                          horizontal: index == selectedIndex ? 4.0 : 0.0,  // 选中时增加水平外边距
+                          horizontal: index == controller.selectedIndex ? 4.0 : 0.0,  // 选中时增加水平外边距
                         ),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(1),      // 圆角1px
                           color: Colors.transparent,                    // 透明背景
                           border: Border(
                             bottom: BorderSide(                         // 底部边框（下划线）
-                              color: index == selectedIndex
+                              color: index == controller.selectedIndex
                                   ? const Color(0xE64C9BFF)            // 选中时蓝色
                                   : Colors.transparent,                  // 未选中时透明
                               width: 2,                                  // 边框宽度2px
@@ -653,12 +591,12 @@ class _ContactsPageState extends State<ContactsPage> {
                           child: AnimatedDefaultTextStyle(
                             duration: const Duration(milliseconds: 300),
                             style: TextStyle(
-                              color: index == selectedIndex
+                              color: index == controller.selectedIndex
                                   ? const Color(0xE64C9BFF)  // 选中时蓝色
                                   : Colors.black,              // 未选中时黑色
                               fontSize: 16,                    // 字号16px
                             ),
-                            child: Text(tabs[index]),          // 实际文字内容
+                            child: Text(controller.tabs[index]),          // 实际文字内容
                           ),
                         ),
                       ),
@@ -676,7 +614,7 @@ class _ContactsPageState extends State<ContactsPage> {
               //内容切换动画的组件
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
-                child: getContent(tabs[selectedIndex]),
+                child: getContent(controller.tabs[controller.selectedIndex]),
               ),
             ),
           ],

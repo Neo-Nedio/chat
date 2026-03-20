@@ -1,4 +1,5 @@
 
+import 'package:chat_mobile/utils/getx_config/ControllerBinding.dart';
 import 'package:chat_mobile/utils/getx_config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';

@@ -1,8 +1,8 @@
+import 'package:chat_mobile/pages/mine/index.dart';
 import 'package:flutter/material.dart';
 
 import '../chat_list/index.dart';
 import '../contacts/index.dart';
-import '../mine/mine.dart';
 import '../talk/index.dart';
 
 //主页导航栏
@@ -68,8 +68,8 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
         children: [
           ChatListPage(),
           ContactsPage(),
-          Talk(),
-          Mine(),
+          TalkPage(),
+          MinePage(),
         ]
       ),
 
