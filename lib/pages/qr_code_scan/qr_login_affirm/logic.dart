@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
-import '../../api/user_api.dart';
+import '../../../api/user_api.dart';
 
 class QRLoginAffirmLogic extends GetxController {
   final _userAPi = UserApi();

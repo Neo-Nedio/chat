@@ -12,8 +12,9 @@ import '../../pages/navigation/logic.dart';
 import '../../pages/password/retrieve/logic.dart';
 import '../../pages/password/update/logic.dart';
 import '../../pages/qr_code_scan/logic.dart';
+import '../../pages/qr_code_scan/qr_friend_affirm/logic.dart';
+import '../../pages/qr_code_scan/qr_login_affirm/logic.dart';
 import '../../pages/qr_code_scan/qr_other_result/logic.dart';
-import '../../pages/qr_login_affirm/logic.dart';
 import '../../pages/register/logic.dart';
 import '../../pages/talk/logic.dart';
 
@@ -34,5 +35,6 @@ class ControllerBinding extends Bindings {
     Get.lazyPut(() => NavigationLogic());
     Get.lazyPut(() => MineQRCodeLogic());
     Get.lazyPut(() => QrOtherResultLogic());
+    Get.lazyPut(() => QRFriendAffirmLogic());
   }
 }

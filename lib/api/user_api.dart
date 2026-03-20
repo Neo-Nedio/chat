@@ -14,7 +14,7 @@ class UserApi {
     return _instance;
   }
 
-  //扫码登录
+  //电脑端扫码登录
   Future<Map<String, dynamic>> qrLogin(String? key) async {
     final response = await _dio.post(
       '/v1/api/login/qr',

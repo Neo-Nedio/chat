@@ -10,7 +10,9 @@ import '../../pages/navigation/index.dart';
 import '../../pages/password/retrieve/index.dart';
 import '../../pages/password/update/index.dart';
 import '../../pages/qr_code_scan/index.dart';
-import '../../pages/qr_login_affirm/index.dart';
+import '../../pages/qr_code_scan/qr_friend_affirm/index.dart';
+import '../../pages/qr_code_scan/qr_login_affirm/index.dart';
+import '../../pages/qr_code_scan/qr_other_result/index.dart';
 import '../../pages/register/index.dart';
 import '../../pages/talk/index.dart';
 import 'ControllerBinding.dart';
@@ -100,6 +102,20 @@ class AppRoutes {
       key: const Key('mine_qr_code'),
     ),
     binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/qr_friend_affirm',
+      page: () => QRFriendAffirmPage(
+        key: const Key('qr_friend_affirm'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/qr_other_result',
+      page: () => QrOtherResultPage(
+        key: const Key('qr_other_result'),
+      ),
+      binding: ControllerBinding(),
     ),
   ];
 }

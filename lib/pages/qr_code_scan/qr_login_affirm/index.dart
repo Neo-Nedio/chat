@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../components/custom_button/index.dart';
-import '../../utils/getx_config/config.dart';
+import '../../../components/custom_button/index.dart';
+import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
 
 
@@ -55,6 +55,7 @@ class QrLoginAffirmPage extends CustomWidget<QRLoginAffirmLogic> {
                     onTap: controller.onQrLogin,  // 点击调用登录方法
                     width: 220,
                   ),
+
                   const SizedBox(height: 10),  // 按钮间距
 
                   // 取消按钮

@@ -70,21 +70,21 @@ class MineQRCodePage extends CustomWidget<MineQRCodeLogic> {
                               ),
                               borderRadius: BorderRadius.circular(40), // 圆形
                             ),
-                            child: const CustomPortrait(
+                            child: CustomPortrait(
                                 url: // 头像URL
-                                    'https://tse3-mm.cn.bing.net/th/id/OIP-C.ruq8qPQn8b_W0prkr4eucQAAAA?rs=1&pid=ImgDetMain',
+                                controller.currentUserInfo['portrait'] ?? '',
                                 size: 80,
                                 radius: 40),
                           ),
                           //用户信息
-                          const Text( // 显示名称
-                            'Heath',
-                            style: TextStyle(
+                          Text( // 显示名称
+                            controller.currentUserInfo['name'] ?? '',
+                            style: const TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.w600),
                           ),
-                          const Text( // 账号
-                            'heath',
-                            style: TextStyle(
+                          Text( // 账号
+                            controller.currentUserInfo['account'] ?? '',
+                            style: const TextStyle(
                                 fontSize: 14, color: Color(0xFF7D7D7D)),
                           ),
 
@@ -110,7 +110,7 @@ class MineQRCodePage extends CustomWidget<MineQRCodeLogic> {
                                   blendMode: BlendMode.srcATop, // 混合模式：源在目标上,渐变颜色叠加在二维码上
                                   //QrImageView	生成并显示二维码
                                   child: QrImageView(  // 二维码组件
-                                    data: '1234567890',  // 二维码内容（硬编码，应该改为动态数据）
+                                    data: controller.qrCode, // 二维码内容
                                     version: QrVersions.auto,  // 自动选择版本
                                     padding: const EdgeInsets.all(5),
                                     size: 200.0,
