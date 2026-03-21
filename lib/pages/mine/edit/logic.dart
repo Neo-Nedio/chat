@@ -9,6 +9,8 @@ import 'package:dio/dio.dart' show MultipartFile, FormData;
 
 import '../../../api/user_api.dart';
 import '../../../utils/cropPicture.dart';
+import '../../../utils/getx_config/GlobalThemeConfig.dart';
+import '../../navigation/logic.dart';
 import '../logic.dart';
 
 //个人资料编辑页面逻辑
@@ -311,6 +313,18 @@ class EditMineLogic extends getx.GetxController {
         currentUserInfo['portrait'] = portrait;
         // 退出编辑模式
         isEdit = false;
+
+        // 性别变更后主题应立即切换：GlobalThemeConfig 无 GetBuilder 订阅，需顺带刷新主界面与「我的」
+        getx.Get.find<GlobalThemeConfig>().changeThemeMode(
+            sex == '女' ? 'pink' : 'blue');
+        //刷新导航页面
+        if (getx.Get.isRegistered<NavigationLogic>()) {
+          getx.Get.find<NavigationLogic>().update([const Key('main')]);
+        }
+        //刷新「我的」页渐变、图标
+        _mineLogic.update([const Key('mine')]);
+        //刷新当前编辑页顶部渐变
+        update([const Key('edit_mine')]);
 
       } else {
         //保存失败
