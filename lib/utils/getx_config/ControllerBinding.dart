@@ -21,7 +21,7 @@ import '../../pages/talk/logic.dart';
 class ControllerBinding extends Bindings {
   @override
   void dependencies() {
-    // 懒加载方式创建控制器实例
+    // 懒加载方式创建控制器实例(没有创建实例，即Get.find之前不会初始化)
     Get.lazyPut(() => LoginPageLogic());        // 登录页控制器
     Get.lazyPut(() => RegisterPageLogic());     // 注册页控制器
     Get.lazyPut(() => RetrievePasswordLogic()); // 找回密码控制器

@@ -12,10 +12,11 @@ class MineLogic extends GetxController {
 
   //获取用户信息
   void _onGetCurrentUserInfo() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
       currentUserInfo['name'] = prefs.getString('username');
       currentUserInfo['portrait'] = prefs.getString('portrait');
       currentUserInfo['account'] = prefs.getString('account');
+      currentUserInfo['sex'] = prefs.getString('sex');
   }
 
   void handlerLogout() async {

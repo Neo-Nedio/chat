@@ -37,6 +37,7 @@ class QRFriendAffirmPage extends CustomWidget<QRFriendAffirmLogic> {
 
   @override
   Widget buildWidget(BuildContext context) {
+    bool isNv = controller.result['sex'] == "女";
     return Scaffold(
       backgroundColor: const Color(0xFFF9FBFF),
       appBar: AppBar(
@@ -60,8 +61,13 @@ class QRFriendAffirmPage extends CustomWidget<QRFriendAffirmLogic> {
                   //顶部渐变卡片（好友头像和基本信息
                   Container(
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFDFF4FF), Color(0xFFFFFFFF)],  // 浅蓝到白渐变
+                      gradient: LinearGradient(
+                        colors: [
+                          isNv
+                              ? const Color(0xFFFBEBFF)
+                              : const Color(0xFFDFF4FF),
+                                const Color(0xFFFFFFFF)
+                        ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -110,10 +116,14 @@ class QRFriendAffirmPage extends CustomWidget<QRFriendAffirmLogic> {
                                                 horizontal: 5),
                                             height: 15,
                                             decoration: BoxDecoration(
-                                              gradient: const LinearGradient(
+                                              gradient:  LinearGradient(
                                                 colors: [
-                                                  Color(0x1A4C9BFF),
-                                                  Color(0xE64C9BFF)
+                                                  isNv
+                                                      ? const Color(0x1AFFA0CF)
+                                                      : const Color(0x1A4C9BFF),
+                                                  isNv
+                                                      ? const Color(0xE6FFA0CF)
+                                                      : const Color(0xE64C9BFF),
                                                 ],
                                                 begin: Alignment.centerLeft,
                                                 end: Alignment.centerRight,

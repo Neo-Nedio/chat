@@ -10,12 +10,14 @@ class MineQRCodeLogic extends GetxController {
   late String qrCode = ''; //二维码内容
 
   @override
+  //index创建，会Get.find创建实例并初始化
   void onInit() async {
     super.onInit();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currentUserInfo['name'] = prefs.getString('username');
     currentUserInfo['portrait'] = prefs.getString('portrait');
     currentUserInfo['account'] = prefs.getString('account');
+    currentUserInfo['sex'] = prefs.getString('sex');
     update([const Key("mine_qr_code")]);
     onQrCode();
   }

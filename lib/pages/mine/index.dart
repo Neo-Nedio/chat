@@ -51,18 +51,23 @@ class MinePage extends CustomWidget<MineLogic> {
   */
   @override
   Widget buildWidget(BuildContext context) {
+    bool isNv = controller.currentUserInfo['sex'] == "女";
     return Scaffold(
       backgroundColor: const Color(0xFFF9FBFF), // 浅蓝色背景
       body: Column(
         children: [
+          //上方头像与用户区域
           Container(
-            decoration: const BoxDecoration(
+            decoration:  BoxDecoration(
               gradient: LinearGradient(  // 线性渐变
-                colors: [Color(0xFFDFF4FF), Color(0xFFFFFFFF)],  // 浅蓝到白
+                colors: [
+                  isNv ? const Color(0xFFFBEBFF) : const Color(0xFFDFF4FF),
+                  const Color(0xFFFFFFFF)
+                ],
                 begin: Alignment.topLeft,      // 渐变起点：左上角
                 end: Alignment.bottomRight,    // 渐变终点：右下角
               ),
-              borderRadius: BorderRadius.only(  // 底部圆角
+              borderRadius: const BorderRadius.only(  // 底部圆角
                 bottomLeft: Radius.circular(20.0),
                 bottomRight: Radius.circular(20.0),
               ),
@@ -107,7 +112,7 @@ class MinePage extends CustomWidget<MineLogic> {
                             clipBehavior: Clip.none,      // 允许子组件超出边界
                             children: [
                               Positioned(
-                                top: 13,
+                                top: 13, //向下偏移13
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 0, vertical: 0),
@@ -115,10 +120,14 @@ class MinePage extends CustomWidget<MineLogic> {
                                     padding: const EdgeInsets.symmetric(horizontal: 5),  // 左右内边距5
                                     height: 15,  // 高度15像素
                                     decoration: BoxDecoration(
-                                      gradient: const LinearGradient(  // 线性渐变
+                                      gradient: LinearGradient(  // 线性渐变
                                         colors: [
-                                          Color(0x1A4C9BFF),  // 透明蓝 (10%透明度)
-                                          Color(0xE64C9BFF)   // 不透明蓝 (90%透明度)
+                                          isNv
+                                              ? const Color(0x1AFFA0CF)
+                                              : const Color(0x1A4C9BFF),
+                                          isNv
+                                              ? const Color(0xE6FFA0CF)
+                                              : const Color(0xE64C9BFF),
                                         ],
                                         begin: Alignment.centerLeft,   // 从左开始
                                         end: Alignment.centerRight,    // 到右结束
@@ -175,9 +184,9 @@ class MinePage extends CustomWidget<MineLogic> {
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Column(
                 children: [
-                  _primarySelectButton('我的说说', 'mine-talk.png', () {}),
+                  _primarySelectButton('我的说说', 'mine-talk${isNv ? '-pink' : ''}.png', () {}),
                   const SizedBox(height: 2),
-                  _primarySelectButton('系统通知', 'mine-notify.png', () {}),
+                  _primarySelectButton('系统通知', 'mine-notify${isNv ? '-pink' : ''}.png', () {}),
                   const SizedBox(height: 30),
                   _minorSelectButton('修改密码', 'mine-password.png',  () {
                     Get.toNamed('/update_password');
