@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../components/count_down_register/index.dart';
 import '../../components/custom_text_field/index.dart';
 import '../../utils/getx_config/config.dart';
 import 'logic.dart';
@@ -101,8 +100,30 @@ class RegisterPage extends CustomWidget<RegisterPageLogic> {
                         ),
                         const SizedBox(height: 20.0),
 
-                        CountdownRegister(
-                          key: const Key("countdown"),
+                        CustomTextField(
+                          labelText: '验证码',
+                          hintText: "请输入验证码",
+                          controller: controller.codeController,
+                          suffix: controller.mailController.text!=""?Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              GestureDetector(
+                                onTap: controller.onTapSendMail,
+                                child: Text(
+                                  controller.countdownTime > 0
+                                      ? '${controller.countdownTime}后重新获取'
+                                      : '获取验证码',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: controller.countdownTime > 0
+                                        ? const Color.fromARGB(255, 183, 184, 195)
+                                        : const Color.fromARGB(255, 17, 132, 255),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8.0),
+                            ],
+                          ):null,
                         ),
 
                         const SizedBox(height: 20.0),

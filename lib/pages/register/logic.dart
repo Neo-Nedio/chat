@@ -34,7 +34,7 @@ class RegisterPageLogic extends GetxController {
   set countdownTime(int value) {
     _countdownTime = value;
     update([
-      const Key("countdown"), //用来指定要更新组件的key，而不是全部更新
+      const Key("register"), //用来指定要更新组件的key，而不是全部更新
     ]);
   }
 

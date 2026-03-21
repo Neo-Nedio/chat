@@ -12,6 +12,7 @@ class CustomTextField extends StatelessWidget {
   final Widget? suffix;                // 右侧自定义组件
   final ValueChanged<String>? onChanged;  // 输入变化回调
   final int? inputLimit;                // 输入字符数量限制
+  final bool readOnly;
 
   const CustomTextField({
     super.key,
@@ -23,6 +24,7 @@ class CustomTextField extends StatelessWidget {
     this.onChanged,
     this.suffixIcon,
     this.inputLimit,
+    this.readOnly = false, //控制文本输入框是否可编辑
   });
 
 
@@ -85,6 +87,7 @@ class CustomTextField extends StatelessWidget {
             controller: controller,
             obscureText: obscureText,
             onChanged: onChanged,//函数回调
+            readOnly: readOnly,
             inputFormatters: inputLimit != null
                 ? <TextInputFormatter>[
               //只输入数字

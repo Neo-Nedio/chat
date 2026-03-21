@@ -74,20 +74,25 @@ class MinePage extends CustomWidget<MineLogic> {
             child: Row(
               children: [
                 //头像区域
-                Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 5,
+                GestureDetector(
+                  onTap: () {
+                    Get.toNamed('/edit_mine');
+                  },
+                  child: Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 5,
+                      ),
+                      borderRadius: BorderRadius.circular(35),
                     ),
-                    borderRadius: BorderRadius.circular(35),
+                    child: CustomPortrait(
+                        url: controller.currentUserInfo['portrait'] ?? '',
+                        size: 70,
+                        radius: 35),
                   ),
-                  child: CustomPortrait(
-                      url: controller.currentUserInfo['portrait'] ?? '',
-                      size: 70,
-                      radius: 35),
                 ),
 
                 //分割
@@ -176,9 +181,9 @@ class MinePage extends CustomWidget<MineLogic> {
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Column(
                 children: [
-                  _primarySelectButton('我的说说', 'mine-talk${theme.themeMode}.png', () {}),
+                  _primarySelectButton('我的说说', 'mine-talk-${theme.themeMode}.png', () {}),
                   const SizedBox(height: 2),
-                  _primarySelectButton('系统通知', 'mine-notify${theme.themeMode}.png', () {}),
+                  _primarySelectButton('系统通知', 'mine-notify-${theme.themeMode}.png', () {}),
                   const SizedBox(height: 30),
                   _minorSelectButton('修改密码', 'mine-password.png',  () {
                     Get.toNamed('/update_password');

@@ -4,6 +4,7 @@ import 'package:get/get_navigation/src/routes/get_route.dart';
 import '../../pages/chat_list/index.dart';
 import '../../pages/contacts/index.dart';
 import '../../pages/login/index.dart';
+import '../../pages/mine/edit/index.dart';
 import '../../pages/mine/index.dart';
 import '../../pages/mine/mine_qr_code/index.dart';
 import '../../pages/navigation/index.dart';
@@ -93,6 +94,13 @@ class AppRoutes {
       name: '/qr_login_affirm',
       page: () => QrLoginAffirmPage(
         key: const Key('qr_login_affirm'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/edit_mine',
+      page: () => EditMinePage(
+        key: const Key('edit_mine'),
       ),
       binding: ControllerBinding(),
     ),

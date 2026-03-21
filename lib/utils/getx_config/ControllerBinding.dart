@@ -6,6 +6,7 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import '../../pages/chat_list/logic.dart';
 import '../../pages/contacts/logic.dart';
 import '../../pages/login/logic.dart';
+import '../../pages/mine/edit/logic.dart';
 import '../../pages/mine/logic.dart';
 import '../../pages/mine/mine_qr_code/logic.dart';
 import '../../pages/navigation/logic.dart';
@@ -35,6 +36,7 @@ class ControllerBinding extends Bindings {
     Get.lazyPut(() => QRCodeScanLogic());
     Get.lazyPut(() => QRLoginAffirmLogic());
     Get.lazyPut(() => NavigationLogic());
+    Get.lazyPut(() => EditMineLogic());
     Get.lazyPut(() => MineQRCodeLogic());
     Get.lazyPut(() => QrOtherResultLogic());
     Get.lazyPut(() => QRFriendAffirmLogic());

@@ -64,6 +64,36 @@ class UserApi {
     return response.data;
   }
 
+  //上传用户头像（表单）
+  Future<Map<String, dynamic>> upload(FormData formData) async {
+    final response = await _dio.post(
+      '/v1/api/user/upload/portrait/form',
+      data: formData,
+    );
+    return response.data;
+  }
+
+  //修改用户信息（birthday：UTC 日历日 0 点的毫秒时间戳，与 Jackson 默认 Date 反序列化一致）
+  Future<Map<String, dynamic>> update({
+    required String name,
+    required String sex,
+    required int birthdayMillis,
+    required String signature,
+    required String portrait,
+  }) async {
+    final response = await _dio.post(
+      '/v1/api/user/update',
+      data: {
+        'name': name,
+        'sex': sex,
+        'birthday': birthdayMillis,
+        'signature': signature,
+        'portrait': portrait
+      },
+    );
+    return response.data;
+  }
+
   //发送邮箱验证码（按邮箱）
   Future<Map<String, dynamic>> emailVerification(String email) async {
     final response = await _dio.post(
