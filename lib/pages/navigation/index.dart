@@ -38,7 +38,7 @@ class NavigationPage extends CustomWidget<NavigationLogic> {
             currentIndex: controller.currentIndex,
             onTap: controller.onTap,
 
-            selectedItemColor: Theme.of(context).primaryColor,  // 选中文字颜色
+            selectedItemColor: theme.primaryColor,  // 选中文字颜色
             unselectedItemColor: Colors.grey,  // 未选中文字颜色
             showUnselectedLabels: true,  // 显示未选中标签
             backgroundColor: const Color(0xFFEDF2F9),  // 背景色
@@ -49,7 +49,7 @@ class NavigationPage extends CustomWidget<NavigationLogic> {
                 // 根据选中状态显示不同图标
                 icon: Image.asset(
                   controller.currentIndex == index
-                      ? controller.selectedIcons[index]
+                      ? 'assets/images/${controller.selectedIcons[index]}-${theme.themeMode}.png'
                       : controller.unselectedIcons[index],
                   width: 26,
                   height: 26,

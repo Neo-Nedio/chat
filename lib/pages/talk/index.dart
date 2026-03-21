@@ -65,6 +65,7 @@ class TalkPage extends CustomWidget<TalkLogic> {
         //刷新组件
         child: RefreshIndicator(
           onRefresh: controller.refreshData,
+          color: theme.primaryColor,
           child: ListView.builder(
             controller: controller.scrollController,
             itemCount: controller.talkList.length + 1, // +1 用于底部footer
@@ -84,8 +85,8 @@ class TalkPage extends CustomWidget<TalkLogic> {
   //底部Footer（加载更多/没有更多）
   Widget _buildFooter() {
     if (controller.isLoading) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 16),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
         child: Center(
           child: SizedBox(
             width: 30.0,
@@ -93,7 +94,7 @@ class TalkPage extends CustomWidget<TalkLogic> {
             //滚动圆圈
             child: CircularProgressIndicator(
               strokeWidth: 4,
-              color: Color(0xFF4C9BFF),
+              color: theme.primaryColor,
             ),
           ),
         ),

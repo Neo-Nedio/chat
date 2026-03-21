@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/getx_config/config.dart';
+
 //自定义有涟漪效果的文本按钮
-class CustomTextButton extends StatelessWidget {
+class CustomTextButton extends StatelessThemeWidget {
   final String value;
   final GestureTapCallback onTap;
   final Color? textColor;
@@ -12,7 +14,7 @@ class CustomTextButton extends StatelessWidget {
         super.key,
         required this.onTap,
         this.fontSize = 12,
-        this.textColor = const Color(0xFF4C9BFF),
+        this.textColor ,
       });
 
 /*  CustomTextButton
@@ -31,7 +33,7 @@ class CustomTextButton extends StatelessWidget {
         value,
         style: TextStyle(
           fontSize: fontSize,
-          color: textColor,
+          color: textColor ?? theme.primaryColor,
         ),
       ),
     );

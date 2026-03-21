@@ -17,10 +17,12 @@ import '../../pages/qr_code_scan/qr_login_affirm/logic.dart';
 import '../../pages/qr_code_scan/qr_other_result/logic.dart';
 import '../../pages/register/logic.dart';
 import '../../pages/talk/logic.dart';
+import 'GlobalThemeConfig.dart';
 
 class ControllerBinding extends Bindings {
   @override
   void dependencies() {
+    Get.put(GlobalThemeConfig(), permanent: true);
     // 懒加载方式创建控制器实例(没有创建实例，即Get.find之前不会初始化)
     Get.lazyPut(() => LoginPageLogic());        // 登录页控制器
     Get.lazyPut(() => RegisterPageLogic());     // 注册页控制器

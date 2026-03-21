@@ -197,19 +197,20 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
                       controller.onGetChatList();    // 调用API重新获取聊天列表
                       return Future.delayed(const Duration(milliseconds: 700)); // 延迟700ms返回
                     },
+                    color: theme.primaryColor,
 
                     child: ListView(
                       children: [
 
                         if (controller.searchList.isNotEmpty) ...[
-                          const Padding(
+                           Padding(
                             padding: EdgeInsets.symmetric(vertical: 8.0),
                             child: Text(
                               "搜索结果",
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF4C9BFF),
+                                color: theme.primaryColor,
                               ),
                             ),
                           ),
@@ -219,7 +220,7 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
                         ],
 
                         if (controller.topList.isNotEmpty) ...[
-                          const Padding(
+                           Padding(
                             // 显示"置顶"标题
                             padding: EdgeInsets.symmetric(vertical: 8.0),
                             child: Text(
@@ -227,7 +228,7 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF4C9BFF),
+                                color: theme.primaryColor,
                               ),
                             ),
                           ),
@@ -238,7 +239,7 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
                         ],
 
                         if (controller.otherList.isNotEmpty) ...[
-                          const Padding(
+                          Padding(
                             // "全部"标题
                             padding: EdgeInsets.symmetric(vertical: 8.0),
                             child: Text(
@@ -246,7 +247,7 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF4C9BFF),
+                                color: theme.primaryColor,
                               ),
                             ),
                           ),
@@ -317,7 +318,7 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
           SlidableAction(
             padding: const EdgeInsets.all(0),  // 内边距为0
             onPressed: (context) => controller.onTopStatus(id, chat['isTop']),  // 点击调用置顶切换
-            backgroundColor: const Color(0xFF4C9BFF),  // 蓝色背景
+            backgroundColor: theme.primaryColor, //跟随主题
             foregroundColor: Colors.white,        // 白色图标和文字
             // 根据置顶状态显示不同的图标：置顶显示图钉，不置顶显示空心图钉
             icon: chat['isTop'] ? Icons.push_pin_outlined : Icons.push_pin,
@@ -512,37 +513,8 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
             padding: const EdgeInsets.symmetric(horizontal: 8.0),  // 左右内边距8
             child: Row(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(25),// 圆角25（圆形，因为宽高50）
-                  child: CachedNetworkImage(
-                    imageUrl: friend['portrait'], // 从friend对象获取头像URL
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-
-                    // 加载中的占位图
-                    placeholder: (context, url) => Container(
-                      width: 50,
-                      height: 50,
-                      color: Colors.grey[300],  // 灰色背景
-                      child: const Center(
-                        child: CircularProgressIndicator(  // 旋转加载圈
-                          color: Color(0xffffffff),  // 白色
-                          strokeWidth: 2,
-                        ),
-                      ),
-                    ),
-
-                    // 加载失败的占位图
-                    errorWidget: (context, url, error) => Container(
-                      width: 50,
-                      height: 50,
-                      color: Colors.grey[300],
-                      child: Image.asset('assets/images/default-portrait.jpeg'),  // 默认头像
-                    ),
-
-                  ),
-                ),
+                //圆角头像
+                CustomPortrait(url: friend['portrait']),
 
                 //分割线
                 const SizedBox(width: 12),

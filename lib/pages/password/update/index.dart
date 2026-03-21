@@ -16,13 +16,10 @@ class UpdatePasswordPage extends CustomWidget<UpdatePasswordLogic> {
 
   @override
   Widget buildWidget(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
- return Container(
-        decoration: const BoxDecoration(
+    return Container(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFDFF4FF), Color(0xFFFFFFFF)],
+            colors: [theme.minorColor, Color(0xFFFFFFFF)],
             // 渐变颜色
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,

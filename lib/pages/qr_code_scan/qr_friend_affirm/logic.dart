@@ -11,6 +11,7 @@ class QRFriendAffirmLogic extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    //Get.arguments（对象参数）
     result = Get.arguments['result']; // 接收参数
   }
 

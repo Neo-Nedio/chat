@@ -1,14 +1,25 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
+import '../../utils/getx_config/GlobalThemeConfig.dart';
+
 class NavigationLogic extends GetxController {
   late int currentIndex = 0;
 
+  @override
+  void onInit() {
+    super.onInit();
+    //Get.parameters（URL 参数）
+    String sex = Get.parameters['sex'] ?? "男"; // 获取路由参数
+    final theme = Get.find<GlobalThemeConfig>(); // 获取主题配置实例
+    theme.changeThemeMode(sex == "女" ? 'pink' : 'blue'); // 根据性别设置主题
+  }
+
   final List<String> selectedIcons = [
-    'assets/images/chat.png',
-    'assets/images/user.png',
-    'assets/images/talk.png',
-    'assets/images/mine.png',
+    'chat',
+    'user',
+    'talk',
+    'mine',
   ];
 
   final List<String> unselectedIcons = [

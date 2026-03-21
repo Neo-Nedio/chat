@@ -51,7 +51,6 @@ class MinePage extends CustomWidget<MineLogic> {
   */
   @override
   Widget buildWidget(BuildContext context) {
-    bool isNv = controller.currentUserInfo['sex'] == "女";
     return Scaffold(
       backgroundColor: const Color(0xFFF9FBFF), // 浅蓝色背景
       body: Column(
@@ -60,10 +59,7 @@ class MinePage extends CustomWidget<MineLogic> {
           Container(
             decoration:  BoxDecoration(
               gradient: LinearGradient(  // 线性渐变
-                colors: [
-                  isNv ? const Color(0xFFFBEBFF) : const Color(0xFFDFF4FF),
-                  const Color(0xFFFFFFFF)
-                ],
+                colors: [theme.minorColor, const Color(0xFFFFFFFF)],
                 begin: Alignment.topLeft,      // 渐变起点：左上角
                 end: Alignment.bottomRight,    // 渐变终点：右下角
               ),
@@ -122,12 +118,8 @@ class MinePage extends CustomWidget<MineLogic> {
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(  // 线性渐变
                                         colors: [
-                                          isNv
-                                              ? const Color(0x1AFFA0CF)
-                                              : const Color(0x1A4C9BFF),
-                                          isNv
-                                              ? const Color(0xE6FFA0CF)
-                                              : const Color(0xE64C9BFF),
+                                          theme.primaryColor.withValues(alpha: 0.1),
+                                          theme.primaryColor,
                                         ],
                                         begin: Alignment.centerLeft,   // 从左开始
                                         end: Alignment.centerRight,    // 到右结束
@@ -184,9 +176,9 @@ class MinePage extends CustomWidget<MineLogic> {
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Column(
                 children: [
-                  _primarySelectButton('我的说说', 'mine-talk${isNv ? '-pink' : ''}.png', () {}),
+                  _primarySelectButton('我的说说', 'mine-talk${theme.themeMode}.png', () {}),
                   const SizedBox(height: 2),
-                  _primarySelectButton('系统通知', 'mine-notify${isNv ? '-pink' : ''}.png', () {}),
+                  _primarySelectButton('系统通知', 'mine-notify${theme.themeMode}.png', () {}),
                   const SizedBox(height: 30),
                   _minorSelectButton('修改密码', 'mine-password.png',  () {
                     Get.toNamed('/update_password');

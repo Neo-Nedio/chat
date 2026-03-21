@@ -48,7 +48,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
             ...controller.friendList.map((group) {
 //ExpansionTile 是 Flutter 中的可展开/折叠的列表项组件。它包含一个标题行，点击后可以展开显示更多的内容（通常是子列表）
               return ExpansionTile(
-                iconColor: const Color(0xFF4C9BFF),  // 箭头图标颜色（蓝色）
+                iconColor:  theme.primaryColor, // 箭头图标颜色
                 visualDensity: VisualDensity(horizontal: 0, vertical: -4), // 垂直方向更紧凑
                 dense: true, // 启用密集模式
                 //边框形状
@@ -226,8 +226,8 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
                       Text(
                         _getNotifyContentTip(
                             notify['status'], isFromCurrentUser),
-                        style: const TextStyle(
-                            fontSize: 12, color: Color(0xFF4C9BFF)),
+                        style: TextStyle(
+                            fontSize: 12, color: theme.primaryColor),
                       ),
 
                       //上下间隔
@@ -274,15 +274,15 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
     switch (status) {
       case "wait":
         {
-          return "正在验证你的请求";
+          return "正在验证请求";
         }
       case "reject":
         {
-          return "对方已拒绝你的请求";
+          return "已拒绝申请请求";
         }
       case "agree":
         {
-          return "对方已同意你的请求";
+          return "已同意申请请求";
         }
     }
     return "";
@@ -313,21 +313,21 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
       case "wait":
         {
           return Text(
-            "正在验证",
+            "等待验证",
             style: TextStyle(fontSize: 12, color: Colors.grey[600]),
           );
         }
       case "reject":
         {
           return Text(
-            "对方已拒绝",
+            "已拒绝",
             style: TextStyle(fontSize: 12, color: Colors.grey[600]),
           );
         }
       case "agree":
         {
           return Text(
-            "对方已同意",
+            "已同意",
             style: TextStyle(fontSize: 12, color: Colors.grey[600]),
           );
         }
@@ -574,7 +574,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
                           border: Border(
                             bottom: BorderSide(                         // 底部边框（下划线）
                               color: index == controller.selectedIndex
-                                  ? const Color(0xE64C9BFF)            // 选中时蓝色
+                                  ? theme.primaryColor           // 选中时蓝色
                                   : Colors.transparent,                  // 未选中时透明
                               width: 2,                                  // 边框宽度2px
                             ),
@@ -588,7 +588,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
                             duration: const Duration(milliseconds: 300),
                             style: TextStyle(
                               color: index == controller.selectedIndex
-                                  ? const Color(0xE64C9BFF)  // 选中时蓝色
+                                  ? theme.primaryColor // 选中时蓝色
                                   : Colors.black,              // 未选中时黑色
                               fontSize: 16,                    // 字号16px
                             ),

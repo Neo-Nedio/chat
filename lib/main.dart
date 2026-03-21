@@ -13,10 +13,12 @@ Future<void> main() async {
   //获取token,并判断是否需要登录
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('x-token');
+  String? sex = prefs.getString('sex');
   //runApp(MyApp(initialPage: token != null ? const CustomBottomNavigationBar() : LoginPage()));
   runApp(MyApp(
       initialRoute:
-      token != null ? '/' : '/login'));
+          //有token时去主页面，并携带性别参数 sex=$sex
+      token != null ? '/?sex=$sex' : '/login'));
 }
 
 class MyApp extends StatelessWidget {

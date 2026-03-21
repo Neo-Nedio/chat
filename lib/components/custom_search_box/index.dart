@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/getx_config/config.dart';
+
 //自定义搜索框
-class CustomSearchBox extends StatelessWidget {
+class CustomSearchBox extends StatelessThemeWidget {
   final bool isCentered;           // 是否居中显示
   final Color backgroundColor;      // 背景颜色
   final double borderRadius;        // 圆角大小
@@ -31,14 +33,14 @@ class CustomSearchBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    Color iconColor = const Color(0xFF4C9BFF);
+    Color iconColor = theme.primaryColor;
 
     return Container(
       alignment: isCentered ? Alignment.center : Alignment.centerLeft,
       height: 40,
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: theme.searchBarColor,
         borderRadius: BorderRadius.circular(borderRadius),
       ),
 
@@ -64,7 +66,10 @@ class CustomSearchBox extends StatelessWidget {
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.all(0), // 无内边距
                 hintText: '搜索', // 提示文字
-                hintStyle: TextStyle(color: iconColor, fontSize: 16),
+                hintStyle: TextStyle(
+                    color: iconColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700),
                 // 无边框
                 // 1. 普通边框（默认状态）
                 border: const OutlineInputBorder(

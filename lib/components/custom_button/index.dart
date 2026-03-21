@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/getx_config/config.dart';
 import '../custom_material_button/index.dart';
 
 //对material_button进行封装的自定义按钮
-class CustomButton extends StatelessWidget {
+class CustomButton extends StatelessThemeWidget {
   final String text;
   final VoidCallback onTap;
   final String type;
@@ -19,11 +20,11 @@ class CustomButton extends StatelessWidget {
   Color _getColor(String type) {
     switch (type) {
       case 'primary':
-        return const Color(0xFF4C9AFF);  // 主要按钮：蓝色
+        return theme.primaryColor;
       case 'minor':
         return const Color(0xFFEDF2F9);  // 次要按钮：浅灰蓝
       default:
-        return const Color(0xFF4C9AFF);  // 默认蓝色
+        return theme.primaryColor;
     }
   }
 
@@ -42,8 +43,8 @@ class CustomButton extends StatelessWidget {
     switch (type) {
       case 'gradient':
         return BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF4C9AFF), Color(0xFF0060D9)],
+          gradient: LinearGradient(
+            colors: [theme.primaryColor, theme.boldColor],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

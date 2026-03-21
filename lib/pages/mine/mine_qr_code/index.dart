@@ -29,14 +29,11 @@ class MineQRCodePage extends CustomWidget<MineQRCodeLogic> {
     │  提示文字: "扫描二维码，添加我为好友"      │
     └─────────────────────────────────────────┘
     */
-    bool isNv = controller.currentUserInfo['sex'] == "女";
     return Scaffold(
       body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                isNv ? const Color(0xFFFBEBFF) : const Color(0xFFDFF4FF),
-                const Color(0xFFFFFFFF)],
+              colors: [theme.minorColor, const Color(0xFFFFFFFF)],
               begin: Alignment.topLeft,      // 渐变起点：左上角
               end: Alignment.bottomRight,    // 渐变终点：右下角
             ),
@@ -103,12 +100,8 @@ class MineQRCodePage extends CustomWidget<MineQRCodeLogic> {
                                   shaderCallback: (Rect bounds) {
                                     return  LinearGradient(  //渐变
                                       colors: [
-                                        isNv
-                                            ? const Color(0xFFFFA0CF)
-                                            : const Color(0xFF40A9FF),
-                                        isNv
-                                            ? const Color(0xFFF5CFFF)
-                                            : const Color(0xFFA0D9F6)
+                                        theme.primaryColor,
+                                        theme.qrColor
                                       ],
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
@@ -141,7 +134,7 @@ class MineQRCodePage extends CustomWidget<MineQRCodeLogic> {
                                     color: Colors.white,
                                   ),
                                   child: Image.asset(
-                                      'assets/images/logo-qr${isNv ? '-pink' : ''}.png'),
+                                      'assets/images/logo-qr-${theme.themeMode}.png'),
                                 ),
                               ],
                             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
+import 'GlobalThemeConfig.dart';
 import 'route.dart';
 
 
@@ -41,6 +42,8 @@ abstract class CustomWidget<T extends GetxController> extends StatelessWidget {
   // 获取控制器
   ///控制器就是对应的logic对象
   T get controller => GetInstance().find<T>(tag: tag);
+  GlobalThemeConfig get theme =>
+      GetInstance().find<GlobalThemeConfig>(tag: tag);
 
   /// 生命周期方法
   // 初始化
@@ -77,6 +80,13 @@ abstract class CustomWidget<T extends GetxController> extends StatelessWidget {
         dispose: (GetBuilderState<T> state) => close(context), // 销毁
       );
 }
+
+//让与颜色相关的widget内部封装有获取全局颜色配置的方法
+abstract class StatelessThemeWidget extends StatelessWidget {
+  const StatelessThemeWidget({super.key});
+  GlobalThemeConfig get theme => GetInstance().find<GlobalThemeConfig>();
+}
+
 
 // 继承自GetView
 // 适用于局部

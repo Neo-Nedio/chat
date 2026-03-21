@@ -124,75 +124,75 @@ class QRCodeScanPage extends CustomWidget<QRCodeScanLogic> {
       ),
     );
   }
+  //绘制扫描框的四个角装饰
+  List<Widget> buildCorners(constraints) {
+    return [
+      // 左上角
+      //从摄像区域中心(宽高减半到就是摄像区域中心），向上移动125，向左移动125(透明框是120，设置125是为了有些许出去)
+      //通过边框为蓝，增加视觉效果
+      Positioned(
+        top: constraints.maxHeight / 2 - 125,
+        left: constraints.maxWidth / 2 - 125,
+        child: Container(
+          width: 20,
+          height: 20,
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(color: theme.primaryColor, width: 4),
+              left: BorderSide(color: theme.primaryColor, width: 4),
+            ),
+          ),
+        ),
+      ),
+      // 右上角
+      Positioned(
+        top: constraints.maxHeight / 2 - 125,
+        right: constraints.maxWidth / 2 - 125,
+        child: Container(
+          width: 20,
+          height: 20,
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(color: theme.primaryColor, width: 4),
+              right: BorderSide(color: theme.primaryColor, width: 4),
+            ),
+          ),
+        ),
+      ),
+      // 左下角
+      Positioned(
+        bottom: constraints.maxHeight / 2 - 125,
+        left: constraints.maxWidth / 2 - 125,
+        child: Container(
+          width: 20,
+          height: 20,
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(color: theme.primaryColor, width: 4),
+              left: BorderSide(color: theme.primaryColor, width: 4),
+            ),
+          ),
+        ),
+      ),
+      // 右下角
+      Positioned(
+        bottom: constraints.maxHeight / 2 - 125,
+        right: constraints.maxWidth / 2 - 125,
+        child: Container(
+          width: 20,
+          height: 20,
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(color: theme.primaryColor, width: 4),
+              right: BorderSide(color: theme.primaryColor, width: 4),
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
 }
 
-//绘制扫描框的四个角装饰
-List<Widget> buildCorners(constraints) {
-  return [
-    // 左上角
-    //从摄像区域中心(宽高减半到就是摄像区域中心），向上移动125，向左移动125(透明框是120，设置125是为了有些许出去)
-    //通过边框为蓝，增加视觉效果
-    Positioned(
-      top: constraints.maxHeight / 2 - 125,
-      left: constraints.maxWidth / 2 - 125,
-      child: Container(
-        width: 20,
-        height: 20,
-        decoration: const BoxDecoration(
-          border: Border(
-            top: BorderSide(color: Color(0xFF4C9BFF), width: 4),
-            left: BorderSide(color: Color(0xFF4C9BFF), width: 4),
-          ),
-        ),
-      ),
-    ),
-    // 右上角
-    Positioned(
-      top: constraints.maxHeight / 2 - 125,
-      right: constraints.maxWidth / 2 - 125,
-      child: Container(
-        width: 20,
-        height: 20,
-        decoration: const BoxDecoration(
-          border: Border(
-            top: BorderSide(color: Color(0xFF4C9BFF), width: 4),
-            right: BorderSide(color: Color(0xFF4C9BFF), width: 4),
-          ),
-        ),
-      ),
-    ),
-    // 左下角
-    Positioned(
-      bottom: constraints.maxHeight / 2 - 125,
-      left: constraints.maxWidth / 2 - 125,
-      child: Container(
-        width: 20,
-        height: 20,
-        decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: Color(0xFF4C9BFF), width: 4),
-            left: BorderSide(color: Color(0xFF4C9BFF), width: 4),
-          ),
-        ),
-      ),
-    ),
-    // 右下角
-    Positioned(
-      bottom: constraints.maxHeight / 2 - 125,
-      right: constraints.maxWidth / 2 - 125,
-      child: Container(
-        width: 20,
-        height: 20,
-        decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: Color(0xFF4C9BFF), width: 4),
-            right: BorderSide(color: Color(0xFF4C9BFF), width: 4),
-          ),
-        ),
-      ),
-    ),
-  ];
-}
 
 /*
 
