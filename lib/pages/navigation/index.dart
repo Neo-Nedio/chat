@@ -9,7 +9,6 @@ import '../talk/index.dart';
 import 'logic.dart';
 
 //主页导航栏
-//把整体CustomWidgetObx包括改为上下部分单独Obx，优化性能
 class NavigationPage extends CustomWidget<NavigationLogic> {
   NavigationPage({required super.key});
 
@@ -32,12 +31,11 @@ class NavigationPage extends CustomWidget<NavigationLogic> {
   Widget buildWidget(BuildContext context) {
     return Scaffold(
       // 上半部分：页面内容
-      body: Obx(() => _buildPage((controller.currentIndex.value))),
+      body: _buildPage((controller.currentIndex)),
 
       // 下半部分：底部导航栏
-      bottomNavigationBar: Obx(
-          () =>BottomNavigationBar(
-            currentIndex: controller.currentIndex.value,
+      bottomNavigationBar: BottomNavigationBar(
+            currentIndex: controller.currentIndex,
             onTap: controller.onTap,
 
             selectedItemColor: Theme.of(context).primaryColor,  // 选中文字颜色
@@ -50,7 +48,7 @@ class NavigationPage extends CustomWidget<NavigationLogic> {
               return BottomNavigationBarItem(
                 // 根据选中状态显示不同图标
                 icon: Image.asset(
-                  controller.currentIndex.value == index
+                  controller.currentIndex == index
                       ? controller.selectedIcons[index]
                       : controller.unselectedIcons[index],
                   width: 26,
@@ -60,7 +58,6 @@ class NavigationPage extends CustomWidget<NavigationLogic> {
               );
             }),
           ),
-      )
-    );
+      );
   }
 }
