@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../components/custom_button/index.dart';
 import '../../../components/custom_portrait/index.dart';
 import '../../../components/custom_text_field/index.dart';
 import '../../../utils/getx_config/config.dart';
@@ -13,10 +14,9 @@ class EditMinePage extends CustomWidget<EditMineLogic> {
   Widget buildWidget(BuildContext context) {
     //屏幕高度
     final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       body: Container(
-        height: screenHeight, //屏幕高度
+        height: screenHeight,
         decoration: BoxDecoration(
           gradient: LinearGradient( //渐变
             colors: [theme.minorColor, const Color(0xFFFFFFFF)],
@@ -130,89 +130,79 @@ class EditMinePage extends CustomWidget<EditMineLogic> {
                   //上下间隔
                   const SizedBox(height: 16),
 
-                  // 昵称输入框
-                  CustomTextField(
-                    labelText: "昵称",
-                    controller: controller.nameController,
-                    inputLimit: 30,
-                    onChanged: controller.onNameTextChanged,
-                    readOnly: !controller.isEdit,//根据是否开始编辑.达成是否可读
-                    suffix: Text('${controller.nameTextLength}/30'),
-                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 20.0,
+                      horizontal: 20.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10.0),
+                      border: Border.all(
+                        color: const Color(0xFFF2F2F2),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Column(children: [
+                      // 昵称输入框
+                      CustomTextField(
+                        labelText: "昵称",
+                        controller: controller.nameController,
+                        inputLimit: 30,
+                        onChanged: controller.onNameTextChanged,
+                        readOnly: !controller.isEdit,//根据是否开始编辑.达成是否可读
+                        suffix: Text('${controller.nameTextLength}/30'),
+                      ),
 
-                  //上下间隔
-                  const SizedBox(height: 8),
+                      //上下间隔
+                      const SizedBox(height: 10),
 
-                  //签名输入框
-                  CustomTextField(
-                    labelText: "签名",
-                    controller: controller.signatureController,
-                    inputLimit: 30,
-                    onChanged: controller.onSignatureTextChanged,
-                    readOnly: !controller.isEdit,//根据是否开始编辑.达成是否可读
-                    suffix: Text('${controller.signatureTextLength}/100'),
-                  ),
+                      //生日选择器
+                      CustomTextField(
+                        labelText: "生日",
+                        controller: controller.birthdayController,
+                        readOnly: true,
+                        suffixIcon: IconButton( //设定右侧可点击图标
+                          onPressed: () => controller.selectDate(context),
+                          icon: const Icon(Icons.calendar_today, size: 20),
+                        ),
+                      ),
 
-                  //上下间隔
-                  const SizedBox(height: 16),
+                      //上下间隔
+                      const SizedBox(height: 10),
 
-                  //生日选择器
-                  CustomTextField(
-                    labelText: "生日",
-                    controller: controller.birthdayController,
-                    readOnly: true,
-                    suffixIcon: IconButton( //设定右侧可点击图标
-                      onPressed: () => controller.selectDate(context),
-                      icon: const Icon(Icons.calendar_today, size: 20),
+                      //签名输入框
+                      CustomTextField(
+                        labelText: "签名",
+                        controller: controller.signatureController,
+                        inputLimit: 100,
+                        onChanged: controller.onSignatureTextChanged,
+                        readOnly: !controller.isEdit,//根据是否开始编辑.达成是否可读
+                        maxLines: 4,
+                        suffix: Text('${controller.signatureTextLength}/100'),
+                      ),
+                    ]
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+
+
+                  const SizedBox(height: 16),
 
                   //按钮
                   !controller.isEdit
-                      ? FractionallySizedBox(
-                          widthFactor: 0.8,
-                          child: ElevatedButton(
-                            onPressed: () => controller.onPressed(),
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 5,
-                                vertical: 5,
-                              ),
-                              backgroundColor: const Color(0xFF4C9BFF),
-                              foregroundColor: Colors.white,
-                            ),
-                            child: const Text(
-                              "编辑资料",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        )
-                      : FractionallySizedBox(
-                          widthFactor: 0.8,
-                          child: ElevatedButton(
-                            onPressed: () => controller.onPressed(),
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 5,
-                                vertical: 5,
-                              ),
-                              backgroundColor: const Color(0xFF4C9BFF),
-                              foregroundColor: Colors.white,
-                            ),
-                            child: const Text(
-                              "保  存",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
+                      ? CustomButton(
+                    text: "编辑资料",
+                    onTap: controller.onPressed,
+                    width: MediaQuery.of(context).size.width,
+                    type: 'gradient',
+                  )
+                      : CustomButton(
+                    text: "保存",
+                    onTap: controller.onPressed,
+                    width: MediaQuery.of(context).size.width,
+                    type: 'gradient',
+                  ),
 
                   const Spacer(flex: 6),
                 ],

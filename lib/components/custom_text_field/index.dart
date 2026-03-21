@@ -13,6 +13,7 @@ class CustomTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;  // 输入变化回调
   final int? inputLimit;                // 输入字符数量限制
   final bool readOnly;
+  final int? maxLines; // 新增maxLines参数
 
   const CustomTextField({
     super.key,
@@ -25,6 +26,7 @@ class CustomTextField extends StatelessWidget {
     this.suffixIcon,
     this.inputLimit,
     this.readOnly = false, //控制文本输入框是否可编辑
+    this.maxLines = 1, // 默认为1行
   });
 
 
@@ -80,7 +82,7 @@ class CustomTextField extends StatelessWidget {
 
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFFEDF2F9), // 设置背景颜色为 #EDF2F9
+            color: const Color(0xFFEDF2F9), // 设置背景颜色
             borderRadius: BorderRadius.circular(10.0),
           ),
           child: TextField(
@@ -88,9 +90,9 @@ class CustomTextField extends StatelessWidget {
             obscureText: obscureText,
             onChanged: onChanged,//函数回调
             readOnly: readOnly,
+            maxLines: maxLines,
             inputFormatters: inputLimit != null
                 ? <TextInputFormatter>[
-              //只输入数字
               LengthLimitingTextInputFormatter(inputLimit) //限制输入长度
             ]
                 : null, // 不设置任何限制
@@ -111,7 +113,7 @@ class CustomTextField extends StatelessWidget {
               ),
               //设置输入框内部内容的内边距（padding）
               contentPadding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
             ),
           ),
         ),
