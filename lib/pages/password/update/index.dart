@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 import '../../../components/custom_button/index.dart';
 import '../../../components/custom_text_field/index.dart';
 import '../../../utils/getx_config/config.dart';
@@ -38,6 +40,13 @@ class UpdatePasswordPage extends CustomWidget<UpdatePasswordLogic> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // 返回按钮
+                Row(
+                    // mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(onPressed: ()=>Get.back(), icon: const Icon(Icons.arrow_back))
+                    ],
+                  ),
 
                 const Spacer(flex: 1),
 

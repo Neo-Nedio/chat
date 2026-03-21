@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 
 import '../../components/custom_text_field/index.dart';
 import '../../utils/getx_config/config.dart';
@@ -36,6 +38,13 @@ class RegisterPage extends CustomWidget<RegisterPageLogic> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 children: [
+                  // 返回按钮
+                  Row(
+                    // mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(onPressed: ()=>Get.back(), icon: const Icon(Icons.arrow_back))
+                    ],
+                  ),
                   const Spacer(flex: 1),
                   // Logo部分
                   Image.asset(
