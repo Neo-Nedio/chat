@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 class CustomLabelValue extends StatelessWidget {
   final String label;
   final String value;
+  final double? width;
 
   const CustomLabelValue({
     super.key,
     required this.label,
     required this.value,
+    this.width = 60, //控制标签大小
   });
 
 /*
@@ -24,7 +26,7 @@ class CustomLabelValue extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white, //白色边框
         borderRadius: BorderRadius.circular(8),
       ),
 
@@ -33,12 +35,15 @@ class CustomLabelValue extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,                // 宽度自适应内容
         mainAxisAlignment: MainAxisAlignment.center,   // 水平居中
         children: [
-          //标签
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black54, // 半透明黑色，视觉权重较低
+          SizedBox(
+            width: width,
+            //标签
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.black54, // 半透明黑色，视觉权重较低
+              ),
             ),
           ),
           const SizedBox(width: 20),

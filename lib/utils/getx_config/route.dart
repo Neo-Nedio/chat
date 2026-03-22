@@ -4,6 +4,7 @@ import 'package:get/get_navigation/src/routes/get_route.dart';
 import '../../pages/chat_list/index.dart';
 import '../../pages/contacts/index.dart';
 import '../../pages/login/index.dart';
+import '../../pages/mine/about/index.dart';
 import '../../pages/mine/edit/index.dart';
 import '../../pages/mine/index.dart';
 import '../../pages/mine/mine_qr_code/index.dart';
@@ -122,6 +123,13 @@ class AppRoutes {
       name: '/qr_other_result',
       page: () => QrOtherResultPage(
         key: const Key('qr_other_result'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/about',
+      page: () => AboutPage(
+        key: const Key('about'),
       ),
       binding: ControllerBinding(),
     ),

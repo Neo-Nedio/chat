@@ -189,7 +189,10 @@ class MinePage extends CustomWidget<MineLogic> {
                     Get.toNamed('/update_password');
                   }),
                   const SizedBox(height: 2),
-                  _minorSelectButton('关于我们', 'mine-about.png', () {}),
+                  const SizedBox(height: 2),
+                  _minorSelectButton('关于我们', 'mine-about.png', () {
+                    Get.toNamed('/about');
+                  }),
                   const SizedBox(height: 2),
                   _minorSelectButton('设置', 'mine-set.png', () {}),
                   const SizedBox(height: 30),
