@@ -40,15 +40,7 @@ class UpdatePasswordPage extends CustomWidget<UpdatePasswordLogic> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 返回按钮
-                Row(
-                    // mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(onPressed: ()=>Get.back(), icon: const Icon(Icons.arrow_back))
-                    ],
-                  ),
-
-                const Spacer(flex: 1),
+                  const Spacer(flex: 1),
 
                   // Logo部分
                   const SizedBox(height: 10.0),
