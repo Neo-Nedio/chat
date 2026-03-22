@@ -14,6 +14,7 @@ class MinePage extends CustomWidget<MineLogic> {
 
   @override
   void init(BuildContext context) {
+    super.init(context);
     controller.init();
   }
 /*

@@ -204,6 +204,24 @@ class LoginPage extends CustomWidget<LoginPageLogic>  {
                             onChanged: controller.onPasswordTextChanged,
                             suffix: Text('${controller.passwordTextLength}/16'),
                           ),
+
+                          //忘记密码
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                onPressed: () => controller.toRetrievePassword(),
+                                child: const Text(
+                                  "忘记密码?",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFFb0b0ba),
+                                    // fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                           //间隔
                           const SizedBox(height: 20.0),
 
@@ -234,17 +252,7 @@ class LoginPage extends CustomWidget<LoginPageLogic>  {
                           //上下分割
                           const SizedBox(height: 10.0),
 
-                          //忘记密码与注册
-                          TextButton(
-                            onPressed: () => controller.toRetrievePassword(),
-                            child: const Text(
-                              "忘记密码",
-                              style: TextStyle(
-                                fontSize: 16,
-                                // fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
+                          //注册
                           TextButton(
                             onPressed: () => controller.toRegister(),
                             child: const Text(

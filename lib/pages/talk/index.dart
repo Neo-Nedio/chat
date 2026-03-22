@@ -273,9 +273,8 @@ class TalkPage extends CustomWidget<TalkLogic> {
                 ),
               ),
               //失败图片
-              errorWidget: (context, url, error) => Container(
-                child: Image.asset('assets/images/empty-bg.png'),
-              ),
+              errorWidget: (context, url, error) =>
+                  Image.asset('assets/images/empty-bg.png'),
             );
           } else {
             // 加载中

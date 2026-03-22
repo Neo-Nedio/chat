@@ -190,15 +190,8 @@ class EditMinePage extends CustomWidget<EditMineLogic> {
                   const SizedBox(height: 16),
 
                   //按钮
-                  !controller.isEdit
-                      ? CustomButton(
-                    text: "编辑资料",
-                    onTap: controller.onPressed,
-                    width: MediaQuery.of(context).size.width,
-                    type: 'gradient',
-                  )
-                      : CustomButton(
-                    text: "保存",
+                  CustomButton(
+                    text: !controller.isEdit?"编辑资料":"保存",
                     onTap: controller.onPressed,
                     width: MediaQuery.of(context).size.width,
                     type: 'gradient',

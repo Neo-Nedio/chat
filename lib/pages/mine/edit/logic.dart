@@ -1,5 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_pickers/pickers.dart';
+import 'package:flutter_pickers/style/picker_style.dart';
+import 'package:flutter_pickers/time_picker/model/date_type.dart';
+import 'package:flutter_pickers/time_picker/model/pduration.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart' as getx;
 import 'package:image_picker/image_picker.dart';
@@ -10,7 +14,6 @@ import 'package:dio/dio.dart' show MultipartFile, FormData;
 import '../../../api/user_api.dart';
 import '../../../utils/cropPicture.dart';
 import '../../../utils/getx_config/GlobalThemeConfig.dart';
-import '../../navigation/logic.dart';
 import '../logic.dart';
 
 //个人资料编辑页面逻辑
@@ -18,6 +21,8 @@ class EditMineLogic extends getx.GetxController {
 
   //上个页面控制器(用于返回上一个页面)
   final MineLogic _mineLogic = getx.Get.find<MineLogic>();
+
+  final GlobalThemeConfig _theme = getx.GetInstance().find<GlobalThemeConfig>();
 
   //当页面返回时，销毁控制器
   @override
@@ -119,7 +124,7 @@ class EditMineLogic extends getx.GetxController {
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 1,
-          backgroundColor: const Color(0xFF4C9BFF),
+          backgroundColor: _theme.primaryColor,
           textColor: Colors.white,
           fontSize: 16.0);
       //保存头像并更新
@@ -214,6 +219,7 @@ class EditMineLogic extends getx.GetxController {
   //设置性别值
   void setSexValue(String value) {
     sex = value;
+    _theme.changeThemeMode(sex == "女" ? "pink" : "blue");
     ///男性选中：蓝色背景 + 白色文字
     if (value == "男") {
       maleColorActive = const Color(0xFF4C9BFF);
@@ -251,16 +257,50 @@ class EditMineLogic extends getx.GetxController {
     if (!isEdit) {
       isEdit = true;
     }
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: birthday,
-      firstDate: DateTime(1900),
-      lastDate: DateTime(2101),
+    final iniDate = PDuration.parse(birthday);//// 解析初始日期
+
+    Pickers.showDatePicker(
+      context,
+      maxDate: PDuration.parse(DateTime.now()),      // 最大日期（今天）
+      minDate: PDuration.parse(DateTime(1900, 1, 1)), // 最小日期（1900-01-01）
+      // 样式配置
+      pickerStyle: PickerStyle(
+        commitButton: Container(//确定按钮样式
+          alignment: Alignment.center,
+          padding: const EdgeInsets.only(left: 12, right: 22),
+          child: Text('确定',
+              style: TextStyle(color: _theme.primaryColor, fontSize: 16.0)),
+        ),
+        headDecoration: BoxDecoration( //头部背景色（根据性别变化）
+          color:
+          sex == "女" ? const Color(0xFFfcebff) : const Color(0xFFe6f2ff),
+        ),
+        backgroundColor: //头部背景色（根据性别变化）
+        sex == "女" ? const Color(0xFFfcebff) : const Color(0xFFe6f2ff),
+      ),
+
+      selectDate: iniDate, // 默认选中的日期
+
+      // 滑动时回调
+      onChanged: (res) {
+        birthday = DateTime(
+          res.getSingle(DateType.Year),   // 获取年份
+          res.getSingle(DateType.Month),  // 获取月份
+          res.getSingle(DateType.Day),    // 获取日期
+        );
+        birthdayController.text = DateFormat('yyyy-MM-dd').format(birthday);
+      },
+      // 确认时回调
+      onConfirm: (res) {
+        birthday = DateTime(
+          res.getSingle(DateType.Year),   // 获取年份
+          res.getSingle(DateType.Month),  // 获取月份
+          res.getSingle(DateType.Day),    // 获取日期
+        );
+        birthdayController.text =
+            DateFormat('yyyy-MM-dd').format(birthday); // 格式化日期
+      },
     );
-    if (pickedDate != null && pickedDate != birthday) {
-      birthday = pickedDate;
-      birthdayController.text = DateFormat('yyyy-MM-dd').format(birthday);
-    }
   }
 
   //点击保存按钮进行网络请求
@@ -273,23 +313,18 @@ class EditMineLogic extends getx.GetxController {
     try {
       //数据准备
       final prefs = await SharedPreferences.getInstance();
-      final name = nameController.text.trim();
-      final signature = signatureController.text;
-      // 本地展示与 SharedPreferences 仍用 yyyy-MM-dd
-      final birthdayStr = DateFormat('yyyy-MM-dd').format(birthday);
-      // 服务端 Jackson 对字符串日期解析失败时，用毫秒时间戳（JSON 数字）最稳妥
-      final birthdayMillis = DateTime.utc(birthday.year, birthday.month, birthday.day)
-          .millisecondsSinceEpoch;
-      final portrait = (currentUserInfo['portrait'] ?? '').toString();
+      String name = nameController.text;
+      String signature = signatureController.text;
+      String birthday = this.birthday.toString();
+      String portrait = currentUserInfo['portrait'];
 
       //调用 API 保存
       final updateResult = await _useApi.update(
-        name: name,
-        sex: sex,
-        birthdayMillis: birthdayMillis,  // 服务端用时间戳，避免日期格式问题
-        signature: signature,
-        portrait: portrait,
-      );
+          name: name,
+          sex: sex,
+          birthday: birthday,
+          signature: signature,
+          portrait: portrait);
 
       //处理保存结果
       if (updateResult['code'] == 0) {
@@ -299,7 +334,7 @@ class EditMineLogic extends getx.GetxController {
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.TOP,
             timeInSecForIosWeb: 1,
-            backgroundColor: const Color(0xFF4C9BFF),
+            backgroundColor: _theme.primaryColor,
             textColor: Colors.white,
             fontSize: 16.0);
 
@@ -307,25 +342,19 @@ class EditMineLogic extends getx.GetxController {
         await prefs.setString('username', name);
         await prefs.setString('portrait', portrait);
         await prefs.setString('sex', sex);
-        await prefs.setString('birthday', birthdayStr);
+        await prefs.setString('birthday', birthday);
         await prefs.setString('signature', signature);
         // 更新当前数据
         currentUserInfo['portrait'] = portrait;
         // 退出编辑模式
         isEdit = false;
 
-        // 性别变更后主题应立即切换：GlobalThemeConfig 无 GetBuilder 订阅，需顺带刷新主界面与「我的」
-        getx.Get.find<GlobalThemeConfig>().changeThemeMode(
+        // 性别变更后主题应立即切换：GlobalThemeConfig 无 GetBuilder 订阅，需顺带刷新主界面
+        //否则只有在导航栏点击其他页面时，才会触发刷新
+        _theme.changeThemeMode(
             sex == '女' ? 'pink' : 'blue');
         //刷新导航页面
-        if (getx.Get.isRegistered<NavigationLogic>()) {
-          getx.Get.find<NavigationLogic>().update([const Key('main')]);
-        }
-        //刷新「我的」页渐变、图标
-        _mineLogic.update([const Key('mine')]);
-        //刷新当前编辑页顶部渐变
-        update([const Key('edit_mine')]);
-
+        _mineLogic.init();
       } else {
         //保存失败
         Fluttertoast.showToast(
@@ -357,33 +386,21 @@ class EditMineLogic extends getx.GetxController {
       //优先使用本地缓存，如果本地没有则用服务端数据
       final userInfo = await _useApi.info();
       final prefs = await SharedPreferences.getInstance();
-      final data = userInfo['data'] as Map<String, dynamic>? ?? {};
       currentUserInfo['name'] =
-          prefs.getString('username') ?? data['name']?.toString() ?? '';
+          prefs.getString('username') ?? userInfo['data']['name'];
       currentUserInfo['portrait'] =
-          prefs.getString('portrait') ?? data['portrait']?.toString() ?? '';
-      nameController.text = currentUserInfo['name']?.toString() ?? '';
+          prefs.getString('portrait') ?? userInfo['data']['portrait'];
+      nameController.text = currentUserInfo['name'];
       nameTextLength = nameController.text.length;
-      final sexStr = prefs.getString('sex') ?? data['sex']?.toString() ?? '男';
-
-      // // 设置性别并更新 UI 样式
-      setSexValue(sexStr);
+      sex = prefs.getString('sex') ?? userInfo['data']['sex'];
+      setSexValue(sex);
       currentUserInfo['sex'] = sex;
-
-      // 加载生日（带异常处理）
-      try {
-        final raw = data['birthday']?.toString();
-        if (raw != null && raw.isNotEmpty) {
-          birthday = DateTime.parse(raw).toLocal();
-        }
-      } catch (_) {
-        birthday = DateTime(2000, 1, 1);
-      } // 解析失败时用默认值
-      birthdayController.text = DateFormat('yyyy-MM-dd').format(birthday);
+      birthday = DateTime.parse(userInfo['data']['birthday']).toLocal();
+      birthdayController.text =
+          DateFormat('yyyy-MM-dd').format(birthday); // 格式化日期
       currentUserInfo['birthday'] = birthday;
-      //加载签名
       signatureController.text =
-          prefs.getString('signature') ?? data['signature']?.toString() ?? '';
+          prefs.getString('signature') ?? userInfo['data']['signature'];
       signatureTextLength = signatureController.text.length;
       update([const Key("edit_mine")]);
     } catch (e, st) {

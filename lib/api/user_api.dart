@@ -77,7 +77,7 @@ class UserApi {
   Future<Map<String, dynamic>> update({
     required String name,
     required String sex,
-    required int birthdayMillis,
+    required String birthday,
     required String signature,
     required String portrait,
   }) async {
@@ -86,7 +86,7 @@ class UserApi {
       data: {
         'name': name,
         'sex': sex,
-        'birthday': birthdayMillis,
+        'birthday': birthday,
         'signature': signature,
         'portrait': portrait
       },
