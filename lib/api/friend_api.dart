@@ -113,4 +113,13 @@ class FriendApi {
     );
     return response.data;
   }
+
+  //查看是否为好友
+  Future<Map<String, dynamic>> isFriend(String friendId) async {
+    final response = await _dio.get(
+      '/v1/api/friend/is/friend',
+      queryParameters: {'targetId': friendId},
+    );
+    return response.data;
+  }
 }

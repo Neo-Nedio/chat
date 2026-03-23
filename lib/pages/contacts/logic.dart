@@ -74,23 +74,9 @@ class ContactsLogic extends GetxController {
     update([const Key("contacts")]);
   }
 
-  //打开好友详情(打开前先获取所有的分组)
+  //打开好友详情
   void handlerFriendTapped(dynamic friend) {
-    List<Map<String, dynamic>> groupList = [];
-
-    //遍历好友列表，过滤出可用的分组
-    //friendList是好友分组列表，其下的Friend才是好友
-    for (var item in friendList) {
-      if (item['name'] == "特别关心" || item['name'] == "未分组"|| item['groupId'] == null) {
-        continue;
-      }
-      //分组名称和标签
-      groupList.add({'label': item['name'], 'value': item['groupId']});
-    }
-
-    //
-    Get.toNamed('/friend_info',
-        arguments: {'friend': friend, 'groupList': groupList});
+    Get.toNamed('/friend_info', arguments: {'friendId': friend['friendId']});
   }
 
   //同意添加好友

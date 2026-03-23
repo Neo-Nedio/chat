@@ -5,10 +5,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../api/friend_api.dart';
 import '../../api/qr_api.dart';
 
 class QRCodeScanLogic extends GetxController {
   final _qrApi = QrApi();
+  final _friendApi = FriendApi();
   String? qrText; // 存储扫描到的二维码内容
   final player = AudioPlayer(); // 音频播放器
   bool isScanning = true; // 是否正在扫描（防重复扫描）
@@ -48,8 +50,16 @@ class QRCodeScanLogic extends GetxController {
           Get.toNamed('/qr_login_affirm', arguments: {'qrCode': qrText});
           break;
         case 'mine':
-          Get.toNamed('/qr_friend_affirm',
-              arguments: {'result': result['data']['extend']});
+          var friendInfo = result['data']['extend'];
+          final isFriend = await _friendApi.isFriend(friendInfo['id']);
+          //通过判断是否为好友，决定通向好友信息页面还是添加好友页面
+          if (isFriend['code'] == 0 && isFriend['data']) {
+            Get.toNamed('/friend_info',
+                arguments: {'friendId': friendInfo['id']});
+          } else {
+            Get.toNamed('/qr_friend_affirm',
+                arguments: {'result': friendInfo});
+          }
           break;
         default:
           Get.toNamed('/qr_other_result',
