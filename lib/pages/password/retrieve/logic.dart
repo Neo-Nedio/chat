@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 
 
 import '../../../api/user_api.dart';
+import '../../../components/custom_flutter_toast/index.dart';
 import '../../../utils/encrypt.dart';
 
 //忘记密码页
@@ -63,25 +64,11 @@ class RetrievePasswordLogic extends GetxController{
       final String mail = mailController.text;
       final emailVerificationResult = await _useApi.emailVerification(mail);
       if (emailVerificationResult['code'] == 0) {
-        Fluttertoast.showToast(
-            msg: "发送成功",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: const Color(0xFF4C9BFF),
-            textColor: Colors.white,
-            fontSize: 16.0);
+        CustomFlutterToast.showSuccessToast('发送成功~');
         countdownTime = 30;
         _startCountdownTimer();
       } else {
-        Fluttertoast.showToast(
-            msg: emailVerificationResult['msg'],
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
+        CustomFlutterToast.showErrorToast(emailVerificationResult['msg']);
       }
     }
   }
@@ -104,33 +91,17 @@ class RetrievePasswordLogic extends GetxController{
     String password = passwordController.text;
     String email = mailController.text;
     String code = codeController.text;
-    if (account.isEmpty ||
-        password.isEmpty ||
-        email.isEmpty ||
-        code.isEmpty) {
-      Fluttertoast.showToast(
-          msg: "不能为空，请填写完整！",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: const Color(0xFF4C9BFF),
-          textColor: Colors.white,
-          fontSize: 16.0);
+    if (account.isEmpty || password.isEmpty || email.isEmpty || code.isEmpty) {
+      CustomFlutterToast.showSuccessToast('不能为空，请填写完整！');
     } else {
-
       final encryptedPassword =await passwordEncrypt(password);
       assert (encryptedPassword!="-1");
       final passwordForgetResult = await _useApi.forget(account, encryptedPassword, email, code);
-        Fluttertoast.showToast(
-            msg: passwordForgetResult['msg'],
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: passwordForgetResult['code']==0?const Color(0xFF4C9BFF):Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
         if (passwordForgetResult['code'] == 0) {
+          CustomFlutterToast.showSuccessToast(passwordForgetResult['msg']);
           Get.back();
+        } else {
+          CustomFlutterToast.showErrorToast(passwordForgetResult['msg']);
         }
     }
   }

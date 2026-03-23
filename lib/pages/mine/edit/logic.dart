@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart' show MultipartFile, FormData;
 
 import '../../../api/user_api.dart';
+import '../../../components/custom_flutter_toast/index.dart';
 import '../../../utils/cropPicture.dart';
 import '../../../utils/getx_config/GlobalThemeConfig.dart';
 import '../logic.dart';
@@ -119,14 +120,7 @@ class EditMineLogic extends getx.GetxController {
 
     // 3. 处理结果
     if (result['code'] == 0) {
-      Fluttertoast.showToast(
-          msg: "头像修改成功",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: _theme.primaryColor,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      CustomFlutterToast.showSuccessToast('头像修改成功');
       //保存头像并更新
       currentUserInfo['portrait'] = result['data'];
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -134,14 +128,7 @@ class EditMineLogic extends getx.GetxController {
       update([const Key("edit_mine")]);
     } else {
       // 失败：显示错误提示
-      Fluttertoast.showToast(
-          msg: result['msg'],
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      CustomFlutterToast.showErrorToast(result['msg']);
     }
   }
 
@@ -329,14 +316,7 @@ class EditMineLogic extends getx.GetxController {
       //处理保存结果
       if (updateResult['code'] == 0) {
         // 显示成功提示
-        Fluttertoast.showToast(
-            msg: "资料修改成功",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: _theme.primaryColor,
-            textColor: Colors.white,
-            fontSize: 16.0);
+        CustomFlutterToast.showSuccessToast('资料修改成功~');
 
         // 保存到本地缓存
         await prefs.setString('username', name);
@@ -357,26 +337,11 @@ class EditMineLogic extends getx.GetxController {
         _mineLogic.init();
       } else {
         //保存失败
-        Fluttertoast.showToast(
-            msg: updateResult['msg']?.toString() ?? '保存失败',
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
+        CustomFlutterToast.showErrorToast(updateResult['msg']);
       }
     } catch (e, st) {
       //异常处理
-      debugPrint('EditMine save error: $e\n$st');
-      Fluttertoast.showToast(
-          msg: '保存失败，请检查网络',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      CustomFlutterToast.showErrorToast('保存失败，请检查网络');
     }
   }
 

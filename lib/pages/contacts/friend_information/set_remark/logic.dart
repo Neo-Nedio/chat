@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 import '../../../../api/friend_api.dart';
+import '../../../../components/custom_flutter_toast/index.dart';
 import '../../../../utils/getx_config/GlobalThemeConfig.dart';
 import '../logic.dart';
 
@@ -30,26 +31,12 @@ class SetRemarkLogic extends GetxController {
     final response =
         await _friendApi.setRemark(friendId, remarkController.text);
     if (response['code'] == 0) {
-      Fluttertoast.showToast(
-          msg: "备注设置成功~",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: theme.primaryColor,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      CustomFlutterToast.showSuccessToast('备注设置成功~');
       //刷新好友信息并返回
       _friendInformationLogic.getFriendInfo();
       Get.back();
     } else {
-      Fluttertoast.showToast(
-          msg: response['msg'],
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      CustomFlutterToast.showErrorToast(response['msg']);
     }
   }
 

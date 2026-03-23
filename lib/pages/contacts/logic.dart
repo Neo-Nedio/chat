@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../api/chat_group_api.dart';
 import '../../api/friend_api.dart';
 import '../../api/notify_api.dart';
+import '../../components/custom_flutter_toast/index.dart';
 import '../../utils/getx_config/GlobalThemeConfig.dart';
 
 class ContactsLogic extends GetxController {
@@ -84,23 +85,9 @@ class ContactsLogic extends GetxController {
     final result = await _friendApi.agree(notifyId);
     if (result['code'] == 0) {
       init();
-      Fluttertoast.showToast(
-          msg: "同意好友请求成功",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: _theme.primaryColor,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      CustomFlutterToast.showSuccessToast("同意好友请求成功");
     } else {
-      Fluttertoast.showToast(
-          msg: "同意好友请求失败",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      CustomFlutterToast.showErrorToast("同意好友请求失败");
     }
   }
 }

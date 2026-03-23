@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 
 
 import '../../api/user_api.dart';
+import '../../components/custom_flutter_toast/index.dart';
 import '../../utils/encrypt.dart';
 
 class RegisterPageLogic extends GetxController {
@@ -87,26 +88,12 @@ class RegisterPageLogic extends GetxController {
       final emailVerificationResult = await _useApi.emailVerification(mail);
 
       if (emailVerificationResult['code'] == 0) {
-        Fluttertoast.showToast(
-            msg: "发送成功",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: const Color(0xFF4C9BFF), // 蓝色成功提示
-            textColor: Colors.white,
-            fontSize: 16.0);
+        CustomFlutterToast.showSuccessToast("发送成功~");
 
         countdownTime = 30;  // 设置倒计时30秒
         _startCountdownTimer();  // 开始倒计时
       } else {
-        Fluttertoast.showToast(
-            msg: emailVerificationResult['msg'],
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red, // 红色错误提示
-            textColor: Colors.white,
-            fontSize: 16.0);
+        CustomFlutterToast.showErrorToast(emailVerificationResult['msg']);
       }
     }
   }
@@ -125,14 +112,7 @@ class RegisterPageLogic extends GetxController {
         password.isEmpty ||
         email.isEmpty ||
         code.isEmpty) {
-      Fluttertoast.showToast(
-          msg: "不能为空，请填写完整！",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      CustomFlutterToast.showErrorToast("不能为空，请填写完整！");
     } else {
       //密码加密
       final encryptedPassword = await passwordEncrypt(password);
@@ -141,21 +121,12 @@ class RegisterPageLogic extends GetxController {
       //调用注册API
       final registerResult = await _useApi.register(
           username, account, encryptedPassword, email, code);
-      //显示结果
-      Fluttertoast.showToast(
-          msg: registerResult['msg'],
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: registerResult['code'] == 0
-              ? const Color(0xFF4C9BFF)  // 成功蓝色
-              : Colors.red,                // 失败红色
-          textColor: Colors.white,
-          fontSize: 16.0);
-
       //注册成功返回上一页
       if (registerResult['code'] == 0) {
+        CustomFlutterToast.showSuccessToast(registerResult['msg']);
         Get.back();  // 返回登录页
+      }else {
+        CustomFlutterToast.showErrorToast(registerResult['msg']);
       }
     }
   }

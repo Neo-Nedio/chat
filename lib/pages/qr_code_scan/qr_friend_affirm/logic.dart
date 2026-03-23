@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 import '../../../api/notify_api.dart';
+import '../../../components/custom_flutter_toast/index.dart';
 
 class QRFriendAffirmLogic extends GetxController {
   final _notifyApi = NotifyApi();
@@ -19,14 +20,7 @@ class QRFriendAffirmLogic extends GetxController {
     // 调用添加好友API
     _notifyApi.friendApply(result['id'], "通过二维码添加好友").then((res) {
       if (res['code'] == 0) {
-        Fluttertoast.showToast(
-            msg: "请求成功~",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: const Color(0xFF4C9BFF),
-            textColor: Colors.white,
-            fontSize: 16.0);
+        CustomFlutterToast.showSuccessToast("请求成功");
       }
       Get.until((route) => Get.currentRoute == "/");
     });

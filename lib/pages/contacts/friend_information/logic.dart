@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 import '../../../api/friend_api.dart';
+import '../../../components/custom_flutter_toast/index.dart';
 import '../../../utils/getx_config/GlobalThemeConfig.dart';
 import '../../../utils/getx_config/config.dart';
 import '../logic.dart';
@@ -124,7 +125,7 @@ class FriendInformationLogic extends Logic {
       friendGender = data['sex'];
       friendBirthday = data['birthday'];
       friendSignature = data['signature'] ?? '';
-      friendGroup = data['group'] ?? '未分组';
+      friendGroup = data['groupName'] ?? '未分组';
       isConcern = data['isConcern'];
     }
     update([const Key('friend_info')]);
@@ -140,36 +141,15 @@ class FriendInformationLogic extends Logic {
   //设置分组
   void setGroup(String value) async {
     if (value == '0') {
-      Fluttertoast.showToast(
-          msg: "选择有误",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      CustomFlutterToast.showErrorToast('选择有误');
       return;
     }
     friendGroup = value;
     final response = await _friendApi.setGroup(friendId, friendGroup);
     if (response['code'] == 0) {
-      Fluttertoast.showToast(
-          msg: "修改分组成功",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: _theme.primaryColor,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      CustomFlutterToast.showSuccessToast('修改分组成功');
     } else {
-      Fluttertoast.showToast(
-          msg: response['msg'],
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      CustomFlutterToast.showErrorToast(response['msg']);
     }
   }
 
