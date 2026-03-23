@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../components/custom_image_group/index.dart';
 import '../../components/custom_portrait/index.dart';
 import '../../components/custom_text_button/index.dart';
 import '../../utils/date.dart';
@@ -196,9 +197,9 @@ class TalkPage extends CustomWidget<TalkLogic> {
                           style: const TextStyle(fontSize: 14),
                         ),
                         // 图片网格
-                        _buildImageGrid(
-                            //img不是url,而是文件名字
-                            talk['content']['img'] ?? [], talk['userId']),
+                        CustomImageGroup(
+                            imagesList: talk['content']['img'] ?? [], //img不是url,是文件名字
+                            userId: talk['userId']),
                       ],
                     ),
                   ),
@@ -229,66 +230,6 @@ class TalkPage extends CustomWidget<TalkLogic> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  // 图片网格
-  Widget _buildImageGrid(List<dynamic> imageUrls, String userId) {
-    return GridView.builder(
-      shrinkWrap: true,  // 根据内容收缩高度
-      physics: const NeverScrollableScrollPhysics(), // 禁止网格自身滚动
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,      // 每行3列
-        crossAxisSpacing: 0,    // 列间距0
-        mainAxisSpacing: 0,     // 行间距0
-        childAspectRatio: 1.0,  // 宽高比1:1
-      ),
-      itemCount: imageUrls.length,
-      itemBuilder: (context, index) {
-        return _buildTalkImage(imageUrls[index], userId);
-      },
-    );
-  }
-
-  // 单个图片
-  Widget _buildTalkImage(String imageStr, String userId) {
-    return Container(
-      padding: const EdgeInsets.all(2.0),
-      child: FutureBuilder<String>(
-        future: controller.onGetImg(imageStr, userId),  // 异步获取图片URL
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return CachedNetworkImage(// 显示图片
-              imageUrl: snapshot.data ?? '',
-              fit: BoxFit.cover,
-              //加载图片
-              placeholder: (context, url) => Container(
-                color: Colors.grey[300],
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    color: Color(0xffffffff),
-                    strokeWidth: 2,
-                  ),
-                ),
-              ),
-              //失败图片
-              errorWidget: (context, url, error) =>
-                  Image.asset('assets/images/empty-bg.png'),
-            );
-          } else {
-            // 加载中
-            return Container(
-              color: Colors.grey[300],
-              child: const Center(
-                child: CircularProgressIndicator(
-                  color: Color(0xffffffff),
-                  strokeWidth: 2,
-                ),
-              ),
-            );
-          }
-        },
       ),
     );
   }
