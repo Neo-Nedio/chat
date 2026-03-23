@@ -37,4 +37,80 @@ class FriendApi {
     );
     return response.data;
   }
+
+  //获取好友详情
+  Future<Map<String, dynamic>> details(String friendId) async {
+    final response = await _dio.get(
+      '/v1/api/friend/details/$friendId',
+    );
+    return response.data;
+  }
+
+  //设置好友备注
+  Future<Map<String, dynamic>> setRemark(String friendId, String remark) async {
+    final response = await _dio.post(
+      '/v1/api/friend/set/remark',
+      data: {
+        'friendId': friendId,
+        'remark': remark,
+      },
+    );
+    return response.data;
+  }
+
+  //设置好友分组
+  Future<Map<String, dynamic>> setGroup(String friendId, String groupId) async {
+    final response = await _dio.post(
+      '/v1/api/friend/set/group',
+      data: {
+        'friendId': friendId,
+        'groupId': groupId,
+      },
+    );
+    return response.data;
+  }
+
+  //特别关心
+  Future<Map<String, dynamic>> careFor(String friendId) async {
+    final response = await _dio.post(
+      '/v1/api/friend/carefor',
+      data: {
+        'friendId': friendId,
+      },
+    );
+    return response.data;
+  }
+
+  //取消特别关心
+  Future<Map<String, dynamic>> unCareFor(String friendId) async {
+    final response = await _dio.post(
+      '/v1/api/friend/uncarefor',
+      data: {
+        'friendId': friendId,
+      },
+    );
+    return response.data;
+  }
+
+  //删除好友
+  Future<Map<String, dynamic>> delete(String friendId) async {
+    final response = await _dio.post(
+      '/v1/api/friend/delete',
+      data: {
+        'friendId': friendId,
+      },
+    );
+    return response.data;
+  }
+
+  //同意好友申请（按通知 ID）
+  Future<Map<String, dynamic>> agree(String notifyId) async {
+    final response = await _dio.post(
+      '/v1/api/friend/agree',
+      data: {
+        'notifyId': notifyId,
+      },
+    );
+    return response.data;
+  }
 }

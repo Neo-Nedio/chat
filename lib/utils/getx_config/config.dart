@@ -11,6 +11,18 @@ typedef CloseFunc = void Function();         // 关闭函数
 typedef CallbackFunc = void Function();      // 回调函数
 typedef FilterFunc<T> = Object Function(T value);  // 过滤器函数
 
+//封装了arguments参数,这样可以直接获取参数
+class Logic extends GetxController {
+  //路由参数
+  dynamic arguments = Get.arguments;
+
+  @override
+  void onClose() {
+    super.onClose();
+    if (arguments != null) arguments = null;
+  }
+}
+
 //路由配置
 // 进入路由时，GetX会自动：
 // 1. 执行 ControllerBinding().dependencies()

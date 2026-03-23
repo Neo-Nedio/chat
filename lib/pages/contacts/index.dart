@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 
 import '../../components/custom_portrait/index.dart';
 import '../../components/custom_search_box/index.dart';
@@ -89,9 +91,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
       borderRadius: BorderRadius.circular(12),  // 圆角12像素
       color: Colors.white,                       // 白色背景
       child: InkWell(
-        onTap: () {
-          // 添加点击事件
-        },
+        onTap: () => controller.handlerFriendTapped(friend),
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10.0),  // 上下内边距10
@@ -257,7 +257,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
                 const SizedBox(width: 20),
 
                 //操作区域
-                _getNotifyOperateTip(notify['status'], isFromCurrentUser),
+                _getNotifyOperateTip(notify['status'], isFromCurrentUser,notify),
               ],
             ),
           ),
@@ -289,12 +289,12 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
   }
 
   //获得操作提示
-  Widget _getNotifyOperateTip(status, isFromCurrentUser) {
+  Widget _getNotifyOperateTip(status, isFromCurrentUser,[dynamic notify]) {
     // 情况1：别人发来的待处理请求 → 显示操作按钮
     if (!isFromCurrentUser && status == "wait") {
       return Row(
         children: [
-          CustomTextButton("同意", onTap: () {}),
+          CustomTextButton("同意", onTap: ()=> controller.handlerAgreeFriend(notify['id'])),
 
           const SizedBox(width: 10),
 
@@ -492,6 +492,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
               PopupMenuItem(
                 value: 1,
                 height: 40,
+                onTap: () => Get.toNamed('/qr_code_scan'),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 
 import '../../pages/chat_list/index.dart';
+import '../../pages/contacts/friend_information/index.dart';
 import '../../pages/contacts/index.dart';
 import '../../pages/login/index.dart';
 import '../../pages/mine/about/index.dart';
@@ -130,6 +131,13 @@ class AppRoutes {
       name: '/about',
       page: () => AboutPage(
         key: const Key('about'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/friend_info',
+      page: () => FriendInformationPage(
+        key: const Key('friend_info'),
       ),
       binding: ControllerBinding(),
     ),

@@ -4,6 +4,7 @@ import 'package:get/get_instance/src/bindings_interface.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 
 import '../../pages/chat_list/logic.dart';
+import '../../pages/contacts/friend_information/logic.dart';
 import '../../pages/contacts/logic.dart';
 import '../../pages/login/logic.dart';
 import '../../pages/mine/about/logic.dart';
@@ -42,5 +43,6 @@ class ControllerBinding extends Bindings {
     Get.lazyPut(() => QrOtherResultLogic());
     Get.lazyPut(() => QRFriendAffirmLogic());
     Get.lazyPut(() => AboutLogic());
+    Get.lazyPut(() => FriendInformationLogic());
   }
 }
