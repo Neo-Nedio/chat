@@ -25,9 +25,17 @@ class EditMineLogic extends getx.GetxController {
 
   final GlobalThemeConfig _theme = getx.GetInstance().find<GlobalThemeConfig>();
 
+  //记录最初主题颜色
+  late final String _originThemeMode;
+  bool _isThemeCommitted = false;//修改的主题是否提交
+
   //当页面返回时，销毁控制器
   @override
   void onClose() {
+    //未提交时回退原主题
+    if (!_isThemeCommitted) {
+      _theme.changeThemeMode(_originThemeMode);
+    }
     super.onClose();
     nameController.dispose();
     signatureController.dispose();
@@ -40,6 +48,7 @@ class EditMineLogic extends getx.GetxController {
   @override
   void onInit() {
     super.onInit();
+    _originThemeMode = _theme.themeMode;
     _loadUserFromServer();
   }
 
@@ -204,9 +213,12 @@ class EditMineLogic extends getx.GetxController {
   }
 
   //设置性别值
-  void setSexValue(String value) {
+  //changeTheme代表是否需要在中过程中改变主题
+  void setSexValue(String value, {bool changeTheme = true}) {
     sex = value;
-    _theme.changeThemeMode(sex == "女" ? "pink" : "blue");
+    if (changeTheme) {
+      _theme.changeThemeMode(sex == "女" ? "pink" : "blue");
+    }
     ///男性选中：蓝色背景 + 白色文字
     if (value == "男") {
       maleColorActive = const Color(0xFF4C9BFF);
@@ -333,6 +345,8 @@ class EditMineLogic extends getx.GetxController {
         //否则只有在导航栏点击其他页面时，才会触发刷新
         _theme.changeThemeMode(
             sex == '女' ? 'pink' : 'blue');
+        //确认提交了新主题
+        _isThemeCommitted = true;
         //刷新导航页面
         _mineLogic.init();
       } else {
@@ -358,7 +372,7 @@ class EditMineLogic extends getx.GetxController {
       nameController.text = currentUserInfo['name'];
       nameTextLength = nameController.text.length;
       sex = prefs.getString('sex') ?? userInfo['data']['sex'];
-      setSexValue(sex);
+      setSexValue(sex, changeTheme: false);
       currentUserInfo['sex'] = sex;
       birthday = DateTime.parse(userInfo['data']['birthday']).toLocal();
       birthdayController.text =
