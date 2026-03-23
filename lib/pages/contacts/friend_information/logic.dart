@@ -3,18 +3,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 import '../../../api/friend_api.dart';
-import '../../../api/user_api.dart';
 import '../../../utils/getx_config/GlobalThemeConfig.dart';
 import '../../../utils/getx_config/config.dart';
 import '../logic.dart';
 
 class FriendInformationLogic extends Logic {
-  //评论输入框焦点
-  final FocusNode commentFocus = FocusNode();
-
-  //评论输入框控制器
-  final TextEditingController commentController = TextEditingController();
-
   //主题配置
   final GlobalThemeConfig _theme = GetInstance().find<GlobalThemeConfig>();
 
@@ -23,15 +16,6 @@ class FriendInformationLogic extends Logic {
 
   //好友api
   final _friendApi = FriendApi();
-
-  //用户api
-  final _userApi = UserApi();
-
-  //透明度
-  RxDouble opacity = 0.0.obs;
-
-  //滚动控制器
-  final scrollController = ScrollController();
 
   //初始化获取从联系人页面传递过来的好友信息参数
   Map<String, dynamic> get friendData => arguments['friend'];
@@ -134,7 +118,7 @@ class FriendInformationLogic extends Logic {
   }
 
   //获取好友信息
-  Future<Map<String, dynamic>> _getFriendInfo() async {
+  Future<Map<String, dynamic>> getFriendInfo() async {
     final response = await _friendApi.details(friendId);
     if (response['code'] == 0) {
       final data = response['data'];
@@ -144,24 +128,19 @@ class FriendInformationLogic extends Logic {
       friendRemark = data['remark'] ?? '';
       friendAccount = data['account'];
       friendGender = data['sex'];
-      final birthday =
-          DateTime.parse(data['birthday'] ?? DateTime.now().toString());
-      //计算年龄
-      friendAge = DateTime.now().difference(birthday).inDays ~/ 365;
-      friendBirthday = "${birthday.month}月${birthday.day}日";
-      friendSignature = data['signature'];
+      friendBirthday = data['birthday'];
+      friendSignature = data['signature'] ?? '';
+      friendGroup = data['group'] ?? '未分组';
       isConcern = data['isConcern'];
     }
+    update([const Key('friend_info')]);
     return response['data'];
   }
 
-  //获取好友说说图片
-  Future<String> getImg(String fileName, String userId) async {
-    dynamic res = await _userApi.getImg(fileName, userId);
-    if (res['code'] == 0) {
-      return res['data'];
-    }
-    return '';
+  @override
+  void onInit() {
+    super.onInit();
+    getFriendInfo();
   }
 
   //设置分组
@@ -200,42 +179,6 @@ class FriendInformationLogic extends Logic {
     }
   }
 
-  //设置备注
-  void setRemark(String value, BuildContext context) async {
-    // 1. 关闭焦点
-    commentFocus.unfocus();
-
-    // 2. 将焦点转移到新的 FocusNode（让键盘彻底关闭）
-    // 焦点被转移到一个"空"节点上，没有任何 Widget 需要键盘
-    // 结果：键盘彻底关闭
-    FocusScope.of(context).requestFocus(FocusNode());
-    /*FocusScope.of(context)	获取当前焦点作用域（管理焦点的容器）
-        .requestFocus(...)	请求将焦点转移到某个 FocusNode
-    FocusNode()	创建一个新的、空的焦点节点（不与任何输入框绑定）*/
-
-    // 3. 如果输入为空 或 备注没有变化，直接返回
-    if (value.isEmpty || friendRemark == value) {
-      return;
-    }
-
-    // 4. 调用 API 设置备注
-    final response = await _friendApi.setRemark(friendId, value);
-
-    // 5. 处理结果
-    if (response['code'] == 0) {
-      friendRemark = value;
-    } else {
-      Fluttertoast.showToast(
-          msg: response['msg'],
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
-    }
-  }
-
   //设置特别关心
   void setConcern() async {
     if(isConcern){
@@ -251,7 +194,7 @@ class FriendInformationLogic extends Logic {
   void setResult(Map<String, dynamic> response) {
     if (response['code'] == 0) {
       Fluttertoast.showToast(
-          msg: "设置成功",
+          msg: isConcern ? "已取消特别关心~" : "特别关心成功~",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 1,
@@ -296,42 +239,8 @@ class FriendInformationLogic extends Logic {
     }
   }
 
-  //滚动监听
-  void scrollListener() {
-    // 情况1：滚动超过140像素，且未超出范围，且透明度不是1(展示)
-    if (scrollController.offset > 140 &&
-        !scrollController.position.outOfRange &&
-        opacity.value != 1) {
-      opacity.value = 1;  // 完全显示
-    }
-
-    // 情况2：滚动小于140像素，且未超出范围，且透明度不是0(隐藏)
-    if (scrollController.offset < 140 &&
-        !scrollController.position.outOfRange &&
-        opacity.value != 0) {
-      opacity.value = 0;  // 完全透明
-    }
-  }
-
-  @override
-  onInit() {
-    super.onInit();
-    scrollController.addListener(scrollListener);
-    friendGroup = friendData['groupId']?? '0'; // 初始化好友分组
-  }
-
-  @override
-  void onReady() {
-    super.onReady();
-    _getFriendInfo();
-  }
-
   @override
   void onClose() {
-    scrollController.removeListener(scrollListener);
-    scrollController.dispose();
-    commentController.dispose();
-    commentFocus.dispose();
     _contactsLogic.init();//刷新上一个页面
     super.onClose();
   }

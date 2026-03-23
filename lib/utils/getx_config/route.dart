@@ -3,6 +3,7 @@ import 'package:get/get_navigation/src/routes/get_route.dart';
 
 import '../../pages/chat_list/index.dart';
 import '../../pages/contacts/friend_information/index.dart';
+import '../../pages/contacts/friend_information/set_remark/index.dart';
 import '../../pages/contacts/index.dart';
 import '../../pages/login/index.dart';
 import '../../pages/mine/about/index.dart';
@@ -138,6 +139,13 @@ class AppRoutes {
       name: '/friend_info',
       page: () => FriendInformationPage(
         key: const Key('friend_info'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/set_remark',
+      page: () => SetRemarkPage(
+        key: const Key('set_remark'),
       ),
       binding: ControllerBinding(),
     ),

@@ -8,6 +8,7 @@ class CustomTextButton extends StatelessThemeWidget {
   final GestureTapCallback onTap;
   final Color? textColor;
   final double fontSize;
+  final EdgeInsetsGeometry? padding;
 
   const CustomTextButton(
       this.value, {
@@ -15,6 +16,7 @@ class CustomTextButton extends StatelessThemeWidget {
         required this.onTap,
         this.fontSize = 12,
         this.textColor ,
+        this.padding,
       });
 
 /*  CustomTextButton
@@ -28,12 +30,20 @@ class CustomTextButton extends StatelessThemeWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      borderRadius: const BorderRadius.all(Radius.circular(15)),
       onTap: onTap,
-      child: Text(
-        value,
-        style: TextStyle(
-          fontSize: fontSize,
-          color: textColor ?? theme.primaryColor,
+      child: Container(
+        padding: padding,
+        child: Row(
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: fontSize,
+                color: textColor ?? theme.primaryColor,
+              ),
+            ),
+          ],
         ),
       ),
     );
