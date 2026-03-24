@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../custom_material_button/index.dart';
 
+//自定义根据是否有内容，在提示与内容之间切换的按钮
 class CustomLabelValueButton extends StatelessWidget {
   final String label;
   final String? value;

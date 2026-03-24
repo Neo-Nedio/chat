@@ -4,12 +4,13 @@ import 'package:flutter/services.dart';
 
 //输入框
 class CustomTextField extends StatelessWidget {
-  final String labelText;//上方标签
+  final String? labelText;//上方标签
   final TextEditingController controller;
   final bool obscureText;//是否展示密码
   final String hintText;//占位文案
   final Widget? suffixIcon;            // 右侧图标
   final Widget? suffix;                // 右侧自定义组件
+  final double vertical;
   final ValueChanged<String>? onChanged;  // 输入变化回调
   final int? inputLimit;                // 输入字符数量限制
   final bool readOnly;
@@ -17,7 +18,7 @@ class CustomTextField extends StatelessWidget {
 
   const CustomTextField({
     super.key,
-    required this.labelText,
+    this.labelText,
     required this.controller,
     this.hintText = '请输入内容',
     this.obscureText = false,
@@ -27,6 +28,7 @@ class CustomTextField extends StatelessWidget {
     this.inputLimit,
     this.readOnly = false, //控制文本输入框是否可编辑
     this.maxLines = 1, // 默认为1行
+    this.vertical = 12.0,
   });
 
 
@@ -73,12 +75,13 @@ class CustomTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start, // 标签左对齐
       children: [
-        Text(
-          labelText,//上方标签
-          style: const TextStyle(color: Color(0xFF1F1F1F), fontSize: 14.0), // 标签样式
-        ),
-
-        const SizedBox(height: 5.0), // 标签和输入框之间的间距
+        //上方标签
+        if (labelText != null)
+          Text(
+            labelText ?? '',
+            style: const TextStyle(color: Color(0xFF1F1F1F), fontSize: 14.0),
+          ),
+        if (labelText != null) const SizedBox(height: 5.0),//标签与输入框的间距
 
         Container(
           decoration: BoxDecoration(
@@ -113,7 +116,7 @@ class CustomTextField extends StatelessWidget {
               ),
               //设置输入框内部内容的内边距（padding）
               contentPadding:
-                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+                  EdgeInsets.symmetric(vertical: vertical, horizontal: 8.0),
             ),
           ),
         ),

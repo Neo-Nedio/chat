@@ -230,7 +230,9 @@ class FriendInformationPage extends CustomWidget<FriendInformationLogic> {
                               controller.friendGender == "男"
                                   ? Icons.male
                                   : Icons.female,
-                              color: theme.primaryColor,
+                              color: controller.friendGender == "男"
+                                  ? const Color(0xFF4C9BFF)
+                                  : const Color(0xFFFFA0CF),
                               size: 18),
                           //左右间隔
                           const SizedBox(width: 2),
@@ -295,7 +297,10 @@ class FriendInformationPage extends CustomWidget<FriendInformationLogic> {
 
                     //分组
                     CustomLabelValueButton(
-                        onTap: () {},
+                        onTap: () => Get.toNamed('set_group', arguments: {
+                          'groupName': controller.friendGroup,
+                          'friendId': controller.friendId
+                        }),
                         width: 50,
                         label: '分组',
                         value: controller.friendGroup),
