@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 
 import 'Http.dart';
@@ -157,5 +159,26 @@ class UserApi {
       },
     );
     return response.data;
+  }
+
+  //获取未读数
+  Future<Map<String, dynamic>> unread() async {
+    final response = await _dio.get('/v1/api/user/unread');
+    return response.data;
+  }
+
+  //获取网络图片
+  Future<dynamic> getNetworkImage(imageUrl) async {
+    // 1. 发起网络请求，获取图片的字节数据
+    final response = await _dio.get<List<int>>(
+      imageUrl,
+      options: Options(responseType: ResponseType.bytes),
+    );
+
+    // 2. 将响应数据转换为 List<int>（字节数组）
+    final List<int> list = List<int>.from(response.data!);
+
+    // 3. 将字节数组转换为 Base64 字符串并返回
+    return base64Encode(list);
   }
 }

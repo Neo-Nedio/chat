@@ -2,12 +2,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../utils/getx_config/GlobalData.dart';
 import '../../utils/getx_config/GlobalThemeConfig.dart';
+import '../../utils/notification.dart';
+import '../../utils/permission_handler.dart';
 import '../../utils/web_socket.dart';
 
 class NavigationLogic extends GetxController {
   late int currentIndex = 0;
   final _wsManager = WebSocketUtil();
+
+  GlobalData get globalData => GetInstance().find<GlobalData>();
 
   void initData(){
     //Get.parameters（URL 参数）
@@ -21,15 +26,19 @@ class NavigationLogic extends GetxController {
     super.onInit();
     initData();
     connectWebSocket(); //建立 WebSocket 连接
+
+    //立即执行
+    (() async {
+      await NotificationUtil.initialize();           // 1. 初始化通知服务
+      await NotificationUtil.createNotificationChannel(); // 2. 创建通知渠道
+      await PermissionHandler.permissionRequest();   // 3. 请求通知权限
+      globalData.init();                              // 4. 初始化全局数据
+    })();
   }
 
   void connectWebSocket() async {
-    // 从本地存储获取 token
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('x-token');
-
     // 建立 WebSocket 连接
-    _wsManager.connect(token!);
+    _wsManager.connect();
   }
 
   final List<String> selectedIcons = [
