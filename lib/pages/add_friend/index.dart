@@ -114,7 +114,6 @@ class AddFriendPage extends CustomWidgetNew<AddFriendLogic> {
             children: [
               //搜索框
               CustomSearchBox(
-                height: 30,
                 hintText: '账号/手机号/邮箱',
                 onChanged: controller.onSearchFriend,
               ),
