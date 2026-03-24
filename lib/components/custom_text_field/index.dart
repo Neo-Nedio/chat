@@ -15,6 +15,7 @@ class CustomTextField extends StatelessWidget {
   final int? inputLimit;                // 输入字符数量限制
   final bool readOnly;
   final int? maxLines; // 新增maxLines参数
+  final Color? labelTextColor; //标签文字颜色
 
   const CustomTextField({
     super.key,
@@ -26,6 +27,7 @@ class CustomTextField extends StatelessWidget {
     this.onChanged,
     this.suffixIcon,
     this.inputLimit,
+    this.labelTextColor = const Color(0xFF1F1F1F),
     this.readOnly = false, //控制文本输入框是否可编辑
     this.maxLines = 1, // 默认为1行
     this.vertical = 12.0,
@@ -79,7 +81,7 @@ class CustomTextField extends StatelessWidget {
         if (labelText != null)
           Text(
             labelText ?? '',
-            style: const TextStyle(color: Color(0xFF1F1F1F), fontSize: 14.0),
+            style: TextStyle(color: labelTextColor, fontSize: 14.0),
           ),
         if (labelText != null) const SizedBox(height: 5.0),//标签与输入框的间距
 

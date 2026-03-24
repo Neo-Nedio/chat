@@ -3,20 +3,26 @@ import 'package:flutter/material.dart';
 import '../../utils/getx_config/config.dart';
 import '../custom_material_button/index.dart';
 
-//对material_button进行封装的自定义按钮
+//对material_button进行封装的自定义文字按钮
 class CustomButton extends StatelessThemeWidget {
   final String text;
   final VoidCallback onTap;
   final String type;
   final double? width;
   final double? height;
+  final double? textSize;
+  final EdgeInsetsGeometry? padding;
+  final double? borderRadius;
 
   const CustomButton(
       {super.key,
       required this.text,
       this.width = 200,
       this.height = 40,
+      this.textSize = 16,
       this.type = 'primary',
+      this.borderRadius = 10,
+      this.padding = const EdgeInsets.all(10),
       required this.onTap});
 
   Color _getColor(String type) {
@@ -33,11 +39,11 @@ class CustomButton extends StatelessThemeWidget {
   TextStyle _getTextStyle(String type) {
     switch (type) {
       case 'primary':
-        return const TextStyle(color: Colors.white, fontSize: 16);  // 白色文字
+        return TextStyle(color: Colors.white, fontSize: textSize);  // 白色文字
       case 'minor':
-        return const TextStyle(color: Color(0xFF1F1F1F), fontSize: 16);  // 深灰色文字
+        return TextStyle(color: const Color(0xFF1F1F1F), fontSize: textSize);  // 深灰色文字
       default:
-        return const TextStyle(color: Colors.white, fontSize: 16); // 白色文字
+        return TextStyle(color: Colors.white, fontSize: textSize); // 白色文字
     }
   }
 
@@ -50,12 +56,12 @@ class CustomButton extends StatelessThemeWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(borderRadius!),
         );
       default:
         return BoxDecoration(
           color: _getColor(type),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(borderRadius!),
         );
     }
   }
@@ -69,6 +75,7 @@ class CustomButton extends StatelessThemeWidget {
         width: width,
         height: height,
         decoration: _getBoxDecoration(type),
+        padding: padding,
         child: Center(
           child: Text(
             text,

@@ -8,6 +8,8 @@ class CustomSearchBox extends StatelessThemeWidget {
   final Color backgroundColor;      // 背景颜色
   final double borderRadius;        // 圆角大小
   final ValueChanged<String> onChanged;  // 输入改变时的回调
+  final double? height;
+  final String? hintText; //提示文字
 
   const CustomSearchBox({
     super.key,
@@ -15,6 +17,8 @@ class CustomSearchBox extends StatelessThemeWidget {
     this.backgroundColor = const Color(0xFFE3ECFF),  // 默认浅蓝色背景
     this.borderRadius = 10.0,       // 默认圆角10
     required this.onChanged,         // 必须提供回调
+    this.height= 40,
+    this.hintText= "搜索",
   });
 
 /*
@@ -37,7 +41,7 @@ class CustomSearchBox extends StatelessThemeWidget {
 
     return Container(
       alignment: isCentered ? Alignment.center : Alignment.centerLeft,
-      height: 40,
+      height: height,
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       decoration: BoxDecoration(
         color: theme.searchBarColor,
@@ -65,7 +69,7 @@ class CustomSearchBox extends StatelessThemeWidget {
 
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.all(0), // 无内边距
-                hintText: '搜索', // 提示文字
+                hintText: hintText, // 提示文字
                 hintStyle: TextStyle(
                     color: iconColor,
                     fontSize: 16,
