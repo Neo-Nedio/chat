@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 
+import '../../pages/add_friend/friend_info/index.dart';
+import '../../pages/add_friend/friend_request/index.dart';
+import '../../pages/add_friend/index.dart';
 import '../../pages/chat_list/index.dart';
 import '../../pages/contacts/friend_information/index.dart';
 import '../../pages/contacts/friend_information/set_group/index.dart';
@@ -154,6 +157,27 @@ class AppRoutes {
       name: '/set_group',
       page: () => SetGroupPage(
         key: const Key('set_group'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/add_friend',
+      page: () => AddFriendPage(
+        key: const Key('add_friend'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/search_info',
+      page: () => SearchInfoPage(
+        key: const Key('search_info'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/friend_request',
+      page: () => FriendRequestPage(
+        key: const Key('friend_request'),
       ),
       binding: ControllerBinding(),
     ),

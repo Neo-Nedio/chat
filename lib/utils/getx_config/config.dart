@@ -11,18 +11,6 @@ typedef CloseFunc = void Function();         // 关闭函数
 typedef CallbackFunc = void Function();      // 回调函数
 typedef FilterFunc<T> = Object Function(T value);  // 过滤器函数
 
-//封装了arguments参数,这样可以直接获取参数
-class Logic extends GetxController {
-  //路由参数
-  dynamic arguments = Get.arguments;
-
-  @override
-  void onClose() {
-    super.onClose();
-    if (arguments != null) arguments = null;
-  }
-}
-
 //路由配置
 // 进入路由时，GetX会自动：
 // 1. 执行 ControllerBinding().dependencies()
@@ -59,16 +47,19 @@ abstract class CustomWidget<T extends GetxController> extends StatelessWidget {
 
   /// 生命周期方法
   // 初始化
-  void init(BuildContext context) {}
+  void init(BuildContext context) => print("init>$runtimeType");
   // 依赖发生变化
-  void didChangeDependencies(BuildContext context) {}
+  void didChangeDependencies(BuildContext context) =>
+      print("change>$runtimeType");
   // 更新Widget
   void didUpdateWidget(
-    GetBuilder oldWidget,
-    GetBuilderState<T> state,
-  ) {}
+      GetBuilder oldWidget,
+      GetBuilderState<T> state,
+      ) =>
+      print("update>$runtimeType");
   // 关闭
-  void close(BuildContext context) {}
+  void close(BuildContext context) => print("close>$runtimeType");
+
 
   // 构建widget 子类必须实现
   Widget buildWidget(BuildContext context);
@@ -91,6 +82,95 @@ abstract class CustomWidget<T extends GetxController> extends StatelessWidget {
         },
         dispose: (GetBuilderState<T> state) => close(context), // 销毁
       );
+}
+
+//封装了arguments参数,这样可以直接获取参数。还有Widget实例和全局主题配置
+class Logic<T extends Widget> extends GetxController {
+  /// 当前widget
+  /// 不要在controller的[onInit()]中使用，会导致widget为null
+  /// 若需要使用widget中的属性需要在Logic的泛型声明 否则不要轻易使用
+  /// 例如：
+  /// class HomeLogic extends Logic<HomeWidget> {}
+  late final T? widget;
+
+  //主题配置
+  // GlobalThemeConfig get theme => GetInstance().find<GlobalThemeConfig>();
+  late final GlobalThemeConfig  theme;
+
+  //路由参数
+  dynamic arguments = Get.arguments;
+
+  @override
+  void onClose() {
+    super.onClose();
+    if (arguments != null) arguments = null;
+  }
+}
+
+//定义对应页面的逻辑必须是logic的子类
+abstract class CustomWidgetNew<T extends Logic> extends StatelessWidget {
+  /// 构造函数
+  CustomWidgetNew({
+    this.key,
+  }) : super(key: key);
+
+  /// 当传入key的时候，若更新widget需使用controller.update([key],)
+  @override
+  final Key? key;
+
+  /// 传入的参数
+  final dynamic arguments = Get.arguments;
+
+  /// 控制器的tag
+  final String? tag = null;
+
+  /// 获取控制器
+  T get controller => GetInstance().find<T>(tag: tag);
+
+  GlobalThemeConfig get theme =>
+      GetInstance().find<GlobalThemeConfig>(tag: tag);
+
+  /// 初始化
+  void init(BuildContext context) {
+    print("init>$runtimeType");
+    controller.widget = this;
+    controller.theme = theme;
+  }
+
+  /// 依赖发生变化
+  void didChangeDependencies(BuildContext context) =>
+      print("change>$runtimeType");
+
+  /// 更新Widget
+  void didUpdateWidget(
+      GetBuilder oldWidget,
+      GetBuilderState<T> state,
+      ) =>
+      print("update>$runtimeType");
+
+  /// 构建widget
+  Widget buildWidget(BuildContext context);
+
+  /// 关闭
+  void close(BuildContext context) => print("close>$runtimeType");
+
+  /// 创建上下文
+  @override
+  StatelessElement createElement() => StatelessElement(this);
+
+  /// 构建
+  @override
+  Widget build(BuildContext context) => GetBuilder<T>(
+    id: key,
+    initState: (GetBuilderState<T> state) => init(context),
+    didChangeDependencies: (GetBuilderState<T> state) =>
+        didChangeDependencies(context),
+    didUpdateWidget: didUpdateWidget,
+    builder: (controller) {
+      return buildWidget(context);
+    },
+    dispose: (GetBuilderState<T> state) => close(context),
+  );
 }
 
 //让与颜色相关的widget内部封装有获取全局颜色配置的方法

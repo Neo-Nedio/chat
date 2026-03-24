@@ -162,7 +162,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
       color: Colors.white,
       child: InkWell(
         onTap: () {
-          // 添加点击事件
+          // todo 添加点击事件
         },
         borderRadius: BorderRadius.circular(12),
         child: Container(
@@ -300,7 +300,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
 
           CustomTextButton(
             "取消",
-            onTap: () {},
+            onTap: () {}, //todo 拒绝好友请求
             textColor: Colors.grey[600],
           ),
           const SizedBox(width: 5), // 右边距
@@ -510,6 +510,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
               PopupMenuItem(
                 value: 1,
                 height: 40,
+                onTap: ()=> Get.toNamed('/add_friend'),
                 child: const Row(
                   children: [
                     Icon(Icons.person_add, size: 20),

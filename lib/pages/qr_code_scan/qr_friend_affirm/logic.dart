@@ -22,7 +22,7 @@ class QRFriendAffirmLogic extends GetxController {
       if (res['code'] == 0) {
         CustomFlutterToast.showSuccessToast("请求成功");
       }
-      Get.until((route) => Get.currentRoute == "/");
+      //Get.until((route) => Get.currentRoute == "/");
     });
   }
 }

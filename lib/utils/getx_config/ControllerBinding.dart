@@ -3,6 +3,9 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/bindings_interface.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 
+import '../../pages/add_friend/friend_info/logic.dart';
+import '../../pages/add_friend/friend_request/logic.dart';
+import '../../pages/add_friend/logic.dart';
 import '../../pages/chat_list/logic.dart';
 import '../../pages/contacts/friend_information/logic.dart';
 import '../../pages/contacts/friend_information/set_group/logic.dart';
@@ -48,5 +51,8 @@ class ControllerBinding extends Bindings {
     Get.lazyPut(() => FriendInformationLogic());
     Get.lazyPut(() => SetRemarkLogic());
     Get.lazyPut(() => SetGroupLogic());
+    Get.lazyPut(() => AddFriendLogic());
+    Get.lazyPut(() => SearchInfoLogic());
+    Get.lazyPut(() => FriendRequestLogic());
   }
 }

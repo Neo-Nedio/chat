@@ -250,7 +250,7 @@ class FriendInformationPage extends CustomWidget<FriendInformationLogic> {
                             margin:
                             const EdgeInsets.symmetric(horizontal: 6),
                           ),
-                          //年龄
+                          //生日
                           Text(
                             controller.friendBirthday != ""
                             ?DateUtil.calculateAge(
@@ -267,7 +267,7 @@ class FriendInformationPage extends CustomWidget<FriendInformationLogic> {
                             margin:
                             const EdgeInsets.symmetric(horizontal: 6),
                           ),
-                          //生日
+                          //年龄
                           Text(
                             controller.friendBirthday !=""
                             ?DateUtil.getYearDayMonth(

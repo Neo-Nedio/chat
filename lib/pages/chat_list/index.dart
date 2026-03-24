@@ -140,7 +140,7 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
                 PopupMenuItem(
                   value: 1,           // 选中时的返回值
                   height: 40,         // 菜单项高度40像素
-                  onTap: () {},       // 点击回调
+                  onTap: ()=> Get.toNamed('/add_friend'),      // 点击回调
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
