@@ -64,7 +64,7 @@ class NotificationUtil {
       'high_importance_channel',        // 渠道ID
       'High Importance Notifications',  // 渠道名称
       description: 'This channel is used for important notifications.',
-      importance: Importance.high,      // 重要性（决定通知行为）
+      importance: Importance.max,      // 重要性（决定通知行为）
     );
 
     await _notificationsPlugin
@@ -97,8 +97,8 @@ class NotificationUtil {
       'high_importance_channel',
       'High Importance Notifications',
       channelDescription: 'This channel is used for important notifications.',
-      importance: Importance.high,
-      priority: Priority.high,
+      importance: Importance.max,
+      priority: Priority.max,
       ticker: 'ticker',
     );
 
@@ -146,8 +146,8 @@ class NotificationUtil {
       'progress_channel',
       'Progress Notifications',
       channelDescription: 'Notifications with progress bar',
-      importance: Importance.low,
-      priority: Priority.low,
+      importance: Importance.max,
+      priority: Priority.max,
       showProgress: true,
       maxProgress: maxProgress,
       progress: progress,
@@ -188,8 +188,8 @@ class NotificationUtil {
       'big_picture_channel',
       'Big Picture Notifications',
       channelDescription: 'Notifications with big picture',
-      importance: Importance.high,
-      priority: Priority.high,
+      importance: Importance.max,
+      priority: Priority.max,
       styleInformation: bigPicture,
     );
 

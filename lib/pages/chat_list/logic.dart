@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:get/get_instance/src/get_instance.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
 import '../../api/chat_list_api.dart';
 import '../../api/friend_api.dart';
+import '../../utils/getx_config/GlobalData.dart';
 import '../../utils/web_socket.dart';
 
 class ChatListLogic extends GetxController {
@@ -16,6 +18,8 @@ class ChatListLogic extends GetxController {
 
   final _wsManager = WebSocketUtil();        // 获取 WebSocket 单例
   StreamSubscription? _subscription;         // 订阅对象，用于取消监听
+
+  GlobalData get globalData => GetInstance().find<GlobalData>();
 
   @override
   void onInit() {
@@ -29,6 +33,7 @@ class ChatListLogic extends GetxController {
       // 判断消息类型：是否是收到的聊天消息
       if (event['type'] == 'on-receive-msg') {
         onGetChatList();                     // 刷新聊天列表
+        globalData.onGetUserUnreadInfo(); //接受到消息时，刷新未读消息
       }
     });
   }
@@ -74,5 +79,11 @@ class ChatListLogic extends GetxController {
       update([const Key("chat_list")]);
       }
     });
+  }
+
+  @override
+  void onClose() {
+    _subscription?.cancel();
+    super.onClose();
   }
 }

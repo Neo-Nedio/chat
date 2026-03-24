@@ -46,6 +46,9 @@ abstract class CustomWidget<T extends GetxController> extends StatelessWidget {
   GlobalThemeConfig get theme =>
       GetInstance().find<GlobalThemeConfig>(tag: tag);
 
+  //用来全局管理未读消息
+  GlobalData get globalData => GetInstance().find<GlobalData>(tag: tag);
+
   /// 生命周期方法
   // 初始化
   void init(BuildContext context) => print("init>$runtimeType");
@@ -130,9 +133,6 @@ abstract class CustomWidgetNew<T extends Logic> extends StatelessWidget {
 
   GlobalThemeConfig get theme =>
       GetInstance().find<GlobalThemeConfig>(tag: tag);
-
-  //用来全局管理未读消息
-  GlobalData get globalData => GetInstance().find<GlobalData>(tag: tag);
 
   /// 初始化
   void init(BuildContext context) {

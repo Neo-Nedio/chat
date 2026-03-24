@@ -1,5 +1,6 @@
 import 'package:chat_mobile/pages/mine/index.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../utils/getx_config/config.dart';
 import '../chat_list/index.dart';
@@ -26,6 +27,34 @@ class NavigationPage extends CustomWidget<NavigationLogic> {
     }
   }
 
+  //未读消息图标
+  Widget _buildUnreadTip(int count) {
+    return Positioned(
+      //右上角
+      right: -10,
+      top: -5,
+      child: Container(
+        height: 16,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        decoration: BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadius.circular(10), // 圆角10（胶囊形状）
+        ),
+        constraints: const BoxConstraints(
+          minWidth: 16, // 最小宽度16像素（保证圆形）
+        ),
+        child: Text(
+          count > 99 ? '99+' : count.toString(),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 10,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget buildWidget(BuildContext context) {
     return Scaffold(
@@ -33,7 +62,8 @@ class NavigationPage extends CustomWidget<NavigationLogic> {
       body: _buildPage((controller.currentIndex)),
 
       // 下半部分：底部导航栏
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: Obx(
+          ()=>BottomNavigationBar(
             currentIndex: controller.currentIndex,
             onTap: controller.onTap,
 
@@ -46,17 +76,27 @@ class NavigationPage extends CustomWidget<NavigationLogic> {
             items: List.generate(controller.unselectedIcons.length, (index) {
               return BottomNavigationBarItem(
                 // 根据选中状态显示不同图标
-                icon: Image.asset(
-                  controller.currentIndex == index
-                      ? 'assets/images/${controller.selectedIcons[index]}-${theme.themeMode}.png'
-                      : controller.unselectedIcons[index],
-                  width: 26,
-                  height: 26,
+                icon: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Image.asset(
+                      controller.currentIndex == index
+                          ? 'assets/images/${controller.selectedIcons[index]}-${theme.themeMode}.png'
+                          : controller.unselectedIcons[index],
+                      width: 26,
+                      height: 26,
+                    ),
+                    //未读消息
+                    if (controller.selectedIcons[index] == 'chat' &&
+                        globalData.getUnreadCount('chat') > 0)
+                      _buildUnreadTip(globalData.getUnreadCount('chat')),
+                  ],
                 ),
                 label: controller.name[index],
               );
             }),
           ),
+      )
       );
   }
 }

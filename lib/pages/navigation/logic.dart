@@ -29,10 +29,10 @@ class NavigationLogic extends GetxController {
 
     //立即执行
     (() async {
+      await globalData.init(); //  初始化全局数据
       await NotificationUtil.initialize();           // 1. 初始化通知服务
       await NotificationUtil.createNotificationChannel(); // 2. 创建通知渠道
       await PermissionHandler.permissionRequest();   // 3. 请求通知权限
-      globalData.init();                              // 4. 初始化全局数据
     })();
   }
 
