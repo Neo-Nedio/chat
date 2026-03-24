@@ -25,6 +25,7 @@ import '../../pages/qr_code_scan/qr_login_affirm/logic.dart';
 import '../../pages/qr_code_scan/qr_other_result/logic.dart';
 import '../../pages/register/logic.dart';
 import '../../pages/talk/logic.dart';
+import '../../pages/talk/talk_details/logic.dart';
 import 'GlobalData.dart';
 import 'GlobalThemeConfig.dart';
 
@@ -56,5 +57,6 @@ class ControllerBinding extends Bindings {
     Get.lazyPut(() => AddFriendLogic());
     Get.lazyPut(() => SearchInfoLogic());
     Get.lazyPut(() => FriendRequestLogic());
+    Get.lazyPut(() => TalkDetailsLogic());
   }
 }

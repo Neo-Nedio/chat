@@ -74,6 +74,9 @@ class DateUtil {
   }
 
   static String formatTimingTime(String time) {
+    if (time == '') {
+      return '';
+    }
     final int totalSeconds = int.tryParse(time) ?? 0;
     final hours = totalSeconds ~/ 3600;
     final minutes = (totalSeconds % 3600) ~/ 60;

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/talk_api.dart';
 import '../../api/user_api.dart';
@@ -7,6 +8,7 @@ import '../../api/user_api.dart';
 class TalkLogic extends GetxController {
   final _talkApi = TalkApi();
   final _userApi = UserApi();
+  String currentUserId = '';
 
   final List<dynamic> talkList = [];  // 说说列表数据
   int index = 0;                       // 分页索引
@@ -14,9 +16,13 @@ class TalkLogic extends GetxController {
   bool isLoading = false;               // 是否正在加载
   final ScrollController scrollController = ScrollController(); // 滚动控制器
 
-  void init() {
+  void init() async {
     onTalkList();           // 首次加载数据
     scrollController.addListener(scrollListener); // 添加滚动监听
+    //获取当前用户id
+    SharedPreferences.getInstance().then((prefs) {
+      currentUserId = prefs.getString('userId') ?? '';
+    });
   }
 
   @override
@@ -69,6 +75,17 @@ class TalkLogic extends GetxController {
     hasMore = true;    // 重置更多标志
     update([const Key("talk")]);
     onTalkList(); // 重新加载
+  }
+
+  //更新评论或点赞数量
+  void updateTalkLikeOrCommentCount(String key, int num, String talkId) {
+    for (var talk in talkList) {
+      if (talk['talkId'] == talkId) {
+        talk[key] = num;
+        update([const Key("talk")]);
+        return;
+      }
+    }
   }
 
   // 获取图片URL

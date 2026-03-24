@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 class CustomTextField extends StatelessWidget {
   final String? labelText;//上方标签
   final TextEditingController controller;
+  final FocusNode? focusNode;
   final bool obscureText;//是否展示密码
   final String hintText;//占位文案
   final Widget? suffixIcon;            // 右侧图标
@@ -14,13 +15,16 @@ class CustomTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;  // 输入变化回调
   final int? inputLimit;                // 输入字符数量限制
   final bool readOnly;
-  final int? maxLines; // 新增maxLines参数
+  final int? maxLines;
+  final int? minLines;
   final Color? labelTextColor; //标签文字颜色
+  final Color? hintTextColor;
 
   const CustomTextField({
     super.key,
     this.labelText,
     required this.controller,
+    this.focusNode,
     this.hintText = '请输入内容',
     this.obscureText = false,
     this.suffix,
@@ -30,7 +34,9 @@ class CustomTextField extends StatelessWidget {
     this.labelTextColor = const Color(0xFF1F1F1F),
     this.readOnly = false, //控制文本输入框是否可编辑
     this.maxLines = 1, // 默认为1行
+    this.minLines,
     this.vertical = 12.0,
+    this.hintTextColor = Colors.grey,
   });
 
 
@@ -92,10 +98,12 @@ class CustomTextField extends StatelessWidget {
           ),
           child: TextField(
             controller: controller,
+            focusNode: focusNode,
             obscureText: obscureText,
             onChanged: onChanged,//函数回调
             readOnly: readOnly,
             maxLines: maxLines,
+            minLines: minLines,
             inputFormatters: inputLimit != null
                 ? <TextInputFormatter>[
               LengthLimitingTextInputFormatter(inputLimit) //限制输入长度
@@ -105,7 +113,7 @@ class CustomTextField extends StatelessWidget {
               hintText: hintText,//占位文案
               suffixIcon: suffixIcon, // 右侧图标
               suffix: suffix, // 右侧自定义组件
-              hintStyle: const TextStyle(color: Colors.grey, fontSize: 14.0),
+              hintStyle: TextStyle(color: hintTextColor, fontSize: 14.0),
               // 填充背景
               filled: true,
               // 填充背景颜色

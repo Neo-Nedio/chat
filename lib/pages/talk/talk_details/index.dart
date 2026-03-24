@@ -1,0 +1,366 @@
+import 'package:flutter/material.dart';
+
+import '../../../components/app_bar_title/index.dart';
+import '../../../components/custom_button/index.dart';
+import '../../../components/custom_image_group/index.dart';
+import '../../../components/custom_portrait/index.dart';
+import '../../../components/custom_text_button/index.dart';
+import '../../../components/custom_text_field/index.dart';
+import '../../../utils/date.dart';
+import '../../../utils/getx_config/config.dart';
+import 'logic.dart';
+
+
+class TalkDetailsPage extends CustomWidget<TalkDetailsLogic> {
+  TalkDetailsPage({super.key});
+/*
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │                          TalkDetailsPage                                │
+  │                         （说说详情页面）                                 │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │                                                                         │
+  │  ┌─────────────────────────────────────────────────────────────────┐   │
+  │  │                         AppBar                                   │   │
+  │  │  [←]                    说说详情                                │   │
+  │  └─────────────────────────────────────────────────────────────────┘   │
+  │                                                                         │
+  │  ┌─────────────────────────────────────────────────────────────────┐   │
+  │  │                     Column (主布局)                              │   │
+  │  │                                                                 │   │
+  │  │  ┌───────────────────────────────────────────────────────────┐ │   │
+  │  │  │              Expanded (可滚动内容区)                       │ │   │
+  │  │  │                                                           │ │   │
+  │  │  │  ┌─────────────────────────────────────────────────────┐ │ │   │
+  │  │  │  │            SingleChildScrollView                    │ │ │   │
+  │  │  │  │  ┌───────────────────────────────────────────────┐ │ │ │   │
+  │  │  │  │  │            Container (卡片容器)               │ │ │ │   │
+  │  │  │  │  │  ┌─────────────────────────────────────────┐ │ │ │ │   │
+  │  │  │  │  │  │         Column (内容区)                 │ │ │ │ │   │
+  │  │  │  │  │  │                                         │ │ │ │ │   │
+  │  │  │  │  │  │  ┌───────────────────────────────────┐ │ │ │ │ │   │
+  │  │  │  │  │  │  │    头部信息区                      │ │ │ │ │   │
+  │  │  │  │  │  │  │  [头像] 张三              删除    │ │ │ │ │   │
+  │  │  │  │  │  │  │         2小时前                    │ │ │ │ │   │
+  │  │  │  │  │  │  └───────────────────────────────────┘ │ │ │ │ │   │
+  │  │  │  │  │  │                                         │ │ │ │ │   │
+  │  │  │  │  │  │  ┌───────────────────────────────────┐ │ │ │ │ │   │
+  │  │  │  │  │  │  │    分隔线                         │ │ │ │ │   │
+  │  │  │  │  │  │  └───────────────────────────────────┘ │ │ │ │ │   │
+  │  │  │  │  │  │                                         │ │ │ │ │   │
+  │  │  │  │  │  │  ┌───────────────────────────────────┐ │ │ │ │ │   │
+  │  │  │  │  │  │  │    说说内容区                      │ │ │ │ │   │
+  │  │  │  │  │  │  │  今天天气真好，出去玩了一整天！    │ │ │ │ │   │
+  │  │  │  │  │  │  │  ┌───┬───┬───┐                   │ │ │ │ │   │
+  │  │  │  │  │  │  │  │ 1 │ 2 │ 3 │                   │ │ │ │ │   │
+  │  │  │  │  │  │  │  └───┴───┴───┘                   │ │ │ │ │   │
+  │  │  │  │  │  │  └───────────────────────────────────┘ │ │ │ │ │   │
+  │  │  │  │  │  │                                         │ │ │ │ │   │
+  │  │  │  │  │  │  ┌───────────────────────────────────┐ │ │ │ │ │   │
+  │  │  │  │  │  │  │    点赞区                          │ │ │ │ │   │
+  │  │  │  │  │  │  │  ❤️ 点赞（15）                     │ │ │ │ │   │
+  │  │  │  │  │  │  │  [👤]张三 [👤]李四 [👤]王五        │ │ │ │ │   │
+  │  │  │  │  │  │  └───────────────────────────────────┘ │ │ │ │ │   │
+  │  │  │  │  │  │                                         │ │ │ │ │   │
+  │  │  │  │  │  │  ┌───────────────────────────────────┐ │ │ │ │ │   │
+  │  │  │  │  │  │  │    评论区                          │ │ │ │ │   │
+  │  │  │  │  │  │  │  💬 评论（8）                      │ │ │ │ │   │
+  │  │  │  │  │  │  │                                     │ │ │ │ │   │
+  │  │  │  │  │  │  │  ┌─────────────────────────────┐ │ │ │ │ │   │
+  │  │  │  │  │  │  │  │ 评论项1                      │ │ │ │ │   │
+  │  │  │  │  │  │  │  │ [头像] 李四          删除    │ │ │ │ │   │
+  │  │  │  │  │  │  │  │        1小时前               │ │ │ │ │   │
+  │  │  │  │  │  │  │  │  写的真好！                 │ │ │ │ │   │
+  │  │  │  │  │  │  │  └─────────────────────────────┘ │ │ │ │ │   │
+  │  │  │  │  │  │  │                                     │ │ │ │ │   │
+  │  │  │  │  │  │  │  ┌─────────────────────────────┐ │ │ │ │ │   │
+  │  │  │  │  │  │  │  │ 评论项2                      │ │ │ │ │   │
+  │  │  │  │  │  │  │  │ [头像] 王五                  │ │ │ │ │   │
+  │  │  │  │  │  │  │  │        30分钟前              │ │ │ │ │   │
+  │  │  │  │  │  │  │  │  下次一起啊！               │ │ │ │ │   │
+  │  │  │  │  │  │  │  └─────────────────────────────┘ │ │ │ │ │   │
+  │  │  │  │  │  │  └───────────────────────────────────┘ │ │ │ │ │   │
+  │  │  │  │  │  └─────────────────────────────────────────┘ │ │ │ │   │
+  │  │  │  │  └───────────────────────────────────────────────┘ │ │ │   │
+  │  │  │  └─────────────────────────────────────────────────────┘ │ │   │
+  │  │  └───────────────────────────────────────────────────────────┘ │   │
+  │  │                                                                 │   │
+  │  │  ┌───────────────────────────────────────────────────────────┐ │   │
+  │  │  │            Container (底部输入区)                         │ │   │
+  │  │  │  ┌─────────────────────────────────────────────────────┐ │ │   │
+  │  │  │  │  Row                                               │ │ │ │   │
+  │  │  │  │  ┌───────────────────────────┐  ┌───────────────┐ │ │ │ │   │
+  │  │  │  │  │  CustomTextField          │  │  CustomButton │ │ │ │ │   │
+  │  │  │  │  │  "输入评论"                │  │   "确定"      │ │ │ │ │   │
+  │  │  │  │  └───────────────────────────┘  └───────────────┘ │ │ │ │   │
+  │  │  │  └─────────────────────────────────────────────────────┘ │ │ │   │
+  │  │  └───────────────────────────────────────────────────────────┘ │   │
+  │  │                                                                 │   │
+  │  └─────────────────────────────────────────────────────────────────┘   │
+  │                                                                         │
+  └─────────────────────────────────────────────────────────────────────────┘*/
+
+  @override
+  Widget buildWidget(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF9FBFF),
+      //导航栏
+      appBar: AppBar(
+        centerTitle: true,
+        title: const AppBarTitle('说说详情'),
+        backgroundColor: const Color(0xFFF9FBFF),
+      ),
+      //主体
+      body: Column(
+        children: [
+          Expanded(
+              child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 头部信息
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        //左侧信息
+                        Row(
+                          children: [
+                            //头像
+                            CustomPortrait(
+                              url: controller.talkDetails['portrait'] ?? '',
+                            ),
+                            const SizedBox(width: 10),
+                            //昵称与时间
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                //昵称
+                                Text(
+                                  controller.talkDetails['remark'] ??
+                                      controller.talkDetails['name'],
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                //时间
+                                Text(
+                                  DateUtil.formatTime(controller.talkDetails['time']),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[800],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+
+                        //右侧删除按钮，根据是否处于发布者显示
+                        if (controller.currentUserId == controller.talkDetails['userId'])
+                          CustomTextButton('删除', onTap: () {}),
+                      ],
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    // 说说内容
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 5.0),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(color: Colors.grey[100]!, width: 1.0),
+                          bottom: BorderSide(color: Colors.grey[100]!, width: 1.0),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            controller.talkDetails['content']['text'] ?? '',
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          CustomImageGroup(
+                            imagesList: controller.talkDetails['content']['img'] ?? [],
+                            userId: controller.talkDetails['userId'],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    // 点赞区
+                    //IntrinsicWidth 是一个让子组件宽度自适应内容的布局组件。
+                    IntrinsicWidth( //点赞
+                      child: CustomTextButton(
+                        '${controller.isLiked ? '已' : ''}点赞（${controller.talkLikeList.length}）',
+                        onTap: controller.onCreateOrDeleteTalkLike,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    //Wrap 是一个自动换行布局组件，当子组件在一行放不下时，会自动换到下一行。
+                    Wrap(
+                      spacing: 2.0,      // 水平间距（同一行子组件之间的距离）
+                      runSpacing: 2.0,   // 垂直间距（行与行之间的距离）
+                      children: controller.talkLikeList.map((like) => _buildLikeItem(like)).toList(),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // 评论区
+                    IntrinsicWidth(
+                      child: CustomTextButton(
+                        '评论（${controller.talkCommentList.length}）',
+                        onTap: controller.commentFocusNode.requestFocus,//让输入框获得焦点并弹出键盘
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Column(
+                      children: controller.talkCommentList.map((comment) => _buildCommentItem(comment)).toList(),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          )),
+
+          //底部输入区
+          Container(
+            color: const Color(0xFFF9FBFF),
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  //输入框
+                  child: CustomTextField(
+                    controller: controller.commentController,
+                    focusNode: controller.commentFocusNode,
+                    maxLines: 3,
+                    minLines: 1,
+                    hintTextColor: theme.primaryColor,
+                    hintText: '输入评论',
+                    vertical: 8,
+                  ),
+                ),
+                const SizedBox(width: 5),
+                CustomButton(
+                  text: '确定',
+                  onTap: controller.onCreateTalkComment,
+                  width: 60,
+                  textSize: 14,
+                  height: 38,
+                  // type: 'minor',
+                )
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  //评论项组件
+  Widget _buildCommentItem(comment) {
+    return Container(
+      padding: const EdgeInsets.all(6.0),
+      decoration: BoxDecoration( //白色背景
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey[100]!,//灰色边框
+            width: 1,
+          ),
+        ),
+      ),
+
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              //头像 昵称与时间
+              Row(
+                children: [
+                  //头像
+                  CustomPortrait(
+                    url: comment['portrait'] ?? '',
+                    size: 30,
+                  ),
+                  const SizedBox(width: 3),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //昵称
+                      Text(
+                        comment['remark'] ?? comment['name'],
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      //发布时间
+                      Text(
+                        DateUtil.formatTime(comment['createTime']),
+                        style: const TextStyle(
+                            fontSize: 10, color: Colors.black38),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+              //是用户发表的展示删除按钮
+              if (controller.currentUserId == comment['userId'])
+                CustomTextButton('删除',
+                    onTap: () => controller.onDeleteTalkComment(comment['id'])),
+            ],
+          ),
+          const SizedBox(height: 3),
+
+          //评论内容
+          Text(
+            comment['content'] ?? '',
+            style: const TextStyle(fontSize: 12),
+          )
+        ],
+      ),
+    );
+  }
+
+  //点赞项
+  Widget _buildLikeItem(like) {
+    return Container(
+      height: 26,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border:
+            Border.all(color: theme.primaryColor.withValues(alpha: 0.1), width: 1),
+        color: theme.searchBarColor,
+      ),
+      constraints: const BoxConstraints(maxWidth: 100),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          //头像
+          CustomPortrait(
+            url: like['portrait'] ?? '',
+            size: 16,
+          ),
+          const SizedBox(width: 2),
+          //昵称
+          Expanded(
+            child: Text(
+              like['remark'] ?? like['name'],
+              style: const TextStyle(
+                  fontSize: 12, overflow: TextOverflow.ellipsis),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}

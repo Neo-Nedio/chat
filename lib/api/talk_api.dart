@@ -20,4 +20,11 @@ class TalkApi {
         .post('/v1/api/talk/list', data: {'index': index, 'num': num});
     return response.data;
   }
+
+  //说说详情
+  Future<Map<String, dynamic>> details(String talkId) async {
+    final response =
+    await _dio.post('/v1/api/talk/details', data: {'talkId': talkId});
+    return response.data;
+  }
 }

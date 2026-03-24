@@ -23,6 +23,7 @@ import '../../pages/qr_code_scan/qr_login_affirm/index.dart';
 import '../../pages/qr_code_scan/qr_other_result/index.dart';
 import '../../pages/register/index.dart';
 import '../../pages/talk/index.dart';
+import '../../pages/talk/talk_details/index.dart';
 import 'ControllerBinding.dart';
 
 class AppRoutes {
@@ -178,6 +179,13 @@ class AppRoutes {
       name: '/friend_request',
       page: () => FriendRequestPage(
         key: const Key('friend_request'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/talk_details',
+      page: () => TalkDetailsPage(
+        key: const Key('talk_details'),
       ),
       binding: ControllerBinding(),
     ),
