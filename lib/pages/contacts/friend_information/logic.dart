@@ -118,15 +118,18 @@ class FriendInformationLogic extends Logic {
     if (response['code'] == 0) {
       final data = response['data'];
       talkContent = data['talkContent'] ?? talkContent;
-      friendPortrait = data['portrait'];
-      friendName = data['name'];
+      friendPortrait = data['portrait'] ?? '';
+      friendName = data['name'] ?? '';
       friendRemark = data['remark'] ?? '';
-      friendAccount = data['account'];
-      friendGender = data['sex'];
-      friendBirthday = data['birthday'];
+      friendAccount = data['account'] ?? '';
+      friendGender = data['sex'] ?? '';
+      // 生日可能为 null，避免类型错误导致后续字段（如 groupName）无法赋值
+      //因为当生日为null时，会直接错误，导致后续无法继续运行
+      //所以要添加空值判断
+      friendBirthday = data['birthday'] ?? '';
       friendSignature = data['signature'] ?? '';
       friendGroup = data['groupName'] ?? '未分组';
-      isConcern = data['isConcern'];
+      isConcern = data['isConcern'] == true;
     }
     update([const Key('friend_info')]);
     return response['data'];
