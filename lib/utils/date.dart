@@ -1,5 +1,8 @@
 class DateUtil {
   static String formatTime(String dateStr) {
+    if (dateStr == '') {
+      return '';
+    }
     final date = DateTime.parse(dateStr);
     final now = DateTime.now();
     final diff = now.difference(date);
