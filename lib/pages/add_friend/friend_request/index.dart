@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../components/app_bar_title/index.dart';
 import '../../../components/custom_button/index.dart';
 import '../../../components/custom_portrait/index.dart';
 import '../../../components/custom_text_field/index.dart';
@@ -16,7 +17,7 @@ class FriendRequestPage extends CustomWidgetNew<FriendRequestLogic> {
     //标题栏
     appBar: AppBar(
       backgroundColor: const Color(0xFFF9FBFF),
-      title: const Text('申请信息'),
+      title: const AppBarTitle('申请信息'),
       centerTitle: true,
     ),
 

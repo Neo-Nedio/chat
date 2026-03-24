@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../components/app_bar_title/index.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
 
@@ -12,7 +13,7 @@ class QrOtherResultPage extends CustomWidget<QrOtherResultLogic> {
       backgroundColor: const Color(0xFFF9FBFF), // 浅蓝色背景
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('扫描结果'),
+        title: const AppBarTitle('扫描结果'),
         backgroundColor: const Color(0xFFF9FBFF),
       ),
       body: Center(

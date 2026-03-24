@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../components/app_bar_title/index.dart';
 import '../../components/custom_button/index.dart';
 import '../../utils/getx_config/config.dart';
 import 'logic.dart';
@@ -17,7 +18,7 @@ class QRCodeScanPage extends CustomWidget<QRCodeScanLogic> {
       appBar: AppBar(
         // 标题栏
         centerTitle: true,
-        title: const Text('扫一扫'),
+        title: const AppBarTitle('扫一扫'),
         backgroundColor: const Color(0xFFF9FBFF),
       ),
 

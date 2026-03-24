@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../components/app_bar_title/index.dart';
 import '../../../components/custom_button/index.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
@@ -17,7 +18,7 @@ class QrLoginAffirmPage extends CustomWidget<QRLoginAffirmLogic> {
       // 标题栏
       appBar: AppBar(
         centerTitle: true,  // 标题居中
-        title: const Text('登录确认'),
+        title: const AppBarTitle('登录确认'),
         backgroundColor: const Color(0xFFF9FBFF),  // 与背景同色
       ),
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../components/app_bar_title/index.dart';
 import '../../../components/custom_label_value/index.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
@@ -25,7 +26,7 @@ class AboutPage extends CustomWidget<AboutLogic> {
         //标题
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          title: const Text('关于我们'),
+          title: const AppBarTitle('关于我们'),
           centerTitle: true,
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle.dark,

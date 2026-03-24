@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../components/app_bar_title/index.dart';
 import '../../../components/custom_button/index.dart';
 import '../../../components/custom_image_group/index.dart';
 import '../../../components/custom_label_value_button/index.dart';
@@ -32,7 +33,7 @@ class FriendInformationPage extends CustomWidget<FriendInformationLogic> {
       //标题
       appBar: AppBar(
           centerTitle: true,
-          title: const Text('好友资料'),
+          title: const AppBarTitle('好友资料'),
           backgroundColor: const Color(0xFFF9FBFF),
           actions: [
             // 关注/取消关注按钮

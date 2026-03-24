@@ -4,6 +4,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 
+import '../../components/app_bar_title/index.dart';
 import '../../components/custom_portrait/index.dart';
 import '../../components/custom_search_box/index.dart';
 import '../../utils/date.dart';
@@ -106,7 +107,7 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
       backgroundColor: const Color(0xFFF9FBFF),
       appBar: AppBar(
         centerTitle: true, //  // 标题居中显示
-        title: const Text('聊天列表'),
+        title: const AppBarTitle('聊天列表'),
         backgroundColor: const Color(0xFFF9FBFF),
         // 应用栏右侧的操作按钮
         actions: [

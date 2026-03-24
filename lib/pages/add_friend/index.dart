@@ -3,6 +3,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 
 
+import '../../components/app_bar_title/index.dart';
 import '../../components/custom_button/index.dart';
 import '../../components/custom_portrait/index.dart';
 import '../../components/custom_search_box/index.dart';
@@ -91,11 +92,13 @@ class AddFriendPage extends CustomWidgetNew<AddFriendLogic> {
 
   //添加好友页面
   @override
-  Widget buildWidget(BuildContext context)
-    => Scaffold(
+  Widget buildWidget(BuildContext context) => Scaffold(
       backgroundColor: const Color(0xFFF9FBFF),
       //标题
-      appBar: AppBar(title: const Text('好友搜索'), centerTitle: true, actions: [
+      appBar: AppBar(
+        title: const AppBarTitle('好友搜索'),
+        centerTitle: true,
+        actions: [
         //取消按钮
         TextButton(
           child: const Text('取消'),

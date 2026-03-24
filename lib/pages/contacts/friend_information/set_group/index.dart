@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../components/app_bar_title/index.dart';
 import '../../../../components/custom_button/index.dart';
 import '../../../../components/custom_material_button/index.dart';
 import '../../../../components/custom_text_button/index.dart';
@@ -111,7 +112,7 @@ class SetGroupPage extends CustomWidget<SetGroupLogic> {
       //标题
       appBar: AppBar(
           backgroundColor: Colors.transparent,
-          title: const Text('好友分组'),
+          title: const AppBarTitle('好友分组'),
           centerTitle: true,
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle.dark,

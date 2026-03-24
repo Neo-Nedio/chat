@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../components/app_bar_title/index.dart';
 import '../../../../components/custom_text_button/index.dart';
 import '../../../../components/custom_text_field/index.dart';
 import '../../../../utils/getx_config/config.dart';
@@ -16,7 +17,7 @@ class SetRemarkPage extends CustomWidget<SetRemarkLogic> {
       //头部
       appBar: AppBar(
           backgroundColor: Colors.transparent,
-          title: const Text('好友备注'),
+          title: const AppBarTitle('好友备注'),
           centerTitle: true,
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle.dark,
