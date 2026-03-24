@@ -25,7 +25,6 @@ class NavigationLogic extends GetxController {
   void onInit() {
     super.onInit();
     initData();
-    connectWebSocket(); //建立 WebSocket 连接
 
     //立即执行
     (() async {
@@ -33,10 +32,19 @@ class NavigationLogic extends GetxController {
       await NotificationUtil.initialize();           // 1. 初始化通知服务
       await NotificationUtil.createNotificationChannel(); // 2. 创建通知渠道
       await PermissionHandler.permissionRequest();   // 3. 请求通知权限
+      await connectWebSocket(); //建立 WebSocket 连接
+      eventListen(); //进行监听
     })();
   }
 
-  void connectWebSocket() async {
+  // 监听消息(收到任何消息，立马刷新)
+  void eventListen() {
+    _wsManager.eventStream.listen((event) {
+      globalData.onGetUserUnreadInfo();
+    });
+  }
+
+  Future<void> connectWebSocket() async {
     // 建立 WebSocket 连接
     _wsManager.connect();
   }

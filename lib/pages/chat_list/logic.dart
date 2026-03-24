@@ -33,7 +33,6 @@ class ChatListLogic extends GetxController {
       // 判断消息类型：是否是收到的聊天消息
       if (event['type'] == 'on-receive-msg') {
         onGetChatList();                     // 刷新聊天列表
-        globalData.onGetUserUnreadInfo(); //接受到消息时，刷新未读消息
       }
     });
   }

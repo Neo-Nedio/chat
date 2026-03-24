@@ -11,6 +11,7 @@ import '../../api/chat_group_api.dart';
 import '../../api/friend_api.dart';
 import '../../api/notify_api.dart';
 import '../../components/custom_flutter_toast/index.dart';
+import '../../utils/getx_config/GlobalData.dart';
 import '../../utils/getx_config/GlobalThemeConfig.dart';
 
 class ContactsLogic extends GetxController {
@@ -19,6 +20,8 @@ class ContactsLogic extends GetxController {
   final _notifyApi = NotifyApi();
   //主题配置
   final GlobalThemeConfig _theme = GetInstance().find<GlobalThemeConfig>();
+
+  final GlobalData _globalData = GetInstance().find<GlobalData>();
 
   List<String> tabs = ['我的群聊', '我的好友', '好友通知']; // 标签页
 
@@ -69,10 +72,19 @@ class ContactsLogic extends GetxController {
     });
   }
 
+  //消息已读
+  void onReadNotify() async {
+    await _notifyApi.read('friend'); //消息已读
+    await _globalData.onGetUserUnreadInfo();
+  }
+
   // 标签切换
   void handlerTabTapped(int index) {
     selectedIndex = index;
     update([const Key("contacts")]);
+    if (index == 2) {
+      onReadNotify(); //切换到好友通知时，把消息已读
+    }
   }
 
   //打开好友详情

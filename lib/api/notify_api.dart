@@ -28,4 +28,11 @@ class NotifyApi {
     );
     return response.data;
   }
+
+  //通知已读
+  Future<Map<String, dynamic>> read(type) async {
+    final response =
+    await _dio.post('/v1/api/notify/read', data: {'notifyType': type});
+    return response.data;
+  }
 }

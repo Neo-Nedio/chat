@@ -150,7 +150,9 @@ class WebSocketUtil {
             });
             break;
           case 'notify':  // 系统通知
-          // 处理通知消息
+            _eventController.add(
+                {'type': 'on-receive-notify',
+                 'content': wsContent['content']});
             break;
           case 'video':   // 视频通话
           // 处理视频消息

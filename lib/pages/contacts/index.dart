@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 import '../../components/app_bar_title/index.dart';
 import '../../components/custom_portrait/index.dart';
 import '../../components/custom_search_box/index.dart';
 import '../../components/custom_text_button/index.dart';
+import '../../components/custom_tip/index.dart';
 import '../../utils/getx_config/config.dart';
 import 'logic.dart';
 
@@ -560,48 +562,62 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween, // 两端对齐
               children: List.generate(controller.tabs.length, (index) {
                 return Expanded( // 每个标签平均分配宽度
-                  child: AnimatedAlign(
-                    duration: const Duration(milliseconds: 300),  // 动画时长300ms
-                    alignment: Alignment.center,                  // 居中对齐
-                    child: GestureDetector(
-                      onTap: () => controller.handlerTabTapped(index), // 点击时调用切换方法
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),  // 动画时长
-                        curve: Curves.easeInOut,                      // 动画曲线：缓入缓出
-                        padding: const EdgeInsets.all(5),              // 内边距5px
-                        margin: EdgeInsets.symmetric(
-                          horizontal: index == controller.selectedIndex ? 4.0 : 0.0,  // 选中时增加水平外边距
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(1),      // 圆角1px
-                          color: Colors.transparent,                    // 透明背景
-                          border: Border(
-                            bottom: BorderSide(                         // 底部边框（下划线）
-                              color: index == controller.selectedIndex
-                                  ? theme.primaryColor           // 选中时蓝色
-                                  : Colors.transparent,                  // 未选中时透明
-                              width: 2,                                  // 边框宽度2px
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [ //todo 动画
+                      AnimatedAlign(
+                        duration: const Duration(milliseconds: 300),  // 动画时长300ms
+                        alignment: Alignment.center,                  // 居中对齐
+                        child: GestureDetector(
+                          onTap: () => controller.handlerTabTapped(index), // 点击时调用切换方法
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),  // 动画时长
+                            curve: Curves.easeInOut,                      // 动画曲线：缓入缓出
+                            padding: const EdgeInsets.all(5),              // 内边距5px
+                            margin: EdgeInsets.symmetric(
+                              horizontal: index == controller.selectedIndex ? 4.0 : 0.0,  // 选中时增加水平外边距
                             ),
-                          ),
-                        ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(1),      // 圆角1px
+                              color: Colors.transparent,                    // 透明背景
+                              border: Border(
+                                bottom: BorderSide(                         // 底部边框（下划线）
+                                  color: index == controller.selectedIndex
+                                      ? theme.primaryColor           // 选中时蓝色
+                                      : Colors.transparent,                  // 未选中时透明
+                                  width: 2,                                  // 边框宽度2px
+                                ),
+                              ),
+                            ),
 
-                        //确保文字在容器内居中显示
-                        child: Center(
-                          //文字样式动画的组件
-                          child: AnimatedDefaultTextStyle(
-                            duration: const Duration(milliseconds: 300),
-                            style: TextStyle(
-                              color: index == controller.selectedIndex
-                                  ? theme.primaryColor // 选中时蓝色
-                                  : Colors.black,              // 未选中时黑色
-                              fontSize: 16,                    // 字号16px
+                            //确保文字在容器内居中显示
+                            child: Center(
+                              //文字样式动画的组件
+                              child: AnimatedDefaultTextStyle(
+                                duration: const Duration(milliseconds: 300),
+                                style: TextStyle(
+                                  color: index == controller.selectedIndex
+                                      ? theme.primaryColor // 选中时蓝色
+                                      : Colors.black,              // 未选中时黑色
+                                  fontSize: 16,                    // 字号16px
+                                ),
+                                child: Text(controller.tabs[index]),          // 实际文字内容
+                              ),
                             ),
-                            child: Text(controller.tabs[index]),          // 实际文字内容
                           ),
                         ),
                       ),
-                    ),
-                  ),
+
+                      //右上角好友通知的红色提醒
+                      if (index == 2)
+                        Obx(() => globalData.getUnreadCount('friendNotify') > 0
+                            ? CustomTip(
+                            globalData.getUnreadCount('friendNotify'),
+                            right: 7,
+                            top: -2)
+                            : const SizedBox.shrink()),
+                    ],
+                  )
                 );
               }),
             ),

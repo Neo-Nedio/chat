@@ -2,6 +2,7 @@ import 'package:chat_mobile/pages/mine/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../components/custom_tip/index.dart';
 import '../../utils/getx_config/config.dart';
 import '../chat_list/index.dart';
 import '../contacts/index.dart';
@@ -25,34 +26,6 @@ class NavigationPage extends CustomWidget<NavigationLogic> {
       default:
         return ChatListPage(key: const Key('chat_list'));
     }
-  }
-
-  //未读消息图标
-  Widget _buildUnreadTip(int count) {
-    return Positioned(
-      //右上角
-      right: -10,
-      top: -5,
-      child: Container(
-        height: 16,
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        decoration: BoxDecoration(
-          color: Colors.red,
-          borderRadius: BorderRadius.circular(10), // 圆角10（胶囊形状）
-        ),
-        constraints: const BoxConstraints(
-          minWidth: 16, // 最小宽度16像素（保证圆形）
-        ),
-        child: Text(
-          count > 99 ? '99+' : count.toString(),
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 10,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
   }
 
   @override
@@ -89,7 +62,10 @@ class NavigationPage extends CustomWidget<NavigationLogic> {
                     //未读消息
                     if (controller.selectedIcons[index] == 'chat' &&
                         globalData.getUnreadCount('chat') > 0)
-                      _buildUnreadTip(globalData.getUnreadCount('chat')),
+                      CustomTip(globalData.getUnreadCount('chat')),
+                    if (controller.selectedIcons[index] == 'user' &&
+                        globalData.getUnreadCount('friendNotify') > 0)
+                      CustomTip(globalData.getUnreadCount('friendNotify')),
                   ],
                 ),
                 label: controller.name[index],
