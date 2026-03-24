@@ -1,10 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/getx_config/GlobalThemeConfig.dart';
+import '../../utils/web_socket.dart';
 
 class NavigationLogic extends GetxController {
   late int currentIndex = 0;
+  final _wsManager = WebSocketUtil();
 
   void initData(){
     //Get.parameters（URL 参数）
@@ -17,6 +20,16 @@ class NavigationLogic extends GetxController {
   void onInit() {
     super.onInit();
     initData();
+    connectWebSocket(); //建立 WebSocket 连接
+  }
+
+  void connectWebSocket() async {
+    // 从本地存储获取 token
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('x-token');
+
+    // 建立 WebSocket 连接
+    _wsManager.connect(token!);
   }
 
   final List<String> selectedIcons = [

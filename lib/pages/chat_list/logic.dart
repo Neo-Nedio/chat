@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
 import '../../api/chat_list_api.dart';
 import '../../api/friend_api.dart';
+import '../../utils/web_socket.dart';
 
 class ChatListLogic extends GetxController {
   final _chatListApi = ChatListApi();
@@ -10,6 +13,25 @@ class ChatListLogic extends GetxController {
   late List<dynamic> topList = [];     // 置顶聊天列表
   late List<dynamic> otherList = [];   // 其他聊天列表
   late List<dynamic> searchList = [];  // 搜索结果列表
+
+  final _wsManager = WebSocketUtil();        // 获取 WebSocket 单例
+  StreamSubscription? _subscription;         // 订阅对象，用于取消监听
+
+  @override
+  void onInit() {
+    super.onInit();
+    eventListen();  // 页面初始化时开始监听
+  }
+
+  void eventListen() {
+    // 监听 WebSocket 事件流
+    _subscription = _wsManager.eventStream.listen((event) {
+      // 判断消息类型：是否是收到的聊天消息
+      if (event['type'] == 'on-receive-msg') {
+        onGetChatList();                     // 刷新聊天列表
+      }
+    });
+  }
 
   void onGetChatList() {
     //获取列表
