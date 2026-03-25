@@ -60,6 +60,13 @@ class RegisterPageLogic extends GetxController {
     update([const Key("register")]); //用来指定要更新组件的key，而不是全部更新
   }
 
+  int _mailTextLength = 0;
+  int get mailTextLength =>_mailTextLength;
+  set mailTextLength(int value){
+    _mailTextLength = value;
+    update([const Key("register")]); //用来指定要更新组件的key，而不是全部更新
+  }
+
   //用户名输入长度
   void onUserTextChanged(String value) {
     userTextLength = value.length;
@@ -76,6 +83,12 @@ class RegisterPageLogic extends GetxController {
   void onPasswordTextChanged(String value){
     passwordTextLength = value.length;
     if (passwordTextLength >= 16) passwordTextLength = 16;
+  }
+
+  //用户邮箱输入长度
+  void onMailTextChanged(String value){
+    mailTextLength = value.length;
+    if (mailTextLength >= 16) mailTextLength = 16;
   }
 
   //发送验证码
