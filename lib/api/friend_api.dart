@@ -20,6 +20,12 @@ class FriendApi {
     return response.data;
   }
 
+  //获取扁平好友列表(不分组)
+  Future<Map<String, dynamic>> listFlat() async {
+    final response = await _dio.get('/v1/api/friend/list/flat');
+    return response.data;
+  }
+
   //搜索好友
   Future<Map<String, dynamic>> search(String friendInfo) async {
     final response = await _dio.post(
