@@ -6,6 +6,7 @@ import 'package:photo_view/photo_view_gallery.dart';
 import '../../utils/getx_config/config.dart';
 import './logic.dart';
 
+//展示多组图片，下方有小红点代表位置
 class ImageViewerPage extends CustomWidget<ImageViewerLogic> {
   ImageViewerPage({super.key});
 

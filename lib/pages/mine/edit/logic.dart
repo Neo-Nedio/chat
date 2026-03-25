@@ -141,43 +141,13 @@ class EditMineLogic extends getx.GetxController {
     }
   }
 
-  //裁剪图片并上传
-  Future<void> _cropChatBackgroundPicture(ImageSource? type) async {
-    await cropPicture(type, _uploadPicture);
-  }
-
   //点击头像按钮弹出底部选择框
-  void selectPortrait(BuildContext context) {
-    if (!isEdit) {
-      isEdit = true; // 自动进入编辑模式
-    }
-    // 弹出底部选择框
-    getx.Get.bottomSheet(
-      Container( // 选择框内容
-      decoration: const BoxDecoration(
-        color: Colors.white60, // 半透明白色背景
-      ),
-      child: Wrap( // Wrap 让内容自适应高度
-        children: [
-          ListTile(
-            leading: const Icon(Icons.photo),  // 左侧图标
-            title: const Text("图库"),          // 标题文字
-            onTap: () {
-              getx.Get.back();  // 先关闭底部弹窗
-              _cropChatBackgroundPicture(null);//null 表示从图库选择图片
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.camera_alt),  // 相机图标
-            title: const Text("拍照"),               // 标题文字
-            onTap: () {
-              getx.Get.back();  // 先关闭底部弹窗
-              _cropChatBackgroundPicture(ImageSource.camera);//拍照
-            },
-          )
-        ],
-      ),
-    ));
+  void selectPortrait() {
+    if (!isEdit) return;
+    getx.Get.toNamed('/image_viewer_update', arguments: {
+      'imageUrl': currentUserInfo['portrait'],
+      'onConfirm': _uploadPicture
+    });
   }
 
   ///男性选中：蓝色背景 + 白色文字

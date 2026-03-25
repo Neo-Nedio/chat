@@ -7,6 +7,7 @@ import '../../../components/custom_button/index.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
 
+//展示单个图片，点击可以对图片更新
 class ImageViewerUpdatePage extends CustomWidget<ImageViewerUpdateLogic> {
   ImageViewerUpdatePage({super.key});
 

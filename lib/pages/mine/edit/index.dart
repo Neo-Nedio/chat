@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../../components/custom_button/index.dart';
 import '../../../components/custom_portrait/index.dart';
 import '../../../components/custom_text_field/index.dart';
+import '../../../components/custom_update_portrait/index.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
 
@@ -45,10 +46,11 @@ class EditMinePage extends CustomWidget<EditMineLogic> {
                   const Spacer(flex: 1),
 
                   //头像
-                  CustomPortrait(
-                      onTap: () => controller.selectPortrait(context),
+                  CustomUpdatePortrait(
+                      isEdit: controller.isEdit,
+                      onTap: () => controller.selectPortrait(),
                       url: controller.currentUserInfo['portrait'] ?? '',
-                      size: 100,
+                      size: 80,
                       radius: 50),
 
                   const SizedBox(height: 16),
