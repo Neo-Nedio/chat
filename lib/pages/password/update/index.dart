@@ -41,7 +41,7 @@ class UpdatePasswordPage extends CustomWidget<UpdatePasswordLogic> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Spacer(flex: 1),
+                const SizedBox(height: 40),
 
                 // Logo部分
                 const SizedBox(height: 10.0),
@@ -112,7 +112,7 @@ class UpdatePasswordPage extends CustomWidget<UpdatePasswordLogic> {
                     ],
                   ),
                 ),
-                const Spacer(flex: 3),
+                const SizedBox(height: 60),
               ],
             ),
           ),
