@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -13,6 +15,7 @@ import '../../api/notify_api.dart';
 import '../../components/custom_flutter_toast/index.dart';
 import '../../utils/getx_config/GlobalData.dart';
 import '../../utils/getx_config/GlobalThemeConfig.dart';
+import '../../utils/web_socket.dart';
 
 class ContactsLogic extends GetxController {
   final _friendApi = FriendApi();
@@ -30,6 +33,26 @@ class ContactsLogic extends GetxController {
   List<dynamic> friendList = []; // 好友列表数据（按分组）
   List<dynamic> chatGroupList = [];
   List<dynamic> notifyFriendList = [];
+
+  final _wsManager = WebSocketUtil();
+  StreamSubscription? _subscription;
+
+  GlobalData get globalData => GetInstance().find<GlobalData>();
+
+  @override
+  void onInit() {
+    super.onInit();
+    eventListen();
+  }
+
+  void eventListen() {
+    // 监听消息
+    _subscription = _wsManager.eventStream.listen((event) {
+      if (event['type'] == 'on-receive-notify') {
+        init(); //接受到通知时刷新页面
+      }
+    });
+  }
 
   void init() {
     SharedPreferences.getInstance().then((prefs) {
@@ -93,13 +116,32 @@ class ContactsLogic extends GetxController {
   }
 
   //同意添加好友
-  void handlerAgreeFriend(String notifyId) async {
-    final result = await _friendApi.agree(notifyId);
+  void handlerAgreeFriend(dynamic notify) async {
+    onReadNotify(); //消息已读
+    final result = await _friendApi.agree(notify['id'], notify['fromId']);
     if (result['code'] == 0) {
       init();
       CustomFlutterToast.showSuccessToast("同意好友请求成功");
     } else {
       CustomFlutterToast.showErrorToast("同意好友请求失败");
     }
+  }
+
+  //拒绝添加好友
+  void handlerRejectFriend(dynamic notify) async {
+    onReadNotify(); //消息已读
+    final result = await _friendApi.reject(notify['fromId']);
+    if (result['code'] == 0) {
+      init();
+      CustomFlutterToast.showSuccessToast("操作成功");
+    } else {
+      CustomFlutterToast.showErrorToast("网络错误");
+    }
+  }
+
+  @override
+  void onClose() {
+    _subscription?.cancel();
+    super.onClose();
   }
 }

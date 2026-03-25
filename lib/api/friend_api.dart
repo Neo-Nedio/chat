@@ -104,11 +104,23 @@ class FriendApi {
   }
 
   //同意好友申请（按通知 ID）
-  Future<Map<String, dynamic>> agree(String notifyId) async {
+  Future<Map<String, dynamic>> agree(String notifyId, String fromId) async {
     final response = await _dio.post(
-      '/v1/api/friend/agree',
+      '/v1/api/friend/agree/id',
       data: {
         'notifyId': notifyId,
+        'fromId': fromId,
+      },
+    );
+    return response.data;
+  }
+
+  //拒绝好友申请
+  Future<Map<String, dynamic>> reject(String fromId) async {
+    final response = await _dio.post(
+      '/v1/api/friend/reject',
+      data: {
+        'fromId': fromId,
       },
     );
     return response.data;

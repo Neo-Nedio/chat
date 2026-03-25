@@ -164,9 +164,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
       borderRadius: BorderRadius.circular(12),
       color: Colors.white,
       child: InkWell(
-        onTap: () {
-          // todo 添加点击事件
-        },
+        onTap: controller.onReadNotify, //消息已读
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10.0),
@@ -297,14 +295,16 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
     if (!isFromCurrentUser && status == "wait") {
       return Row(
         children: [
-          CustomTextButton("同意",
-              onTap: ()=> controller.handlerAgreeFriend(notify['id'])),
+          CustomTextButton(
+            "同意",
+            onTap: () => controller.handlerAgreeFriend(notify),
+          ),
 
           const SizedBox(width: 10),
 
           CustomTextButton(
-            "取消",
-            onTap: () {}, //todo 拒绝好友请求
+            "拒绝",
+            onTap: () => controller.handlerRejectFriend(notify),
             textColor: Colors.grey[600],
           ),
           const SizedBox(width: 5), // 右边距
