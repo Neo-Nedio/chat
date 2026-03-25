@@ -378,7 +378,9 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween, // 两端对齐
                         children: [
                           Text(  // 用户名
-                            chat['remark'] ?? chat['name'],
+                            chat['remark'] != null && chat['remark'].toString().trim() != ''
+                                ? chat['remark']
+                                : chat['name'],
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,  // 中等粗细

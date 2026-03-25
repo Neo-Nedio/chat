@@ -46,11 +46,21 @@ class ImageViewerUpdatePage extends CustomWidget<ImageViewerUpdateLogic> {
 
             // 动态按钮（文字可变化）
             Obx(
-              () => CustomButton(
-                text: controller.text.value,
-                onTap: () => _showDialog(context),
-                width: MediaQuery.of(context).size.width / 2,
-              ),
+                  () {
+                if (controller.isUpdate.value) {
+                  return Column(
+                    children: [
+                      CustomButton(
+                        text: controller.text.value,
+                        onTap: () => _showDialog(context),
+                        width: MediaQuery.of(context).size.width / 2,
+                      ),
+                      const SizedBox(height: 15),
+                    ],
+                  );
+                }
+                return const SizedBox.shrink();
+              },
             ),
 
             const SizedBox(height: 15),

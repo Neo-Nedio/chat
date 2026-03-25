@@ -25,6 +25,7 @@ class CustomUpdatePortrait extends StatelessWidget {
       children: [
         //头像
         CustomPortrait(
+          onTap: onTap, //在没有遮盖层时也可以编辑
           url: url,
           size: size,
           radius: radius,
