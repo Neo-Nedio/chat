@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../api/user_api.dart';
 import '../../utils/encrypt.dart';
@@ -100,6 +101,19 @@ class LoginPageLogic extends GetxController {
 
   //修改密码
   void toRetrievePassword()=>Get.toNamed('/retrieve_password');
+
+  //打开外部链接的函数，用于跳转到浏览器、拨打电话、发送邮件等外部应用。
+  Future<void> launchURL(String url) async {
+    final uri = Uri.parse(url);                    // 1. 解析 URL
+    if (await canLaunchUrl(uri)) {                // 2. 检查是否能打开
+      await launchUrl(                            // 3. 打开链接
+        uri,
+        mode: LaunchMode.externalApplication,     // 4. 使用外部应用
+      );
+    } else {
+      throw 'Could not launch $url';              // 5. 抛出错误
+    }
+  }
 
   @override
   void onClose() {
