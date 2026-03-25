@@ -11,6 +11,7 @@ class CustomLabelValueButton extends StatelessWidget {
   final int? maxLines;
   final Widget? child;
   final String hint;
+  final Color? color;
 
   const CustomLabelValueButton({
     super.key,
@@ -21,6 +22,7 @@ class CustomLabelValueButton extends StatelessWidget {
     this.maxLines = 5,
     this.hint = '', //值为空时的提示文字
     this.width = 60, // 标签区域的宽度
+    this.color,
   });
 
   Widget _getContent() {
@@ -71,6 +73,7 @@ class CustomLabelValueButton extends StatelessWidget {
     │ └─────────────────────────────────────────────────────────┘ │
     └─────────────────────────────────────────────────────────────┘*/
     return CustomMaterialButton( // 外层：带涟漪效果的按钮
+      color: color,
       onTap: onTap,  // 点击时触发回调
       child: Container( // 容器：提供内边距
         padding: const EdgeInsets.all(10),

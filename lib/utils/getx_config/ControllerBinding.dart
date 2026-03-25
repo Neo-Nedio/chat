@@ -11,6 +11,7 @@ import '../../pages/contacts/friend_information/logic.dart';
 import '../../pages/contacts/friend_information/set_group/logic.dart';
 import '../../pages/contacts/friend_information/set_remark/logic.dart';
 import '../../pages/contacts/logic.dart';
+import '../../pages/contacts/user_select/logic.dart';
 import '../../pages/login/logic.dart';
 import '../../pages/mine/about/logic.dart';
 import '../../pages/mine/edit/logic.dart';
@@ -25,6 +26,7 @@ import '../../pages/qr_code_scan/qr_login_affirm/logic.dart';
 import '../../pages/qr_code_scan/qr_other_result/logic.dart';
 import '../../pages/register/logic.dart';
 import '../../pages/talk/logic.dart';
+import '../../pages/talk/talk_create/logic.dart';
 import '../../pages/talk/talk_details/logic.dart';
 import 'GlobalData.dart';
 import 'GlobalThemeConfig.dart';
@@ -58,5 +60,7 @@ class ControllerBinding extends Bindings {
     Get.lazyPut(() => SearchInfoLogic());
     Get.lazyPut(() => FriendRequestLogic());
     Get.lazyPut(() => TalkDetailsLogic());
+    Get.lazyPut(() => TalkCreateLogic());
+    Get.lazyPut(() => UserSelectLogic());
   }
 }

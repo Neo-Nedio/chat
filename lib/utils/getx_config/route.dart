@@ -9,6 +9,7 @@ import '../../pages/contacts/friend_information/index.dart';
 import '../../pages/contacts/friend_information/set_group/index.dart';
 import '../../pages/contacts/friend_information/set_remark/index.dart';
 import '../../pages/contacts/index.dart';
+import '../../pages/contacts/user_select/index.dart';
 import '../../pages/login/index.dart';
 import '../../pages/mine/about/index.dart';
 import '../../pages/mine/edit/index.dart';
@@ -23,6 +24,7 @@ import '../../pages/qr_code_scan/qr_login_affirm/index.dart';
 import '../../pages/qr_code_scan/qr_other_result/index.dart';
 import '../../pages/register/index.dart';
 import '../../pages/talk/index.dart';
+import '../../pages/talk/talk_create/index.dart';
 import '../../pages/talk/talk_details/index.dart';
 import 'ControllerBinding.dart';
 
@@ -186,6 +188,20 @@ class AppRoutes {
       name: '/talk_details',
       page: () => TalkDetailsPage(
         key: const Key('talk_details'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/talk_create',
+      page: () => TalkCreatePage(
+        key: const Key('talk_create'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/user_select',
+      page: () => UserSelectPage(
+        key: const Key('user_select'),
       ),
       binding: ControllerBinding(),
     ),

@@ -27,4 +27,25 @@ class TalkApi {
     await _dio.post('/v1/api/talk/details', data: {'talkId': talkId});
     return response.data;
   }
+
+  //上传说说图片（流）
+  Future<Map<String, dynamic>> uploadImg(FormData formData) async {
+    final response =
+    await _dio.post('/v1/api/talk/upload/img/form', data: formData);
+    return response.data;
+  }
+
+  //创建说说
+  Future<Map<String, dynamic>> create(String text, List permission) async {
+    final response = await _dio.post('/v1/api/talk/create',
+        data: {'text': text, 'permission': permission});
+    return response.data;
+  }
+
+  //删除说说
+  Future<Map<String, dynamic>> delete(String talkId) async {
+    final response =
+    await _dio.post('/v1/api/talk/delete', data: {'talkId': talkId});
+    return response.data;
+  }
 }
