@@ -64,7 +64,7 @@ class ImageViewerLogic extends GetxController {
         CustomFlutterToast.showErrorToast("保存失败");
       }
     } catch (e) {
-      // 修复3：失败用错误 Toast
+      // 失败用错误 Toast
       CustomFlutterToast.showErrorToast("保存失败~");
     }
   }
