@@ -1,0 +1,97 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart' show Get, GetNavigation, GetxController;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart' show MultipartFile, FormData;
+
+import '../../../api/chat_group_api.dart';
+import '../../../api/chat_group_member.dart';
+import '../../../components/custom_flutter_toast/index.dart';
+
+class ChatGroupInformationLogic extends GetxController {
+  final _chatGroupApi = ChatGroupApi();
+  final _chatGroupMemberApi = ChatGroupMemberApi();
+
+  late bool isOwner = false; // 当前用户是否是群主
+
+  //群聊详情
+  late dynamic chatGroupDetails = {
+    'id': '',
+    'userId': '',
+    'ownerUserId': '',
+    'portrait': '',
+    'name': '',
+    'notice': {},
+    'memberNum': '',
+    'groupName': '',
+    'groupRemark': '',
+  };
+  // 群成员列表
+  late List<dynamic> chatGroupMembers = [];
+  // 从路由参数获取的群聊 ID
+  final String chatGroupId = Get.arguments['chatGroupId'];
+
+  @override
+  void onInit() {
+    () async {
+      await onGetGroupChatDetails();                    // 1. 获取群详情
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');          // 获取当前用户 ID
+      if (userId == chatGroupDetails['ownerUserId']) {   // 判断是否为群主
+        isOwner = true;
+      }
+    }();
+    onGetGroupChatMembers();   // 2. 获取成员列表
+    super.onInit();
+  }
+
+  //获取群聊详情
+  Future<void> onGetGroupChatDetails() async {
+    await _chatGroupApi.details(chatGroupId).then((res) {
+      if (res['code'] == 0) {
+        chatGroupDetails = res['data'];
+        update([const Key('chat_group_info')]);
+      }
+    });
+  }
+
+  //获取群成员列表
+  void onGetGroupChatMembers() async {
+    _chatGroupMemberApi.listPage(chatGroupId).then((res) {
+      if (res['code'] == 0) {
+        chatGroupMembers = res['data'];
+        update([const Key('chat_group_info')]);
+      }
+    });
+  }
+
+  //更新群头像
+  Future<void> _onUpdateChatGroupPortrait(File picture) async {
+    Map<String, dynamic> map = {};
+    final file = await MultipartFile.fromFile(picture.path,
+        filename: picture.path.split('/').last);
+    map['type'] = 'image/jpeg';
+    map['name'] = picture.path.split('/').last;
+    map['size'] = picture.lengthSync();
+    map["file"] = file;
+    map['groupId'] = chatGroupId;
+    FormData formData = FormData.fromMap(map);
+    final result = await _chatGroupApi.upload(formData);
+    if (result['code'] == 0) {
+      CustomFlutterToast.showSuccessToast('头像修改成功');
+      chatGroupDetails['portrait'] = result['data'];
+      update([const Key("chat_group_info")]);
+    } else {
+      CustomFlutterToast.showErrorToast(result['msg']);
+    }
+  }
+
+  //选择头像
+  void selectPortrait() {
+    Get.toNamed('/image_viewer_update', arguments: {
+      'imageUrl': chatGroupDetails['portrait'],
+      'onConfirm': _onUpdateChatGroupPortrait
+    });
+  }
+}

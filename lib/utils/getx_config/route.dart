@@ -5,11 +5,14 @@ import '../../pages/add_friend/friend_info/index.dart';
 import '../../pages/add_friend/friend_request/index.dart';
 import '../../pages/add_friend/index.dart';
 import '../../pages/chat_list/index.dart';
+import '../../pages/contacts/chat_group_information/index.dart';
 import '../../pages/contacts/friend_information/index.dart';
 import '../../pages/contacts/friend_information/set_group/index.dart';
 import '../../pages/contacts/friend_information/set_remark/index.dart';
 import '../../pages/contacts/index.dart';
 import '../../pages/contacts/user_select/index.dart';
+import '../../pages/image_viewer/image_viewer_update/index.dart';
+import '../../pages/image_viewer/index.dart';
 import '../../pages/login/index.dart';
 import '../../pages/mine/about/index.dart';
 import '../../pages/mine/edit/index.dart';
@@ -202,6 +205,27 @@ class AppRoutes {
       name: '/user_select',
       page: () => UserSelectPage(
         key: const Key('user_select'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/chat_group_info',
+      page: () => ChatGroupInformationPage(
+        key: const Key('chat_group_info'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/image_viewer',
+      page: () => ImageViewerPage(
+        key: const Key('image_viewer'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/image_viewer_update',
+      page: () => ImageViewerUpdatePage(
+        key: const Key('image_viewer_update'),
       ),
       binding: ControllerBinding(),
     ),

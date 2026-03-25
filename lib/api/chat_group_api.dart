@@ -18,4 +18,21 @@ class ChatGroupApi {
     final response = await _dio.get('/v1/api/chat-group/list');
     return response.data;
   }
+
+
+  //群详情
+  Future<Map<String, dynamic>> details(String chatGroupId) async {
+    final response = await _dio
+        .post('/v1/api/chat-group/details', data: {'chatGroupId': chatGroupId});
+    return response.data;
+  }
+
+  //群头像上传（表单）
+  Future<Map<String, dynamic>> upload(FormData formData) async {
+    final response = await _dio.post(
+      '/v1/api/chat-group/upload/portrait/form',
+      data: formData,
+    );
+    return response.data;
+  }
 }

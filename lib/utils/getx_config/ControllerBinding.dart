@@ -7,11 +7,14 @@ import '../../pages/add_friend/friend_info/logic.dart';
 import '../../pages/add_friend/friend_request/logic.dart';
 import '../../pages/add_friend/logic.dart';
 import '../../pages/chat_list/logic.dart';
+import '../../pages/contacts/chat_group_information/logic.dart';
 import '../../pages/contacts/friend_information/logic.dart';
 import '../../pages/contacts/friend_information/set_group/logic.dart';
 import '../../pages/contacts/friend_information/set_remark/logic.dart';
 import '../../pages/contacts/logic.dart';
 import '../../pages/contacts/user_select/logic.dart';
+import '../../pages/image_viewer/image_viewer_update/logic.dart';
+import '../../pages/image_viewer/logic.dart';
 import '../../pages/login/logic.dart';
 import '../../pages/mine/about/logic.dart';
 import '../../pages/mine/edit/logic.dart';
@@ -62,5 +65,8 @@ class ControllerBinding extends Bindings {
     Get.lazyPut(() => TalkDetailsLogic());
     Get.lazyPut(() => TalkCreateLogic());
     Get.lazyPut(() => UserSelectLogic());
+    Get.lazyPut(() => ChatGroupInformationLogic());
+    Get.lazyPut(() => ImageViewerLogic());
+    Get.lazyPut(() => ImageViewerUpdateLogic());
   }
 }
