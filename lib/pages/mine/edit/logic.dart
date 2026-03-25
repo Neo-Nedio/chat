@@ -283,6 +283,10 @@ class EditMineLogic extends getx.GetxController {
       //数据准备
       final prefs = await SharedPreferences.getInstance();
       String name = nameController.text;
+      if(name == '' || name.trim().isEmpty){
+        CustomFlutterToast.showErrorToast('用户名不能为空');
+        return;
+      }
       String signature = signatureController.text;
       String birthday = this.birthday.toString();
       String portrait = currentUserInfo['portrait'];
