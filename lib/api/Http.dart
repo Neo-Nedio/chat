@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Http {
+  static final baseIp = '172.16.7.235';
   static final Http _instance = Http._internal();
 
   // 工厂构造函数：可以控制对象的创建过程, 总是返回同一个对象
@@ -12,9 +13,7 @@ class Http {
   // 私有的命名构造函数
   Http._internal() {
     dio = Dio(BaseOptions(
-      baseUrl: 'http://localhost:9200',
-      //baseUrl: 'http://192.168.61.202:9200',
-      //baseUrl: 'http://172.16.7.233:9200',
+      baseUrl: 'http://$baseIp:9200',
       //连接超时20秒
       connectTimeout: const Duration(seconds: 20),
       //接收超时20秒

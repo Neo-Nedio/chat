@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:chat_mobile/api/Http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -95,7 +96,7 @@ class WebSocketUtil {
     try {
       print('WebSocket connecting...');
       //// WebSocket 服务器地址
-      String wsIp = 'ws://127.0.0.1:9100';
+      String wsIp = 'ws://${Http.baseIp}:9100';
 
       //// 创建 WebSocket 连接，URL 中带上 token 用于认证
       _channel = WebSocketChannel.connect(
