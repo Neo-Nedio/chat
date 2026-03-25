@@ -12,6 +12,7 @@ class CustomLabelValueButton extends StatelessWidget {
   final Widget? child;
   final String hint;
   final Color? color;
+  final bool compact;
 
   const CustomLabelValueButton({
     super.key,
@@ -23,6 +24,7 @@ class CustomLabelValueButton extends StatelessWidget {
     this.hint = '', //值为空时的提示文字
     this.width = 60, // 标签区域的宽度
     this.color,
+    this.compact = true,
   });
 
   Widget _getContent() {
@@ -81,34 +83,51 @@ class CustomLabelValueButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
 
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,  // 顶部对齐
-          mainAxisSize: MainAxisSize.min,                // 最小宽度
-          mainAxisAlignment: MainAxisAlignment.center,   // 水平居中
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 第一部分：标签区域
-            SizedBox(
-              width: width,
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.black54,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // 第一部分：标签区域
+                SizedBox(
+                  width: width,
+                  child: Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.black54,
+                    ),
+                  ),
                 ),
-              ),
+                // 第二部分：值显示区域（弹性占满剩余空间）
+                //compact为true时是紧凑模式，值显示在标签右边
+    /*      ┌─────────────────────────────────────────┐
+            │  标签    值内容...                 →    │
+            │  60px    (弹性占满)              16px   │
+            └─────────────────────────────────────────┘*/
+                if (compact)
+                  Expanded(
+                    child: _getContent(),
+                  ),
+                // 第三部分：右箭头图标
+                Icon(
+                  const IconData(0xe61f, fontFamily: 'IconFont'),
+                  size: 16,
+                  color: Colors.grey[700],
+                ),
+              ],
             ),
-            // 第二部分：值显示区域（弹性占满剩余空间）
-            Expanded(
-              child: _getContent(),
-            ),
-            // 第三部分：右箭头图标
-            Icon(
-              const IconData(0xe61f, fontFamily: 'IconFont'),
-              size: 16,
-              color: Colors.grey[700],
-            ),
+            //非紧凑模式显示在标签下方
+      /*    ┌─────────────────────────────────────────┐
+            │  标签                                    │
+            │  值内容...                          →   │
+            └─────────────────────────────────────────┘*/
+            if (!compact) _getContent(),
           ],
-        ),
+        )
       ),
     );
   }
