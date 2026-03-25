@@ -162,7 +162,9 @@ class TalkDetailsPage extends CustomWidget<TalkDetailsLogic> {
 
                         //右侧删除按钮，根据是否处于发布者显示
                         if (controller.currentUserId == controller.talkDetails['userId'])
-                          CustomTextButton('删除', onTap: () {}),
+                          CustomTextButton('删除',
+                              onTap: () =>
+                                  controller.handlerDeleteTalkTip(context)),
                       ],
                     ),
 

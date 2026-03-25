@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../api/talk_api.dart';
 import '../../../api/talk_comment_api.dart';
 import '../../../api/talk_like_api.dart';
+import '../../../components/CustomDialog/index.dart';
 import '../../../components/custom_flutter_toast/index.dart';
 import '../logic.dart';
 
@@ -135,6 +136,19 @@ class TalkDetailsLogic extends GetxController {
         update([const Key('talk_details')]);
       }
     });
+  }
+
+  //删除说说
+  void handlerDeleteTalkTip(BuildContext context) {
+    CustomDialog.showTipDialog(
+      context,
+      text: '确认删除该条说说?',
+      onOk: () {
+        _talkLogic.onDeleteTalk(talkId);
+        Get.back();
+      },
+      onCancel: () {},
+    );
   }
 
   @override

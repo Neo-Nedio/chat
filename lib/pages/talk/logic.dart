@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/talk_api.dart';
 import '../../api/user_api.dart';
+import '../../components/CustomDialog/index.dart';
 
 class TalkLogic extends GetxController {
   final _talkApi = TalkApi();
@@ -86,6 +87,31 @@ class TalkLogic extends GetxController {
         return;
       }
     }
+  }
+
+  //删除说说
+  void onDeleteTalk(talkId) {
+    _talkApi.delete(talkId).then((res) {
+      if (res['code'] == 0) {
+        for (var talk in talkList) {
+          if (talk['talkId'] == talkId) {
+            talkList.remove(talk);
+            update([const Key("talk")]);
+            return;
+          }
+        }
+      }
+    });
+  }
+
+  //点击删除时的弹窗
+  void handlerDeleteTalkTip(BuildContext context, String talkId) {
+    CustomDialog.showTipDialog(
+      context,
+      text: '确认删除该条说说?',
+      onOk: () => onDeleteTalk(talkId),
+      onCancel: () {},
+    );
   }
 
   // 获取图片URL
