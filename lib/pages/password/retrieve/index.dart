@@ -1,6 +1,5 @@
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
-
+import 'package:flutter/services.dart';
+import '../../../components/custom_button/index.dart';
 import '../../../components/custom_text_field/index.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
@@ -16,138 +15,123 @@ class RetrievePassword extends CustomWidget<RetrievePasswordLogic> {
 
   @override
   Widget buildWidget(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Container(
-        height: screenHeight,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFBED7F6), Color(0xFFFFFFFF), Color(0xFFDFF4FF)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [theme.minorColor, const Color(0xFFFFFFFF)],
+          // 渐变颜色
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Container(
-              height: screenHeight -
-                  MediaQuery.of(context).padding.top -
-                  MediaQuery.of(context).padding.bottom,
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                children: [
-                  const Spacer(flex: 1),
-                  // Logo部分
-                  Image.asset(
-                    'assets/images/logo.png',
-                    height: screenWidth * 0.25,
-                    width: screenWidth * 0.25,
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent, //透明
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar( //空标题，用来显示返回键
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          systemOverlayStyle: SystemUiOverlayStyle.dark,
+        ),
+
+        //主体内容
+        body: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 10.0),
+
+              //上方文本
+              const Text(
+                "找回密码",
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 5.0),
+              const Text(
+                "请输入账号，验证码，新密码。验证码会发送到账号所对应的邮箱内。",
+                style: TextStyle(fontSize: 14),
+              ),
+              const SizedBox(height: 20.0),
+
+              // 登录框部分
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 20.0,
+                  horizontal: 20.0,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10.0),
+                  border: Border.all(
+                    color: const Color(0xFFF2F2F2),
+                    width: 1.0,
                   ),
-                  const Text(
-                    "找回密码",
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w900,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CustomTextField(
+                      labelText: "账号",
+                      controller: controller.accountController,
+                      onChanged: controller.onAccountTextChanged,
+                      suffix: Text('${controller.accountTextLength}/30'),
+                      inputLimit: 30,
                     ),
-                  ),
-                  const SizedBox(height: 20.0),
-                  // 登录框部分
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 20.0,
-                      horizontal: 20.0,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10.0),
-                      border: Border.all(
-                        color: const Color(0xFFF2F2F2),
-                        width: 1.0,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        CustomTextField(
-                          labelText: "账号",
-                          controller: controller.accountController,
-                          onChanged: controller.onAccountTextChanged,
-                          suffix: Text('${controller.accountTextLength}/30'),
-                          inputLimit: 30,
-                        ),
-                        const SizedBox(height: 15.0),
-                        CustomTextField(
-                          labelText: "邮箱",
-                          controller: controller.mailController,
-                        ),
-                        const SizedBox(height: 20.0),
-                        CustomTextField(
-                          labelText: '验证码',
-                          hintText: "请输入验证码",
-                          controller: controller.codeController,
-                          suffix: controller.mailController.text!=""?Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              GestureDetector(
-                                onTap: controller.onTapSendMail,
-                                child: Text(
-                                  controller.countdownTime > 0
-                                      ? '${controller.countdownTime}后重新获取'
-                                      : '获取验证码',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: controller.countdownTime > 0
-                                        ? const Color.fromARGB(255, 183, 184, 195)
-                                        : const Color.fromARGB(255, 17, 132, 255),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8.0),
-                            ],
-                          ):null,
-                        ),
-                        const SizedBox(height: 20.0),
-                        CustomTextField(
-                          labelText: "密码",
-                          controller: controller.passwordController,
-                          obscureText: true,
-                          onChanged: controller.onPasswordTextChanged,
-                          suffix: Text('${controller.passwordTextLength}/16'),
-                          inputLimit: 16,
-                        ),
-                        const SizedBox(height: 20.0),
-                        FractionallySizedBox(
-                          widthFactor: 0.8,
-                          child: ElevatedButton(
-                            // onPressed: ()=>controller.login(context),
-                            onPressed: controller.onSubmit,
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 5,
-                                vertical: 5,
-                              ),
-                              backgroundColor: const Color(0xFF4C9BFF),
-                              foregroundColor: Colors.white,
-                            ),
-                            child: const Text(
-                              "提  交",
+                    const SizedBox(height: 20.0),
+                    CustomTextField(
+                      labelText: '验证码',
+                      hintText: "请输入验证码",
+                      controller: controller.codeController,
+                      //发送验证码按钮
+                      suffix: controller.accountController.text != ""
+                          ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: controller.onTapSendMail,
+                            child: Text(
+                              controller.countdownTime > 0
+                                  ? '${controller.countdownTime}后重新获取'
+                                  : '获取验证码',
                               style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: controller.countdownTime > 0
+                                    ? const Color.fromARGB(
+                                    255, 183, 184, 195)
+                                    : const Color.fromARGB(
+                                    255, 17, 132, 255),
                               ),
                             ),
                           ),
-                        )
-                      ],
+                          const SizedBox(width: 8.0),
+                        ],
+                      )
+                          : null,
                     ),
-                  ),
-                  const Spacer(flex: 3),
-                ],
+                    const SizedBox(height: 20.0),
+                    CustomTextField(
+                      labelText: "新密码",
+                      controller: controller.passwordController,
+                      obscureText: true,
+                      onChanged: controller.onPasswordTextChanged,
+                      suffix: Text('${controller.passwordTextLength}/16'),
+                      inputLimit: 16,
+                    ),
+                  ],
+                ),
               ),
-            ),
+              const SizedBox(height: 20.0),
+              //登录按钮
+              CustomButton(
+                text: "确 定",
+                onTap: controller.onSubmit,
+                width: MediaQuery.of(context).size.width,
+                type: 'gradient',
+              ),
+            ],
           ),
         ),
       ),

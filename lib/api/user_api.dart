@@ -105,6 +105,16 @@ class UserApi {
     return response.data;
   }
 
+  //发送邮箱验证码（按账号）
+  Future<Map<String, dynamic>> emailVerificationByAccount(
+      String account) async {
+    final response = await _dio.post(
+      '/v1/api/user/email/verify/by/account',
+      data: {'account': account},
+    );
+    return response.data;
+  }
+
   //用户注册
   Future<Map<String, dynamic>> register(
       String username,String account,String password,String email,String code) async {
@@ -123,13 +133,12 @@ class UserApi {
 
   //忘记密码
   Future<Map<String, dynamic>> forget(
-      String account,String password,String email,String code) async {
+      String account,String password,String code) async {
     final response = await _dio.post(
       '/v1/api/user/forget',
       data: {
         'account':account,
         'password':password,
-        'email':email,
         'code':code
       },
     );
