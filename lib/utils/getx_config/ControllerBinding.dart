@@ -45,38 +45,39 @@ class ControllerBinding extends Bindings {
     Get.put(GlobalThemeConfig(), permanent: true);
     Get.put(GlobalData(), permanent: true);
     // 懒加载方式创建控制器实例(没有创建实例，即Get.find之前不会初始化)
-    Get.lazyPut(() => LoginPageLogic());        // 登录页控制器
-    Get.lazyPut(() => RegisterPageLogic());     // 注册页控制器
-    Get.lazyPut(() => RetrievePasswordLogic()); // 找回密码控制器
-    Get.lazyPut(() => UpdatePasswordLogic());   // 修改密码控制器
-    Get.lazyPut(() => ChatListLogic());
-    Get.lazyPut(() => ContactsLogic());
-    Get.lazyPut(() => MineLogic());
-    Get.lazyPut(() => TalkLogic());
-    Get.lazyPut(() => QRCodeScanLogic());
-    Get.lazyPut(() => QRLoginAffirmLogic());
-    Get.lazyPut(() => NavigationLogic());
-    Get.lazyPut(() => EditMineLogic());
-    Get.lazyPut(() => MineQRCodeLogic());
-    Get.lazyPut(() => QrOtherResultLogic());
-    Get.lazyPut(() => QRFriendAffirmLogic());
-    Get.lazyPut(() => AboutLogic());
-    Get.lazyPut(() => FriendInformationLogic());
-    Get.lazyPut(() => SetRemarkLogic());
-    Get.lazyPut(() => SetGroupLogic());
-    Get.lazyPut(() => AddFriendLogic());
-    Get.lazyPut(() => SearchInfoLogic());
-    Get.lazyPut(() => FriendRequestLogic());
-    Get.lazyPut(() => TalkDetailsLogic());
-    Get.lazyPut(() => TalkCreateLogic());
-    Get.lazyPut(() => UserSelectLogic());
-    Get.lazyPut(() => ChatGroupInformationLogic());
-    Get.lazyPut(() => ImageViewerLogic());
-    Get.lazyPut(() => ImageViewerUpdateLogic());
-    Get.lazyPut(() => SetGroupNameLogic());
-    Get.lazyPut(() => SetGroupRemarkLogic());
-    Get.lazyPut(() => SetGroupNameNickLogic());
-    Get.lazyPut(() => ChatGroupNoticeLogic());
-    Get.lazyPut(() => AddChatGroupNoticeLogic());
+    //fenix: true 是 GetX 中 lazyPut 的一个参数，意思是允许控制器在销毁后重新创建。
+    Get.lazyPut(() => NavigationLogic(),fenix: true);
+    Get.lazyPut(() => LoginPageLogic(),fenix: true);
+    Get.lazyPut(() => RegisterPageLogic(),fenix: true);
+    Get.lazyPut(() => RetrievePasswordLogic(),fenix: true);
+    Get.lazyPut(() => UpdatePasswordLogic(),fenix: true);
+    Get.lazyPut(() => ChatListLogic(),fenix: true);
+    Get.lazyPut(() => ContactsLogic(),fenix: true);
+    Get.lazyPut(() => MineLogic(),fenix: true);
+    Get.lazyPut(() => TalkLogic(),fenix: true);
+    Get.lazyPut(() => QRCodeScanLogic(),fenix: true);
+    Get.lazyPut(() => QRLoginAffirmLogic(),fenix: true);
+    Get.lazyPut(() => EditMineLogic(),fenix: true);
+    Get.lazyPut(() => MineQRCodeLogic(),fenix: true);
+    Get.lazyPut(() => QRFriendAffirmLogic(),fenix: true);
+    Get.lazyPut(() => QrOtherResultLogic(),fenix: true);
+    Get.lazyPut(() => AboutLogic(),fenix: true);
+    Get.lazyPut(() => FriendInformationLogic(),fenix: true);
+    Get.lazyPut(() => SetRemarkLogic(),fenix: true);
+    Get.lazyPut(() => SetGroupLogic(),fenix: true);
+    Get.lazyPut(() => AddFriendLogic(),fenix: true);
+    Get.lazyPut(() => SearchInfoLogic(),fenix: true);
+    Get.lazyPut(() => FriendRequestLogic(),fenix: true);
+    Get.lazyPut(() => TalkDetailsLogic(),fenix: true);
+    Get.lazyPut(() => TalkCreateLogic(),fenix: true);
+    Get.lazyPut(() => UserSelectLogic(),fenix: true);
+    Get.lazyPut(() => ChatGroupInformationLogic(),fenix: true);
+    Get.lazyPut(() => ImageViewerLogic(),fenix: true);
+    Get.lazyPut(() => ImageViewerUpdateLogic(),fenix: true);
+    Get.lazyPut(() => SetGroupNameLogic(),fenix: true);
+    Get.lazyPut(() => SetGroupRemarkLogic(),fenix: true);
+    Get.lazyPut(() => SetGroupNameNickLogic(),fenix: true);
+    Get.lazyPut(() => ChatGroupNoticeLogic(),fenix: true);
+    Get.lazyPut(() => AddChatGroupNoticeLogic(),fenix: true);
   }
 }

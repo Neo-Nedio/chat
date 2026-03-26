@@ -74,4 +74,10 @@ class NavigationLogic extends GetxController {
     currentIndex = index;
     update([const Key("main")]);
   }
+
+  @override
+  void onClose() {
+    super.onClose();
+    _wsManager.dispose();
+  }
 }

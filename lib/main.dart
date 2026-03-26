@@ -2,6 +2,7 @@
 import 'package:chat_mobile/utils/getx_config/ControllerBinding.dart';
 import 'package:chat_mobile/utils/getx_config/config.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/smart_management.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get/get_navigation/src/routes/transitions_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,6 +32,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: '聊天',
+      //GetX 中控制器生命周期管理策略的配置，用于控制控制器销毁时的行为。
+      smartManagement:SmartManagement.keepFactory, //销毁控制器时，保留工厂，下次可重建
       //全局绑定Controller
       initialBinding: ControllerBinding(),
       // todo GetX 框架的日志开关
