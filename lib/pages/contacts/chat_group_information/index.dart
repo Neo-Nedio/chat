@@ -148,8 +148,10 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
                         label: '群公告',
                         hint: '暂无群公告~',
                         maxLines: 10,
-                        value: controller.chatGroupDetails['notice']
-                            ['noticeContent']),
+                        value: controller.chatGroupDetails['notice'] != null
+                            ? controller.chatGroupDetails['notice']['noticeContent']
+                            : '',
+                    ),
                     const SizedBox(height: 1),
 
                     // 成员列表区域
@@ -196,13 +198,13 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
                               ),
                               //邀请按钮
                               CustomIconButton(
-                                onTap: () {},
+                                onTap: controller.chatGroupMember,
                                 icon: Icons.add,
                                 text: '邀请成员',
                               ),
                               //移除按钮
                               CustomIconButton(
-                                onTap: () {},
+                                onTap: controller.chatGroupMember,
                                 icon: Icons.remove,
                                 text: '移除成员',
                               ),
@@ -218,14 +220,14 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
                     // 群主显示"解散群聊"
                     if (controller.isOwner)
                       CustomLeastButton(
-                        onTap: () {},
+                        onTap: () => controller.onDissolveGroup(context),
                         text: '解散群聊',
                         textColor: const Color(0xFFFF4C4C),
                       ),
                     // 非群主显示"退出群聊"
                     if (!controller.isOwner)
                       CustomLeastButton(
-                        onTap: () {},
+                        onTap: () => controller.onQuitGroup(context),
                         text: '退出群聊',
                         textColor: const Color(0xFFFF4C4C),
                       ),

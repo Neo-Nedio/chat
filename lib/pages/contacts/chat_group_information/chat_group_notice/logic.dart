@@ -54,7 +54,7 @@ class ChatGroupNoticeLogic extends GetxController {
       'content': content,
     });
     //result为编辑页面返回的bool值
-    if (result) {
+    if (result != null && result) {
       onGetChatGroupNoticeList();
     }
   }
@@ -65,7 +65,7 @@ class ChatGroupNoticeLogic extends GetxController {
       'chatGroupId': chatGroupId,
     });
     //result为编辑页面返回的bool值
-    if (result) {
+    if (result != null && result) {
       onGetChatGroupNoticeList();
     }
   }
