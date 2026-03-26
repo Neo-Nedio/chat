@@ -15,9 +15,11 @@ class TalkApi {
   }
 
   //说说列表
-  Future<Map<String, dynamic>> list(int index, int num) async {
+  Future<Map<String, dynamic>> list(int index, int num, String targetId) async {
     final response = await _dio
-        .post('/v1/api/talk/list', data: {'index': index, 'num': num});
+        .post('/v1/api/talk/list',
+        //targetId为空时看自己和有权限的好友说说
+        data: {'index': index, 'num': num,'targetId': targetId});
     return response.data;
   }
 

@@ -7,6 +7,7 @@ import '../../components/app_bar_title/index.dart';
 import '../../components/custom_image_group/index.dart';
 import '../../components/custom_portrait/index.dart';
 import '../../components/custom_text_button/index.dart';
+import '../../utils/String.dart';
 import '../../utils/date.dart';
 import '../../utils/getx_config/config.dart';
 import 'logic.dart';
@@ -14,12 +15,6 @@ import 'logic.dart';
 
 class TalkPage extends CustomWidget<TalkLogic> {
   TalkPage({super.key});
-
-  @override
-  void init(BuildContext context) {
-    controller.init();
-  }
-
 
   @override
   Widget buildWidget(BuildContext context) {
@@ -56,17 +51,17 @@ class TalkPage extends CustomWidget<TalkLogic> {
       backgroundColor: const Color(0xFFF9FBFF),// 浅蓝色背景
       appBar: AppBar(
           centerTitle: true,
-          title: const AppBarTitle('说说'),
+          title: AppBarTitle(controller.title),
           backgroundColor: const Color(0xFFF9FBFF),
           actions: [
-            TextButton(
-              onPressed: () {},
-              child: CustomTextButton(
+            //当目标id为空(导航栏打开时为空)或者目标是自己时显示发布按钮
+            if (StringUtil.isNullOrEmpty(controller.targetUserId)
+                || controller.targetUserId == globalData.currentUserId)
+            CustomTextButton(
                   '发表',
                   onTap: () => Get.toNamed('/talk_create'),
                   padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                   fontSize: 14),
-            ),
           ]),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),

@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,6 +12,8 @@ class TalkLogic extends GetxController {
   final _talkApi = TalkApi();
   final _userApi = UserApi();
   String currentUserId = '';
+  String targetUserId = '';
+  String title = '说说';
 
   final List<dynamic> talkList = [];  // 说说列表数据
   int index = 0;                       // 分页索引
@@ -17,8 +21,18 @@ class TalkLogic extends GetxController {
   bool isLoading = false;               // 是否正在加载
   final ScrollController scrollController = ScrollController(); // 滚动控制器
 
+  @override
+  void onInit() {
+    super.onInit();
+    init();
+  }
+
   void init() async {
-    onTalkList();           // 首次加载数据
+    if (Get.arguments != null) {
+      targetUserId = Get.arguments['userId'] ?? '';
+      title = Get.arguments['title'] ?? '说说';
+    }
+    refreshData(); //加载数据
     scrollController.addListener(scrollListener); // 添加滚动监听
     //获取当前用户id
     SharedPreferences.getInstance().then((prefs) {
@@ -47,7 +61,8 @@ class TalkLogic extends GetxController {
     isLoading = true;  // 显示加载状态
     update([const Key("talk")]);
 
-    _talkApi.list(index, 10).then((res) { // 每页10条
+    ////targetId为空时看自己和有权限的好友说说
+    _talkApi.list(index, 10,targetUserId).then((res) { // 每页10条
       if (res['code'] == 0) {
         final List<dynamic> newTalks = res['data'];
 

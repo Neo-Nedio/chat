@@ -6,6 +6,7 @@ import '../../../components/custom_button/index.dart';
 import '../../../components/custom_image_group/index.dart';
 import '../../../components/custom_label_value_button/index.dart';
 import '../../../components/custom_portrait/index.dart';
+import '../../../utils/String.dart';
 import '../../../utils/date.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
@@ -321,7 +322,13 @@ class FriendInformationPage extends CustomWidget<FriendInformationLogic> {
 
                     //说说
                     CustomLabelValueButton(
-                      onTap: () {},
+                      onTap: () => Get.toNamed('/talk', arguments: {
+                        'userId': controller.friendId,
+                        'title': StringUtil.isNotNullOrEmpty(
+                            controller.friendRemark)
+                            ? controller.friendRemark
+                            : controller.friendName,
+                      }),
                       width: 50,
                       label: '说说',
                       hint: '这个人很懒，什么都没留下~',
