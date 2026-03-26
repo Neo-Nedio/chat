@@ -12,6 +12,7 @@ import '../../pages/contacts/chat_group_information/index.dart';
 import '../../pages/contacts/chat_group_information/set_group_name/index.dart';
 import '../../pages/contacts/chat_group_information/set_group_nickname/index.dart';
 import '../../pages/contacts/chat_group_information/set_group_remark/index.dart';
+import '../../pages/contacts/create_chat_group/index.dart';
 import '../../pages/contacts/friend_information/index.dart';
 import '../../pages/contacts/friend_information/set_group/index.dart';
 import '../../pages/contacts/friend_information/set_remark/index.dart';
@@ -274,6 +275,13 @@ class AppRoutes {
       name: '/chat_group_member',
       page: () => ChatGroupMemberPage(
         key: const Key('chat_group_member'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/create_chat_group',
+      page: () => CreateChatGroupPage(
+        key: const Key('create_chat_group'),
       ),
       binding: ControllerBinding(),
     ),

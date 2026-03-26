@@ -25,66 +25,84 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
   //页面
   Widget getContent(String tab) {
     switch (tab) {
-    // 用...将列表展开
       case '好友通知':
-        return ListView(
-          children: [
-            ...controller.notifyFriendList.map((notify) => Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: _buildNotifyFriendItem(notify),
-            )),
-          ],
+        return RefreshIndicator(
+          onRefresh: () async {
+            controller.onNotifyFriendList();
+            return Future.delayed(const Duration(milliseconds: 700));
+          },
+          child: ListView(
+            children: [
+              // 用...将列表展开
+              ...controller.notifyFriendList.map((notify) => Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: _buildNotifyFriendItem(notify),
+              )),
+            ],
+          ),
         );
       case '我的群聊':
-        return ListView(
-          children: [
-            ...controller.chatGroupList.map(
-                  (group) => Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: _buildChatGroupItem(group),
+        return RefreshIndicator(
+          onRefresh: () async {
+            controller.onChatGroupList();
+            return Future.delayed(const Duration(milliseconds: 700));
+          },
+          child: ListView(
+            children: [
+              ...controller.chatGroupList.map(
+                    (group) => Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: _buildChatGroupItem(group),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       case '我的好友':
-        return ListView(
-          children: [
-            // 用...将列表展开
-            ...controller.friendList.map((group) {
-              return GestureDetector(
-                onLongPress: controller.onLongPressGroup, //对列表长按时，进入分组设置页面
-                //ExpansionTile 是 Flutter 中的可展开/折叠的列表项组件。它包含一个标题行，点击后可以展开显示更多的内容（通常是子列表）
-                child:  ExpansionTile(
-                iconColor:  theme.primaryColor, // 箭头图标颜色
-                visualDensity: VisualDensity(horizontal: 0, vertical: -4), // 垂直方向更紧凑
-                dense: true, // 启用密集模式
-                //边框形状
-                collapsedShape: RoundedRectangleBorder(  // 收起时的形状
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                shape: RoundedRectangleBorder(  // 展开时的形状
-                  borderRadius: BorderRadius.circular(8),
-                ),
+        return RefreshIndicator(
+            onRefresh: () async {
+              controller.onFriendList();
+              return Future.delayed(const Duration(milliseconds: 700));
+            },
+            child: ListView(
+              children: [
+                // 用...将列表展开
+                ...controller.friendList.map((group) {
+                  return GestureDetector(
+                    onLongPress: controller.onLongPressGroup, //对列表长按时，进入分组设置页面
+                    //ExpansionTile 是 Flutter 中的可展开/折叠的列表项组件。它包含一个标题行，点击后可以展开显示更多的内容（通常是子列表）
+                    child:  ExpansionTile(
+                      iconColor:  theme.primaryColor, // 箭头图标颜色
+                      visualDensity: VisualDensity(horizontal: 0, vertical: -4), // 垂直方向更紧凑
+                      dense: true, // 启用密集模式
+                      //边框形状
+                      collapsedShape: RoundedRectangleBorder(  // 收起时的形状
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      shape: RoundedRectangleBorder(  // 展开时的形状
+                        borderRadius: BorderRadius.circular(8),
+                      ),
 
-                //分类名称和人数
-                title: Text(
-                  '${group['name']}（${group['friends'].length}）',
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                //子节点（好友列表）
-                children: [
-                  ...group['friends'].map(
-                        (friend) => Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: _buildFriendItem(friend),
+                      //分类名称和人数
+                      title: Text(
+                        '${group['name']}（${group['friends'].length}）',
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                      //子节点（好友列表）
+                      children: [
+                        ...group['friends'].map(
+                              (friend) => Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: _buildFriendItem(friend),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-              );
-            }),
-          ],
+                  );
+                }),
+              ],
+            )
         );
       default:
         return Container();
@@ -366,8 +384,11 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
       borderRadius: BorderRadius.circular(12),
       color: Colors.white,
       child: InkWell(
-        onTap: () => Get.toNamed('/chat_group_info',
-            arguments: {'chatGroupId': group['id']}),
+        onTap: () async {
+          var result = await Get.toNamed('/chat_group_info',
+              arguments: {'chatGroupId': group['id']});
+          if (result != null && result) controller.onChatGroupList();
+        },
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10.0),
@@ -552,6 +573,10 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
               PopupMenuItem(
                 value: 2,
                 height: 40,
+                onTap: () async {
+                  var result = await Get.toNamed('/create_chat_group');
+                  if (result != null && result) controller.onChatGroupList();
+                },
                 child: const Row(
                   children: [
                     Icon(Icons.group_add, size: 20),

@@ -160,7 +160,7 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
                 PopupMenuItem(
                   value: 2,
                   height: 40,
-                  onTap: () {},
+                  onTap: () => Get.toNamed('/create_chat_group'),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

@@ -84,4 +84,28 @@ class ChatGroupApi {
     });
     return response.data;
   }
+
+  //创建群聊
+  Future<Map<String, dynamic>> create(String name) async {
+    final response = await _dio.post('/v1/api/chat-group/create', data: {
+      'name': name,
+    });
+    return response.data;
+  }
+
+  //退出群聊
+  Future<Map<String, dynamic>> quitChatGroup(String groupId) async {
+    final response = await _dio.post('/v1/api/chat-group/quit', data: {
+      'groupId': groupId,
+    });
+    return response.data;
+  }
+
+  //解散群聊
+  Future<Map<String, dynamic>> dissolveChatGroup(String groupId) async {
+    final response = await _dio.post('/v1/api/chat-group/dissolve', data: {
+      'groupId': groupId,
+    });
+    return response.data;
+  }
 }

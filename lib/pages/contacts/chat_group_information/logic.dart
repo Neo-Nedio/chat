@@ -7,6 +7,7 @@ import 'package:dio/dio.dart' show MultipartFile, FormData;
 
 import '../../../api/chat_group_api.dart';
 import '../../../api/chat_group_member.dart';
+import '../../../components/CustomDialog/index.dart';
 import '../../../components/custom_flutter_toast/index.dart';
 
 class ChatGroupInformationLogic extends GetxController {
@@ -153,5 +154,29 @@ class ChatGroupInformationLogic extends GetxController {
     //回来时刷新数据
     onGetGroupChatMembers();
     onGetGroupChatDetails();
+  }
+
+  //退出群聊
+  void onQuitGroup(context) async {
+    CustomDialog.showTipDialog(context, text: "确定退出该群聊?", onOk: () {
+      _chatGroupApi.quitChatGroup(chatGroupId).then((res) {
+        if (res['code'] == 0) {
+          CustomFlutterToast.showSuccessToast('退出群聊成功~');
+          Get.back(result: true);
+        }
+      });
+    }, onCancel: () {});
+  }
+
+  //解散群聊
+  void onDissolveGroup(context) async {
+    CustomDialog.showTipDialog(context, text: "确定解散该群聊?", onOk: () {
+      _chatGroupApi.dissolveChatGroup(chatGroupId).then((res) {
+        if (res['code'] == 0) {
+          CustomFlutterToast.showSuccessToast('解散群聊成功~');
+          Get.back(result: true);
+        }
+      });
+    }, onCancel: () {});
   }
 }
