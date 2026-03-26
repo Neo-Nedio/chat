@@ -70,4 +70,9 @@ class GlobalThemeConfig extends GetxController {
         return const Color(0xFFE3ECFF);
     }
   }
+
+  //错误颜色
+  Color get errorColor {
+    return const Color(0xFFFF4C4C);
+  }
 }

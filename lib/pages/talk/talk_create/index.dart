@@ -7,6 +7,7 @@ import '../../../components/custom_label_value_button/index.dart';
 import '../../../components/custom_portrait/index.dart';
 import '../../../components/custom_text_button/index.dart';
 import '../../../components/custom_text_field/index.dart';
+import '../../../utils/String.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
 
@@ -225,7 +226,9 @@ class TalkCreatePage extends CustomWidget<TalkCreateLogic> {
           //昵称
           Expanded(
             child: Text(
-              user['remark'] ?? user['name'],
+              StringUtil.isNotNullOrEmpty(user['remark'])
+                  ? user['remark']
+                  : user['name'],
               style: const TextStyle(
                   fontSize: 12, overflow: TextOverflow.ellipsis),
             ),

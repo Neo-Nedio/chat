@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import 'date.dart';
+import 'msg.dart';
 import 'notification.dart';
 
 //todo WebSocket 是一种全双工通信协议，允许客户端和服务器之间建立持久连接，双方可以随时发送消息
@@ -241,45 +242,13 @@ class WebSocketUtil {
   void sendNotification(dynamic msg) {
     // 获取消息内容
     dynamic msgContent = msg['msgContent'];
-    try {
       //根据消息类型生成通知文本
-      String contentStr = '';
-      switch (msgContent['type']) {
-        case "text":
-          contentStr = msgContent['content'];
-          break;
-        case "file":
-          var content = jsonDecode(msgContent['content']);
-          contentStr = '[文件] ${content['name']}';
-          break;
-        case "img":
-          contentStr = '[图片]';
-          break;
-        case "retraction":
-          contentStr = '[消息被撤回]';
-          break;
-        case "voice":
-          var content = jsonDecode(msgContent['content']);
-          contentStr = '[语音] ${content['time']}';
-          break;
-        case "call":
-          var content = jsonDecode(msgContent['content']);
-          contentStr =
-          '[通话] ${content['time'] > 0 ? DateUtil.formatTimingTime(content['time']) : "未接通"}';
-          break;
-        case "system":
-          contentStr = '[系统消息]';
-          break;
-        case "quit":
-          contentStr = '[系统消息]';
-          break;
-      }
-      //显示通知
-      NotificationUtil.showNotification(
+    String contentStr = MsgUtil.getMsgContent(msgContent);
+    //显示通知
+     NotificationUtil.showNotification(
         id: 0,
         title: msgContent['formUserName'],  // 发送者昵称
         body: '${msgContent['formUserName']}: $contentStr',  // 通知内容
-      );
-    } catch (e) {}
+     );
   }
 }
