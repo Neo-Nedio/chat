@@ -51,8 +51,10 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
           children: [
             // 用...将列表展开
             ...controller.friendList.map((group) {
-//ExpansionTile 是 Flutter 中的可展开/折叠的列表项组件。它包含一个标题行，点击后可以展开显示更多的内容（通常是子列表）
-              return ExpansionTile(
+              return GestureDetector(
+                onLongPress: controller.onLongPressGroup, //对列表长按时，进入分组设置页面
+                //ExpansionTile 是 Flutter 中的可展开/折叠的列表项组件。它包含一个标题行，点击后可以展开显示更多的内容（通常是子列表）
+                child:  ExpansionTile(
                 iconColor:  theme.primaryColor, // 箭头图标颜色
                 visualDensity: VisualDensity(horizontal: 0, vertical: -4), // 垂直方向更紧凑
                 dense: true, // 启用密集模式
@@ -73,12 +75,13 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
                 //子节点（好友列表）
                 children: [
                   ...group['friends'].map(
-                    (friend) => Container(
+                        (friend) => Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: _buildFriendItem(friend),
                     ),
                   ),
                 ],
+              ),
               );
             }),
           ],
@@ -88,13 +91,32 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
     }
   }
 
+  //底部弹出
+  void _showDeleteGroupBottomSheet(dynamic friend) => Get.bottomSheet(
+    backgroundColor: Colors.white,
+    Wrap(
+      children: [
+        Center(
+          child: TextButton(
+            onPressed: () => controller.onSetConcernFriend(friend),
+            child: Text(
+              friend['isConcern'] ? '取消特别关心' : '设置特别关心',
+              style: TextStyle(color: theme.primaryColor),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+
   //好友项
   Widget _buildFriendItem(dynamic friend) {
     return Material(
       borderRadius: BorderRadius.circular(12),  // 圆角12像素
       color: Colors.white,                       // 白色背景
       child: InkWell(
-        onTap: () => controller.handlerFriendTapped(friend),
+        onTap: () => controller.handlerFriendTapped(friend), //点击进入详情页
+        onLongPress: () => _showDeleteGroupBottomSheet(friend), //长按可设置/取消特别关心
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10.0),  // 上下内边距10
@@ -600,7 +622,11 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
                                       : Colors.black,              // 未选中时黑色
                                   fontSize: 16,                    // 字号16px
                                 ),
-                                child: Text(controller.tabs[index]),          // 实际文字内容
+                                //长按导航栏进入分组
+                                child: GestureDetector(
+                                  onLongPress: controller.onLongPressGroup,
+                                  child: Text(controller.tabs[index]),
+                                ),
                               ),
                             ),
                           ),

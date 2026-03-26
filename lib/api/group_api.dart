@@ -26,4 +26,21 @@ class GroupApi {
     await _dio.post('/v1/api/group/create', data: {'groupName': groupName});
     return response.data;
   }
+
+  //更新分组（名字）
+  Future<Map<String, dynamic>> update(String groupId,String groupName) async {
+    final response = await _dio.post('/v1/api/group/update', data: {
+      'groupId':groupId,
+      'groupName': groupName,
+    });
+    return response.data;
+  }
+
+  //删除分组
+  Future<Map<String, dynamic>> delete(String groupId) async {
+    final response = await _dio.post('/v1/api/group/delete', data: {
+      'groupId': groupId,
+    });
+    return response.data;
+  }
 }

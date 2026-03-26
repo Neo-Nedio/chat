@@ -7,12 +7,14 @@ class CustomMaterialButton extends StatelessWidget {
   final VoidCallback onTap;
   final double borderRadius;
   final Color? color;
+  final GestureLongPressCallback? onLongPress;
 
   const CustomMaterialButton(
       {
       required this.child,
       required this.onTap,
-        this.color,
+      this.onLongPress,
+      this.color,
       this.borderRadius = 10,
       super.key});
 
@@ -24,6 +26,7 @@ class CustomMaterialButton extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(borderRadius),
         onTap: onTap,
+        onLongPress: onLongPress,
         child: child,
       ),
     );
