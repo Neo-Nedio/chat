@@ -10,6 +10,7 @@ import '../../../components/custom_update_portrait/index.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
 
+//todo 弄一个回调，在群聊页面返回时调用打开页面的刷新方法，防止如踢出群聊等操作没有即使刷新
 class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
   ChatGroupInformationPage({super.key});
 /*
@@ -198,7 +199,7 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
                               ),
                               //邀请按钮
                               CustomIconButton(
-                                onTap: controller.chatGroupMember,
+                                onTap: controller.chatGroupMember, //todo 点击邀请按钮进入后应该直接打开选择页
                                 icon: Icons.add,
                                 text: '邀请成员',
                               ),

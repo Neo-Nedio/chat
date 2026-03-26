@@ -8,6 +8,7 @@ import '../../components/app_bar_title/index.dart';
 import '../../components/custom_badge/index.dart';
 import '../../components/custom_portrait/index.dart';
 import '../../components/custom_search_box/index.dart';
+import '../../utils/String.dart';
 import '../../utils/date.dart';
 import '../../utils/getx_config/config.dart';
 import 'logic.dart';
@@ -345,6 +346,12 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
         borderRadius: BorderRadius.circular(12.0),  // 圆角12
         // InkWell 必须放在 Material 内才能工作
         child: InkWell( //点击波纹
+          onTap: () async {
+            await Get.toNamed('/chat_frame', arguments: {
+              'chatInfo': chat,
+            });
+            controller.onGetChatList();
+          },
           borderRadius: BorderRadius.circular(12),  // 和Material一致的圆角
           child:  Container(
           padding: const EdgeInsets.symmetric(vertical: 10.0),  // 上下内边距10
@@ -381,7 +388,7 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
                           Row(
                             children: [
                               Text(  // 用户名
-                                chat['remark'] != null && chat['remark'].toString().trim() != ''
+                                StringUtil.isNotNullOrEmpty(chat['remark'])
                                     ? chat['remark']
                                     : chat['name'],
                                 style: const TextStyle(
@@ -396,7 +403,7 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
                             ],
                           ),
                           Text(  // 最后消息时间
-                            DateUtil.formatTime(chat['createTime']),
+                            DateUtil.formatTime(chat['updateTime']),
                             style: TextStyle(
                               fontSize: 10,
                               color: Colors.grey[500],  // 灰色文字

@@ -20,6 +20,9 @@ class CustomTextField extends StatelessWidget {
   final Color? labelTextColor; //标签文字颜色
   final Color? hintTextColor;
   final IconData? iconData;
+  final VoidCallback? onTap;
+  final Color? fillColor;
+
 
   const CustomTextField({
     super.key,
@@ -39,6 +42,8 @@ class CustomTextField extends StatelessWidget {
     this.vertical = 12.0,
     this.hintTextColor = Colors.grey,
     this.iconData,
+    this.onTap,
+    this.fillColor,
   });
 
 
@@ -84,7 +89,7 @@ class CustomTextField extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           decoration: BoxDecoration(
-            color: const Color(0xFFEDF2F9), // 设置背景颜色
+            color: fillColor ?? const Color(0xFFEDF2F9), // 设置背景颜色
             borderRadius: BorderRadius.circular(10.0),
           ),
           child: Row(
@@ -109,6 +114,7 @@ class CustomTextField extends StatelessWidget {
                     readOnly: readOnly,
                     maxLines: maxLines,
                     minLines: minLines,
+                    onTap: onTap,
                     inputFormatters: inputLimit != null
                         ? <TextInputFormatter>[
                       LengthLimitingTextInputFormatter(inputLimit) //限制输入长度
@@ -122,7 +128,7 @@ class CustomTextField extends StatelessWidget {
                       // 填充背景
                       filled: true,
                       // 填充背景颜色
-                      fillColor: const Color(0xFFEDF2F9),
+                      fillColor: fillColor ?? const Color(0xFFEDF2F9),
                       // 缩小输入框高度，让输入框更紧凑
                       isDense: true,
                       border: OutlineInputBorder(
