@@ -212,7 +212,10 @@ class SearchInfoPage extends CustomWidgetNew<SearchInfoLogic> {
         ),
 
         //底部悬浮窗
-        bottomNavigationBar: Container(
+        bottomNavigationBar:
+            //不是好友且不是自己时可以添加
+            !controller.isFriend && controller.friendId != globalData.currentUserId
+          ?Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -226,6 +229,7 @@ class SearchInfoPage extends CustomWidgetNew<SearchInfoLogic> {
               ),
             ],
           ),
-        ),
+        )
+         :null
       );
 }

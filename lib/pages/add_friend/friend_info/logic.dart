@@ -5,7 +5,9 @@ import '../../../utils/getx_config/config.dart';
 
 class SearchInfoLogic extends Logic {
   //好友信息
-  dynamic get _friendInfo => arguments['friend'];
+  dynamic get _friendInfo => arguments['friendInfo'];
+  dynamic get isFriend => arguments['isFriend'];
+  dynamic get friendId => _friendInfo['id'];
 
   //好友头像
   String _friendPortrait = '';

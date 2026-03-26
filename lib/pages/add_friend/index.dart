@@ -72,6 +72,7 @@ class AddFriendPage extends CustomWidgetNew<AddFriendLogic> {
                   ),
 
                   //添加好友按钮
+                  if(friend['id'] != globalData.currentUserId)
                   CustomButton(
                     text: '添加',
                     onTap: ()=>controller.goApplyFriend(friend),
