@@ -7,6 +7,7 @@ import '../../pages/add_friend/friend_info/logic.dart';
 import '../../pages/add_friend/friend_request/logic.dart';
 import '../../pages/add_friend/logic.dart';
 import '../../pages/chat_list/logic.dart';
+import '../../pages/contacts/chat_group_information/chat_group_member/logic.dart';
 import '../../pages/contacts/chat_group_information/chat_group_notice/add_chat_group_notice/logic.dart';
 import '../../pages/contacts/chat_group_information/chat_group_notice/logic.dart';
 import '../../pages/contacts/chat_group_information/logic.dart';
@@ -79,5 +80,6 @@ class ControllerBinding extends Bindings {
     Get.lazyPut(() => SetGroupNameNickLogic(),fenix: true);
     Get.lazyPut(() => ChatGroupNoticeLogic(),fenix: true);
     Get.lazyPut(() => AddChatGroupNoticeLogic(),fenix: true);
+    Get.lazyPut(() => ChatGroupMemberLogic(), fenix: true);
   }
 }

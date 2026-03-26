@@ -154,7 +154,7 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
 
                     // 成员列表区域
                     CustomLabelValueButton(
-                      onTap: () {},
+                      onTap: controller.chatGroupMember,
                       width: 140,
                       compact: false, // 宽松模式，内容换行显示
                       label:

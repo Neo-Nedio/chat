@@ -8,12 +8,14 @@ class UserSelectLogic extends GetxController {
   late List<dynamic> userList = [];      // 当前显示的用户列表
   late List<dynamic> allUserList = [];   // 所有用户列表（备份）
   late List<dynamic> selectedUsers = []; // 已选中的用户列表
+  late List<dynamic> onlyUsers = []; //用来标识禁止操作的用户
 
   @override
   void onInit() {
     super.onInit();
     // 从路由参数获取已选中的用户列表
-    selectedUsers = Get.arguments['selectedUsers'].toList();
+    selectedUsers = Get.arguments['selectedUsers'] ?? [];
+    onlyUsers = Get.arguments['onlyUsers'] ?? [];
     update([const Key('user_select')]);
     loadUsers();
   }

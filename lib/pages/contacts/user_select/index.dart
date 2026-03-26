@@ -58,11 +58,16 @@ class UserSelectPage extends CustomWidget<UserSelectLogic> {
 
   //用户项组件
   Widget _buildUserItem(dynamic user) {
+    //用来标识禁止操作的用户
+    bool isOnly = controller.onlyUsers.any((id) => id == user['friendId']);
     return Material(
       borderRadius: BorderRadius.circular(12),
       color: Colors.white,
       child: InkWell(
-        onTap: () => controller.handlerSelectUser(user),  // 点击选中/取消
+        onTap: () {
+          //可操作时才能点击
+          if (!isOnly) controller.handlerSelectUser(user); // 点击选中/取消
+        },
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10.0),
@@ -82,11 +87,14 @@ class UserSelectPage extends CustomWidget<UserSelectLogic> {
               children: [
                 // 复选框
                 Checkbox(
-                  checkColor: theme.primaryColor, // 选中时对勾的颜色
+                  //不可操作时为灰色
+                  checkColor: isOnly ? Colors.grey : theme.primaryColor, // 选中时对勾的颜色
                   fillColor: WidgetStateProperty.resolveWith<Color>(
                       (Set<WidgetState> states) {
                     if (states.contains(WidgetState.selected)) {
-                      return theme.searchBarColor; // 选中时背景色
+                      return  isOnly
+                          ? Colors.grey.withValues(alpha: 0.1)  //不可操作时为灰色
+                          : theme.searchBarColor; // 选中时背景色
                     }
                     return Colors.transparent; // 未选中时透明
                   }),
@@ -94,9 +102,13 @@ class UserSelectPage extends CustomWidget<UserSelectLogic> {
                     width: 1.5,
                     color: Colors.grey,
                   ),
-                  value: controller.selectedUsers.any( // 是否选中
-                      (selected) => selected['friendId'] == user['friendId']),
-                  onChanged: (_) => controller.handlerSelectUser(user), // 点击切换
+                value: isOnly
+                    ? true //// 如果是禁用用户，固定显示为选中状态
+                    : controller.selectedUsers.any((selected) => // 否则根据是否已选中来决定
+                selected['friendId'] == user['friendId']),
+                onChanged: (_) { //可操作时可切换
+                  if (!isOnly) controller.handlerSelectUser(user); //切换选中状态
+                },
                 ),
 
                 // 头像

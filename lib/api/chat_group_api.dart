@@ -54,4 +54,34 @@ class ChatGroupApi {
     });
     return response.data;
   }
+
+  //踢出成员
+  Future<Map<String, dynamic>> kickChatGroup(
+      String groupId, String userId) async {
+    final response = await _dio.post('/v1/api/chat-group/kick', data: {
+      'groupId': groupId,
+      'userId': userId,
+    });
+    return response.data;
+  }
+
+  //邀请成员
+  Future<Map<String, dynamic>> inviteMember(
+      String groupId, List<dynamic> ids) async {
+    final response = await _dio.post('/v1/api/chat-group/invite', data: {
+      'groupId': groupId,
+      'userIds': ids,
+    });
+    return response.data;
+  }
+
+  //转让群主
+  Future<Map<String, dynamic>> transferChatGroup(
+      String groupId, String userId) async {
+    final response = await _dio.post('/v1/api/chat-group/transfer', data: {
+      'groupId': groupId,
+      'userId': userId,
+    });
+    return response.data;
+  }
 }

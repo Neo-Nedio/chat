@@ -142,4 +142,16 @@ class ChatGroupInformationLogic extends GetxController {
       onGetGroupChatDetails();
     }
   }
+
+  //转向群成员页面
+  void chatGroupMember() async {
+    await Get.toNamed('/chat_group_member', arguments: {
+      'chatGroupId': chatGroupId,
+      'isOwner': isOwner,
+      'chatGroupDetails': chatGroupDetails
+    });
+    //回来时刷新数据
+    onGetGroupChatMembers();
+    onGetGroupChatDetails();
+  }
 }
