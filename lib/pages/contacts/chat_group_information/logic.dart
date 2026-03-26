@@ -91,7 +91,55 @@ class ChatGroupInformationLogic extends GetxController {
   void selectPortrait() {
     Get.toNamed('/image_viewer_update', arguments: {
       'imageUrl': chatGroupDetails['portrait'],
-      'onConfirm': _onUpdateChatGroupPortrait
+      'onConfirm': _onUpdateChatGroupPortrait,
+      'isUpdate': isOwner //不是群主时不可编辑
     });
+  }
+
+  //设置群名
+  void setGroupName() async {
+    var result = await Get.toNamed('/set_group_name', arguments: {
+      'chatGroupId': chatGroupId,
+      'name': chatGroupDetails['name']
+    });
+    if (result != null) {
+      chatGroupDetails['name'] = result;
+      update([const Key("chat_group_info")]);
+    }
+  }
+
+  //设置群备注
+  void setGroupRemark() async {
+    var result = await Get.toNamed('/set_group_remark', arguments: {
+      'chatGroupId': chatGroupId,
+      'remark': chatGroupDetails['groupRemark'] ?? ''
+    });
+    if (result != null) {
+      chatGroupDetails['groupRemark'] = result;
+      update([const Key("chat_group_info")]);
+    }
+  }
+
+  //设置群昵称
+  void setGroupNickname() async {
+    var result = await Get.toNamed('/set_group_nickname', arguments: {
+      'chatGroupId': chatGroupId,
+      'name': chatGroupDetails['groupName'] ?? ''
+    });
+    if (result != null) {
+      chatGroupDetails['groupName'] = result;
+      update([const Key("chat_group_info")]);
+    }
+  }
+
+  //群通知
+  void chatGroupNotice() async {
+    await Get.toNamed('/chat_group_notice', arguments: {
+      'chatGroupId': chatGroupId,
+      'isOwner': isOwner,
+    });
+    if (isOwner) {
+      onGetGroupChatDetails();
+    }
   }
 }

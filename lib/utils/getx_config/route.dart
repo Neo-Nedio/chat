@@ -5,7 +5,12 @@ import '../../pages/add_friend/friend_info/index.dart';
 import '../../pages/add_friend/friend_request/index.dart';
 import '../../pages/add_friend/index.dart';
 import '../../pages/chat_list/index.dart';
+import '../../pages/contacts/chat_group_information/chat_group_notice/add_chat_group_notice/index.dart';
+import '../../pages/contacts/chat_group_information/chat_group_notice/index.dart';
 import '../../pages/contacts/chat_group_information/index.dart';
+import '../../pages/contacts/chat_group_information/set_group_name/index.dart';
+import '../../pages/contacts/chat_group_information/set_group_nickname/index.dart';
+import '../../pages/contacts/chat_group_information/set_group_remark/index.dart';
 import '../../pages/contacts/friend_information/index.dart';
 import '../../pages/contacts/friend_information/set_group/index.dart';
 import '../../pages/contacts/friend_information/set_remark/index.dart';
@@ -226,6 +231,41 @@ class AppRoutes {
       name: '/image_viewer_update',
       page: () => ImageViewerUpdatePage(
         key: const Key('image_viewer_update'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/set_group_name',
+      page: () => SetGroupNamePage(
+        key: const Key('set_group_name'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/set_group_remark',
+      page: () => SetGroupRemarkPage(
+        key: const Key('set_group_remark'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/set_group_nickname',
+      page: () => SetGroupNickNamePage(
+        key: const Key('set_group_nickname'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/chat_group_notice',
+      page: () => ChatGroupNoticePage(
+        key: const Key('chat_group_notice'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/add_chat_group_notice',
+      page: () => AddChatGroupNoticePage(
+        key: const Key('add_chat_group_notice'),
       ),
       binding: ControllerBinding(),
     ),

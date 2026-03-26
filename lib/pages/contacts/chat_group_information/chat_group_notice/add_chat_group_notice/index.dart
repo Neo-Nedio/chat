@@ -1,0 +1,58 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+
+import '../../../../../components/app_bar_title/index.dart';
+import '../../../../../components/custom_text_button/index.dart';
+import '../../../../../components/custom_text_field/index.dart';
+import '../../../../../utils/getx_config/config.dart';
+import 'logic.dart';
+
+class AddChatGroupNoticePage extends CustomWidget<AddChatGroupNoticeLogic> {
+  AddChatGroupNoticePage({super.key});
+
+  @override
+  Widget buildWidget(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF9FBFF),
+      appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          title: const AppBarTitle('编辑群公告'),
+          centerTitle: true,
+          elevation: 0,
+          systemOverlayStyle: SystemUiOverlayStyle.dark,
+          // 右上角"完成"按钮
+          actions: [
+            CustomTextButton('完成',
+                onTap: controller.onAddNotice,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+                fontSize: 14),
+          ]),
+      //输入框区域
+      body: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            Obx(
+              () => CustomTextField(
+                // labelText: "群公告",
+                controller: controller.noticeController, //当noticeController有值时会自动写上
+                onChanged: (value) {
+                  controller.noticeLength.value = value.length;
+                },
+                inputLimit: 100,
+                hintText: "请输入群公告~",
+                minLines: 8,
+                maxLines: 8,
+                hintTextColor: theme.primaryColor,
+                suffix: Text('${controller.noticeLength.value}/100'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

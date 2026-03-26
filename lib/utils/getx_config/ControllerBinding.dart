@@ -7,7 +7,12 @@ import '../../pages/add_friend/friend_info/logic.dart';
 import '../../pages/add_friend/friend_request/logic.dart';
 import '../../pages/add_friend/logic.dart';
 import '../../pages/chat_list/logic.dart';
+import '../../pages/contacts/chat_group_information/chat_group_notice/add_chat_group_notice/logic.dart';
+import '../../pages/contacts/chat_group_information/chat_group_notice/logic.dart';
 import '../../pages/contacts/chat_group_information/logic.dart';
+import '../../pages/contacts/chat_group_information/set_group_name/logic.dart';
+import '../../pages/contacts/chat_group_information/set_group_nickname/logic.dart';
+import '../../pages/contacts/chat_group_information/set_group_remark/logic.dart';
 import '../../pages/contacts/friend_information/logic.dart';
 import '../../pages/contacts/friend_information/set_group/logic.dart';
 import '../../pages/contacts/friend_information/set_remark/logic.dart';
@@ -68,5 +73,10 @@ class ControllerBinding extends Bindings {
     Get.lazyPut(() => ChatGroupInformationLogic());
     Get.lazyPut(() => ImageViewerLogic());
     Get.lazyPut(() => ImageViewerUpdateLogic());
+    Get.lazyPut(() => SetGroupNameLogic());
+    Get.lazyPut(() => SetGroupRemarkLogic());
+    Get.lazyPut(() => SetGroupNameNickLogic());
+    Get.lazyPut(() => ChatGroupNoticeLogic());
+    Get.lazyPut(() => AddChatGroupNoticeLogic());
   }
 }

@@ -100,7 +100,7 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
                               borderRadius: BorderRadius.circular(35),
                             ),
                             child: CustomUpdatePortrait(
-                              //根据是否群主动态显示群头像修改按钮
+                                isEdit: controller.isOwner, //不是群主时没有编辑遮罩层，点击后前往不能编辑的图片页面
                                 onTap: () => controller.selectPortrait(),
                                 url: controller.chatGroupDetails['portrait'] ?? '',
                                 ),
@@ -123,27 +123,27 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
                     //信息列表
                     const SizedBox(height: 1),
                     CustomLabelValueButton(
-                        onTap: () => {},
+                        onTap: controller.setGroupName,
                         width: 60,
                         label: '群名称',
                         value: controller.chatGroupDetails['name']),
                     const SizedBox(height: 1),
                     CustomLabelValueButton(
-                        onTap: () => {},
+                        onTap: controller.setGroupRemark,
                         width: 60,
                         label: '群备注',
                         hint: '未设置备注',
                         value: controller.chatGroupDetails['groupRemark']),
                     const SizedBox(height: 1),
                     CustomLabelValueButton(
-                        onTap: () => {},
+                        onTap: controller.setGroupNickname,
                         width: 60,
                         label: '群昵称',
                         hint: '未设置昵称',
                         value: controller.chatGroupDetails['groupName']),
                     const SizedBox(height: 1),
                     CustomLabelValueButton(
-                        onTap: () {},
+                        onTap: controller.chatGroupNotice,
                         width: 60,
                         label: '群公告',
                         hint: '暂无群公告~',

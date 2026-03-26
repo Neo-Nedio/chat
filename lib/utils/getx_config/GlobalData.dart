@@ -1,16 +1,21 @@
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/user_api.dart';
 import '../app_badger.dart';
 
-//全局数据管理类，用于管理用户的未读消息数量，并更新桌面角标。
+//全局数据管理类
 class GlobalData extends GetxController {
   final _userApi = UserApi();
   var unread = <String, int>{}.obs; // 未读数据
+  var currentUserId = '';
 
   Future<void> init() async {
     await onGetUserUnreadInfo(); // 异步获取未读数据
+    SharedPreferences.getInstance().then((prefs) {
+      currentUserId = prefs.getString('userId') ?? '';
+    });
   }
 
   // 获取未读信息
