@@ -25,6 +25,7 @@ import '../../pages/mine/about/index.dart';
 import '../../pages/mine/edit/index.dart';
 import '../../pages/mine/index.dart';
 import '../../pages/mine/mine_qr_code/index.dart';
+import '../../pages/mine/system_notify/index.dart';
 import '../../pages/navigation/index.dart';
 import '../../pages/password/retrieve/index.dart';
 import '../../pages/password/update/index.dart';
@@ -282,6 +283,13 @@ class AppRoutes {
       name: '/create_chat_group',
       page: () => CreateChatGroupPage(
         key: const Key('create_chat_group'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/system_notify',
+      page: () => SystemNotifyPage(
+        key: const Key('system_notify'),
       ),
       binding: ControllerBinding(),
     ),

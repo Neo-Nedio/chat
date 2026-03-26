@@ -35,4 +35,10 @@ class NotifyApi {
     await _dio.post('/v1/api/notify/read', data: {'notifyType': type});
     return response.data;
   }
+
+  //系统通知列表
+  Future<Map<String, dynamic>> systemListNotify() async {
+    final response = await _dio.get('/v1/api/notify/system/list');
+    return response.data;
+  }
 }
