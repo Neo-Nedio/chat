@@ -107,6 +107,7 @@ class CustomTextField extends StatelessWidget {
               //输入框
               Expanded(
                   child: TextField(
+                    autofocus: false, //页面加载时，输入框不获得焦点，键盘不弹出
                     controller: controller,
                     focusNode: focusNode,
                     obscureText: obscureText,

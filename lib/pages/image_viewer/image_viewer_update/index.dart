@@ -28,21 +28,23 @@ class ImageViewerUpdatePage extends CustomWidget<ImageViewerUpdateLogic> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             //图片显示区域
-            Container(
-              height: MediaQuery.of(context).size.height * 0.4, // 占屏幕高度的 40%
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(20)),
-              ),
-              child: Obx( //当用户更换图片后，imageUrl 变化，图片自动更新。
-                () => PhotoView(
-                  minScale: PhotoViewComputedScale.contained * 0.5,  // 最小缩放 0.5 倍
-                  maxScale: PhotoViewComputedScale.covered * 2,      // 最大缩放 2 倍
-                  imageProvider: NetworkImage(controller.imageUrl.value),  // 网络图片
+            Expanded(
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.4, // 占屏幕高度的 40%
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
+                  child: Obx( //当用户更换图片后，imageUrl 变化，图片自动更新。
+                        () => PhotoView(
+                      minScale: PhotoViewComputedScale.contained * 0.5,  // 最小缩放 0.5 倍
+                      maxScale: PhotoViewComputedScale.covered * 2,      // 最大缩放 2 倍
+                      imageProvider: NetworkImage(controller.imageUrl.value),  // 网络图片
+                    ),
+                  ),
                 ),
-              ),
             ),
 
-            const SizedBox(height: 50),
+            const SizedBox(height: 30),
 
             // 动态按钮（文字可变化）
             Obx(

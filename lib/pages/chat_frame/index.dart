@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -10,6 +11,7 @@ import '../../components/custom_portrait/index.dart';
 import '../../components/custom_text_field/index.dart';
 import '../../components/custom_voice_record_buttom/index.dart';
 import '../../utils/String.dart';
+import '../../utils/emoji.dart';
 import '../../utils/getx_config/config.dart';
 import 'chat_content/msg.dart';
 import 'logic.dart';
@@ -40,6 +42,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
     final keyboardHeight = MediaQuery.of(Get.context!).viewInsets.bottom;
     if (keyboardHeight == 0) {
       controller.isShowMore.value = false;
+      controller.isShowEmoji.value = false;
     }
   }
 
@@ -71,6 +74,8 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
     │  └─────────────────────────────────────────────────────────────┘│
     └─────────────────────────────────────────────────────────────────┘*/
     return GestureDetector(
+      //整个区域响应点击，同时事件会穿透到下层(让键盘收起同时，其他组件也能响应)
+      behavior: HitTestBehavior.translucent,
       onTap: () {
         FocusScope.of(context).unfocus();
       },
@@ -133,11 +138,20 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                                   ),
                                 ),
                               // 消息列表
-                              ...controller.msgList.map((msg) => ChatMessage(
-                                msg: msg,
-                                chatInfo: controller.chatInfo,
-                                member: controller.members[msg['fromId']],
-                              )),
+                              ...controller.msgList.map(
+                                    (msg) => GestureDetector(
+                                  behavior: HitTestBehavior.translucent,
+                                  // 捕获点击事件并传递
+                                  onTap: () {
+                                    FocusScope.of(context).unfocus(); //关闭键盘
+                                  },
+                                  child: ChatMessage(
+                                    msg: msg,
+                                    chatInfo: controller.chatInfo,
+                                    member: controller.members[msg['fromId']],
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                           // 加载指示器
@@ -178,6 +192,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                               const IconData(0xe661, fontFamily: 'IconFont'),
                                   () {
                                 controller.isShowMore.value = false;
+                                controller.isShowEmoji.value = false;
                                 controller.isRecording.value = false;   // 切换到键盘模式
                                 controller.focusNode.requestFocus();    // 弹出键盘
                               },
@@ -187,6 +202,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                               const IconData(0xe7e2, fontFamily: 'IconFont'),
                                   () {
                                 controller.isShowMore.value = false;
+                                controller.isShowEmoji.value = false;
                                 controller.isRecording.value = true;    // 切换到语音模式
                               },
                             ),
@@ -213,6 +229,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                                 fillColor: Colors.white.withValues(alpha: 0.9),
                                 onTap: () {
                                   controller.isShowMore.value = false;
+                                  controller.isShowEmoji.value = false;
                                   controller.scrollBottom();
                                 },
                                 onChanged: (value) {
@@ -224,16 +241,34 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
 
                           const SizedBox(width: 5),
 
-                          //附件按钮（不在语音输入按钮展示时出现）
+                          //表情按钮（不在语音输入按钮展示时出现）
                           if (!controller.isRecording.value)
                             _buildIconButton1(
                               const IconData(0xe632, fontFamily: 'IconFont'),
-                                  () {},
+                                  () {
+                                    // 如果是语音模式，先切换到输入模式
+                                    if (controller.isRecording.value) {
+                                      controller.isRecording.value = false;
+                                    }
+
+                                    // 收起键盘
+                                    FocusScope.of(context).unfocus();
+
+                                    // 关闭更多面板，切换表情面板
+                                    controller.isShowMore.value = false;
+                                    controller.isShowEmoji.value = !controller.isShowEmoji.value;
+
+                                    if (controller.isShowEmoji.value) {
+                                      Future.delayed(const Duration(milliseconds: 500), () {
+                                        controller.scrollBottom();
+                                      });
+                                    }
+                              },
                             ),
 
                           const SizedBox(width: 10),
 
-                          //动态按钮（表情/发送）
+                          //动态按钮（附件/发送）
                           if (controller.isSend.value)
                           // 有输入内容 → 显示发送按钮
                             CustomButton(
@@ -249,6 +284,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                               const IconData(0xe636, fontFamily: 'IconFont'),
                                   () {
                                 FocusScope.of(context).unfocus();          // 收起键盘
+                                controller.isShowEmoji.value = false;
                                 // 切换更多面板显示状态
                                 //todo 刚打开的列表会因为滚到最底层关闭
                                 controller.isShowMore.value = !controller.isShowMore.value;
@@ -271,11 +307,85 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                             ? _buildMoreOperation()
                             : Container(),
                       ),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                        height: controller.isShowEmoji.value ? 240 : 0,
+                        child: controller.isShowEmoji.value
+                            ? _buildEmoji()
+                            : Container(),
+                      ),
                     ],
                   ),
                 ),
             )
           ],
+        ),
+      ),
+    );
+  }
+
+  //表情选择面板
+  Widget _buildEmoji() {
+    return Container(
+      width: MediaQuery.of(Get.context!).size.width,  // 占满屏幕宽度
+      padding: const EdgeInsets.all(10),               // 内边距
+      margin: const EdgeInsets.only(top: 10),          // 上边距
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: Colors.grey.withValues(alpha: 0.1),  // 淡灰色分割线
+            width: 1.0,
+          ),
+        ),
+      ),
+      alignment: Alignment.center,
+      child: SingleChildScrollView(
+        child: Wrap(
+          alignment: WrapAlignment.center,  // 居中对齐
+          spacing: 10,                       // 水平间距
+          runSpacing: 10,                    // 垂直间距
+          children: Emoji.emojis
+              .map(
+                (emoji) => GestureDetector(
+              onTap: () {
+                // 1. 获取当前输入框的文本
+                final text = controller.msgContentController.text;
+                // 2. 获取当前光标位置
+                final selection = controller.msgContentController.selection;
+                // 光标失焦后可能为 -1，这里兜底到文本末尾，避免 replaceRange 异常
+                final start = (selection.start >= 0 && selection.start <= text.length)
+                    ? selection.start
+                    : text.length;
+                final end = (selection.end >= start && selection.end <= text.length)
+                    ? selection.end
+                    : start;
+                // 3. 替换文本（在光标位置插入表情）
+/*                不同光标状态
+                状态	selection.start	selection.end	含义
+                光标在位置2	2	2	没有选中文本
+                选中位置2-4	2	4	选中了2个字符*/
+                final newText = text.replaceRange(
+                  start,  // 开始位置
+                  end,    // 结束位置
+                  emoji,            // 插入的内容
+                );
+                // 4. 更新输入框
+                controller.msgContentController.value = TextEditingValue(
+                  text: newText,
+                  selection: TextSelection.collapsed(
+                    offset: start + emoji.length,  // 新光标位置
+                  ),
+                );
+                //点击表情代表有了内容，可以发送
+                controller.isSend.value = true;
+              },
+              child: Text(
+                emoji,
+                style: const TextStyle(fontSize: 24),
+              ),
+            ),
+          ).toList(),
         ),
       ),
     );

@@ -35,6 +35,7 @@ class ChatFrameLogic extends GetxController {
   late dynamic chatInfo = {};          // 聊天信息（对方头像、名称等）
   late RxBool isRecording = false.obs; //录音状态
   late RxBool isSend = false.obs;      // 是否有内容可发送
+  late RxBool isShowEmoji = false.obs;
 
   // 分页相关
   int num = 20;      // 每页数量
