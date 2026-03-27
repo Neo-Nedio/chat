@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../components/app_bar_title/index.dart';
 import '../../components/custom_button/index.dart';
@@ -294,10 +295,26 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
           ),
         ),
       ),
-      child: Wrap(
-        spacing: 10,
-        runSpacing: 10,
+      child: GridView.count(
+        shrinkWrap: true,
+        crossAxisCount: 4,
+        mainAxisSpacing: 10,
         children: [
+          _buildIconButton2(
+            '图片',
+            const IconData(0xe9f4, fontFamily: 'IconFont'),
+                () => controller.cropChatBackgroundPicture(null),
+          ),
+          _buildIconButton2(
+            '拍照',
+            const IconData(0xe9f3, fontFamily: 'IconFont'),
+                () => controller.cropChatBackgroundPicture(ImageSource.camera),
+          ),
+          _buildIconButton2(
+            '文件',
+            const IconData(0xeac4, fontFamily: 'IconFont'),
+                () => controller.selectFile(),
+          ),
           if (controller.chatInfo['type'] == 'user')
             _buildIconButton2(
               '语音通话',
@@ -310,16 +327,6 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
               const IconData(0xe9f5, fontFamily: 'IconFont'),
                   () => controller.onInviteVideoChat(false),
             ),
-          _buildIconButton2(
-            '图片',
-            const IconData(0xe9f4, fontFamily: 'IconFont'),
-                () => {},
-          ),
-          _buildIconButton2(
-            '文件',
-            const IconData(0xeac4, fontFamily: 'IconFont'),
-                () => {},
-          ),
         ],
       ),
     );

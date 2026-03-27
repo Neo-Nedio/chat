@@ -25,8 +25,10 @@ class ImageViewerUpdateLogic extends GetxController {
   }
 
   //裁剪图片并上传
-  Future cropChatBackgroundPicture(ImageSource? type) async =>
-      cropPicture(type, onUpdate);
+  Future cropChatBackgroundPicture(ImageSource? type) async {
+    Get.back();
+    cropPicture(type, onUpdate);
+  }
 
   //保存图片
   Future<void> saveImage() async {

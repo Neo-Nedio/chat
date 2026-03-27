@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart' show FormData, MultipartFile;
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart' hide FormData, MultipartFile;
+import 'package:image_picker/image_picker.dart';
 
 import '../../api/chat_group_member.dart';
 import '../../api/chat_list_api.dart';
@@ -12,6 +15,7 @@ import '../../api/msg_api.dart';
 import '../../api/video_api.dart';
 import '../../components/custom_flutter_toast/index.dart';
 import '../../utils/String.dart';
+import '../../utils/cropPicture.dart';
 import '../../utils/web_socket.dart';
 
 class ChatFrameLogic extends GetxController {
@@ -225,6 +229,67 @@ class ChatFrameLogic extends GetxController {
         });
       } else {
         CustomFlutterToast.showErrorToast(res['msg'] ?? '发起通话失败');
+      }
+    });
+  }
+
+  //选择图片/拍照
+  Future cropChatBackgroundPicture(ImageSource? type) async =>
+      cropPicture(type, onUploadImg, isVariable: true);
+
+  //图片上传回调
+  Future<void> onUploadImg(File file) async {
+    onSendImgOrFileMsg(file, 'img');
+  }
+
+  //选择文件
+  void selectFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    final path = result?.files.single.path;
+    if (path != null) {
+      File file = File(path);
+      onSendImgOrFileMsg(file, 'file'); // 发送文件
+    }
+  }
+
+  //发送文件/图片
+  void onSendImgOrFileMsg(File file, type) async {
+    if (StringUtil.isNullOrEmpty(file.path)) {
+      return; // 文件路径为空，不发送
+    }
+
+    // 1. 获取文件名
+    String fileName = file.path.split('/').last;
+    // 2. 创建 MultipartFile
+    final fileData = await MultipartFile.fromFile(file.path, filename: fileName);
+
+    // 3. 构建消息元数据
+    dynamic msg = {
+      'toUserId': targetId,
+      'source': chatInfo['type'],
+      'msgContent': {
+        'type': type,
+        'content': jsonEncode({
+          'name': fileName,
+          'size': fileData.length,
+        })
+      }
+    };
+
+    // 4. 发送元数据
+    _msgApi.send(msg).then((res) {
+      if (res['code'] == 0) {
+        if (StringUtil.isNotNullOrEmpty(res['data']?['id'])) {
+          // 5. 上传文件
+          Map<String, dynamic> map = {};
+          map["file"] = fileData;
+          map['msgId'] = res['data']['id'];
+          FormData formData = FormData.fromMap(map);
+          _msgApi.sendMedia(formData).then((v) {
+            msgListAddMsg(res['data']);
+            onRead();
+          });
+        }
       }
     });
   }
