@@ -1,4 +1,5 @@
 import 'package:chat_mobile/pages/chat_frame/chat_content/retraction.dart';
+import 'package:chat_mobile/pages/chat_frame/chat_content/system.dart';
 import 'package:chat_mobile/pages/chat_frame/chat_content/time.dart';
 import 'package:chat_mobile/pages/chat_frame/chat_content/voice.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +16,13 @@ import 'text.dart';
 class ChatMessage extends StatelessThemeWidget {
   final Map<String, dynamic> msg;
   final Map<String, dynamic> chatInfo;
+  final Map<String, dynamic>? member;
 
   const ChatMessage({
     super.key,
     required this.msg,
     required this.chatInfo,
+    required this.member,
   });
 
   @override
@@ -32,8 +35,7 @@ class ChatMessage extends StatelessThemeWidget {
         if (msg['isShowTime'] == true)
           TimeContent(value: DateUtil.formatTime(msg['createTime'])),
         // 系统消息
-        if (msg['type'] == 'system')
-          Text(DateUtil.formatTime(msg['msgContent']['content'])),
+        if (msg['type'] == 'system') SystemMessage(value: msg['msgContent']),
         // 群聊消息
         if (chatInfo['type'] == 'group' && msg['type'] != 'system')
           Align(
@@ -42,35 +44,41 @@ class ChatMessage extends StatelessThemeWidget {
             child: Row(
               mainAxisAlignment:
                   isRight ? MainAxisAlignment.end : MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 /// 别人发的
                 //头像
                 if (!isRight)
                   CustomPortrait(
                     url: msg['msgContent']?['formUserPortrait'],
+                    size: 40,
                   ),
                 const SizedBox(width: 5),
-                ///用户名（自己时不显示）＋消息内容
+                ///用户名＋消息内容
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: isRight
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
                   children: [
                     // 用户名
-                    if (!isRight)
-                      Text(
-                        msg['msgContent']?['formUserName'] ?? '',
-                        style: const TextStyle(
-                          color: Color(0xFF969696),
-                          fontSize: 12,
-                        ),
+                    Text(
+                      handlerGroupDisplayName(),
+                      style: const TextStyle(
+                        color: Color(0xFF969696),
+                        fontSize: 12,
                       ),
+                    ),
+                    const SizedBox(height: 5),
                     //消息内容
                     getComponentByType(msg['msgContent']['type'], isRight),
                   ],
                 ),
+                const SizedBox(width: 5),
                 ///自己消息
                 if (isRight)
                   CustomPortrait(
                     url: msg['msgContent']?['formUserPortrait'],
+                    size: 40,
                   ),
               ],
             ),
@@ -85,6 +93,22 @@ class ChatMessage extends StatelessThemeWidget {
         const SizedBox(height: 15),
       ],
     );
+  }
+
+  //获取群成员的显示名称
+  String handlerGroupDisplayName() {
+    // 1. 如果没有成员信息，返回消息中的用户名
+    if (member == null) {
+      return msg['msgContent']?['formUserName'] ?? '';
+    }
+    // 2. 有成员信息，按优先级返回
+    if (member!.containsKey('groupName') && member!['groupName'] != null) {
+      return member!['groupName']!;      // 优先级1：群昵称
+    } else if (member!.containsKey('remark') && member!['remark'] != null) {
+      return member!['remark']!;          // 优先级2：备注名
+    } else {
+      return member!['name'] ?? '';       // 优先级3：昵称
+    }
   }
 
   Widget getComponentByType(String? type, bool isRight) {

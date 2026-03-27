@@ -23,7 +23,7 @@ class MsgUtil {
           break;
         case "voice":
           var content = jsonDecode(msgContent['content']);
-          contentStr = '[语音] ${content['time']}';
+          contentStr = '[语音] ${content['time']}"';
           break;
         case "call":
           var content = jsonDecode(msgContent['content']);

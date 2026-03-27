@@ -7,6 +7,7 @@ import '../../components/custom_button/index.dart';
 import '../../components/custom_icon_button/index.dart';
 import '../../components/custom_portrait/index.dart';
 import '../../components/custom_text_field/index.dart';
+import '../../components/custom_voice_record_buttom/index.dart';
 import '../../utils/String.dart';
 import '../../utils/getx_config/config.dart';
 import 'chat_content/msg.dart';
@@ -43,6 +44,31 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
 
   @override
   Widget buildWidget(BuildContext context) {
+/*
+    ┌─────────────────────────────────────────────────────────────────┐
+    │  ← 张三                                           [头像]      │  ← AppBar
+    ├─────────────────────────────────────────────────────────────────┤
+    │  ┌─────────────────────────────────────────────────────────────┐│
+    │  │  消息列表区域                                                ││
+    │  │  ┌─────────────────────────────────────────────────────────┐││
+    │  │  │  没有更多消息了                                          │││
+    │  │  └─────────────────────────────────────────────────────────┘││
+    │  │  ┌─────────────────────────────────────────────────────────┐││
+    │  │  │          [对方消息]  ← 左侧白色气泡                      │││
+    │  │  └─────────────────────────────────────────────────────────┘││
+    │  │  ┌─────────────────────────────────────────────────────────┐││
+    │  │  │  [自己消息]               ← 右侧蓝色气泡                 │││
+    │  │  └─────────────────────────────────────────────────────────┘││
+    │  └─────────────────────────────────────────────────────────────┘│
+    ├─────────────────────────────────────────────────────────────────┤
+    │  ┌─────────────────────────────────────────────────────────────┐│
+    │  │  [🎙️]  [按住说话 / 输入框]  [📎]  [😊/发送]               ││  ← 输入栏
+    │  └─────────────────────────────────────────────────────────────────┘│
+    │  ┌─────────────────────────────────────────────────────────────┐│
+    │  │  更多操作面板（展开时）                                      ││
+    │  │  [语音通话] [视频通话] [图片] [文件]                         ││
+    │  └─────────────────────────────────────────────────────────────┘│
+    └─────────────────────────────────────────────────────────────────┘*/
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -107,7 +133,10 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                                 ),
                               // 消息列表
                               ...controller.msgList.map((msg) => ChatMessage(
-                                  msg: msg, chatInfo: controller.chatInfo)),
+                                msg: msg,
+                                chatInfo: controller.chatInfo,
+                                member: controller.members[msg['fromId']],
+                              )),
                             ],
                           ),
                           // 加载指示器
@@ -130,117 +159,121 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                 ),
               )
             ),
-            Container(
-              color: const Color(0xFFEDF2F9),
-              padding:
+            //下部操作栏
+            Obx(
+                () => Container(
+                  color: const Color(0xFFEDF2F9),
+                  padding:
                   const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      //语音按钮
-                      CustomIconButton(
-                        onTap: () {},
-                        icon: const IconData(0xe602, fontFamily: 'IconFont'),
-                        width: 36,
-                        height: 36,
-                        iconSize: 26,
-                        iconColor: Colors.black,
-                        color: Colors.transparent,
-                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          //语音/键盘切换
+                          if (controller.isRecording.value)
+                            _buildIconButton1(
+                              const IconData(0xe661, fontFamily: 'IconFont'),
+                                  () {
+                                controller.isShowMore.value = false;
+                                controller.isRecording.value = false;   // 切换到键盘模式
+                                controller.focusNode.requestFocus();    // 弹出键盘
+                              },
+                            )
+                          else
+                            _buildIconButton1(
+                              const IconData(0xe7e2, fontFamily: 'IconFont'),
+                                  () {
+                                controller.isShowMore.value = false;
+                                controller.isRecording.value = true;    // 切换到语音模式
+                              },
+                            ),
 
-                      const SizedBox(width: 10),
+                          const SizedBox(width: 10),
 
-                      //文本输入框
-                      Expanded(
-                        child: CustomTextField(
-                          controller: controller.msgContentController,
-                          maxLines: 3,
-                          minLines: 1,
-                          hintTextColor: theme.primaryColor,
-                          hintText: '请输入消息',
-                          vertical: 8,
-                          fillColor: Colors.white,
-                          onTap: () {
-                            controller.isShowMore.value = false;
-                            controller.scrollBottom();
-                          },
-                          onChanged: (value) {
-                            controller.isSend.value = value.trim().isNotEmpty;
-                          },
-                        ),
-                      ),
-
-                      const SizedBox(width: 5),
-
-                      //附件按钮
-                      CustomIconButton(
-                        onTap: () {},
-                        icon: const IconData(0xe632, fontFamily: 'IconFont'),
-                        width: 36,
-                        height: 36,
-                        iconSize: 26,
-                        iconColor: Colors.black,
-                        color: Colors.transparent,
-                      ),
-
-                      const SizedBox(width: 10),
-
-                      //动态按钮（表情/发送）
-                      Obx(() {
-                        if (controller.isSend.value) {
-                          return CustomButton(
-                            text: '发送',
-                            onTap: controller.sendTextMsg,
-                            width: 60,
-                            textSize: 14,
-                            height: 34,
-                          );
-                        } else {
-                          return CustomIconButton(
-                            onTap: () {
-                              // 1. 收起键盘
-                              FocusScope.of(context).unfocus();
-                              // 2. 切换面板显示状态
-                              controller.isShowMore.value =
-                              !controller.isShowMore.value;
-                              // 3. 如果面板打开，延迟后滚动到底部
-                              if (controller.isShowMore.value) {
-                                Future.delayed(
-                                    const Duration(milliseconds: 500), () {
+                          //输入框/语音按钮
+                          if (controller.isRecording.value)
+                            Expanded(
+                              child: CustomVoiceRecordButton(
+                                  onFinish: controller.onSendVoiceMsg // 完成语音发送回调
+                              ),
+                            )
+                          else
+                            Expanded(
+                              child: CustomTextField(
+                                controller: controller.msgContentController,
+                                maxLines: 3,
+                                minLines: 1,
+                                hintTextColor: theme.primaryColor,
+                                hintText: '请输入消息',
+                                vertical: 8,
+                                focusNode: controller.focusNode,
+                                fillColor: Colors.white.withValues(alpha: 0.9),
+                                onTap: () {
+                                  controller.isShowMore.value = false;
                                   controller.scrollBottom();
-                                });
-                              }
-                            },
-                            // 表情图标
-                            icon: const IconData(0xe636, fontFamily: 'IconFont'),
+                                },
+                                onChanged: (value) {
+                                  controller.isSend.value =
+                                      value.trim().isNotEmpty;
+                                },
+                              ),
+                            ),
 
-                            width: 36,
-                            height: 36,
-                            iconSize: 26,
-                            iconColor: Colors.black,
-                            color: Colors.transparent,
-                          );
-                        }
-                      }),
+                          const SizedBox(width: 5),
+
+                          //附件按钮（不在语音输入按钮展示时出现）
+                          if (!controller.isRecording.value)
+                            _buildIconButton1(
+                              const IconData(0xe632, fontFamily: 'IconFont'),
+                                  () {},
+                            ),
+
+                          const SizedBox(width: 10),
+
+                          //动态按钮（表情/发送）
+                          if (controller.isSend.value)
+                          // 有输入内容 → 显示发送按钮
+                            CustomButton(
+                              text: '发送',
+                              onTap: controller.sendTextMsg, //发送消息
+                              width: 60,
+                              textSize: 14,
+                              height: 34,
+                            )
+                          else
+                          // 无输入内容 → 显示表情按钮
+                            _buildIconButton1(
+                              const IconData(0xe636, fontFamily: 'IconFont'),
+                                  () {
+                                FocusScope.of(context).unfocus();          // 收起键盘
+                                // 切换更多面板显示状态
+                                //todo 刚打开的列表会因为滚到最底层关闭
+                                controller.isShowMore.value = !controller.isShowMore.value;
+                                if (controller.isShowMore.value) {
+                                  Future.delayed(
+                                      const Duration(milliseconds: 500), () {
+                                    controller.scrollBottom();
+                                  });
+                                }
+                              },
+                            ),
+                        ],
+                      ),
+                      //展示“更多”菜单
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                        height: controller.isShowMore.value ? 240 : 0,
+                        child: controller.isShowMore.value
+                            ? _buildMoreOperation()
+                            : Container(),
+                      ),
                     ],
                   ),
-                  //展示“更多”菜单
-                  Obx(() {
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeInOut,
-                      height: controller.isShowMore.value ? 240 : 0,
-                      child: controller.isShowMore.value
-                          ? _buildMoreOperation()
-                          : Container(),
-                    );
-                  }),
-                ],
-              ),
-            ),
+                ),
+            )
           ],
         ),
       ),
@@ -256,7 +289,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             width: 1.0,
           ),
         ),
@@ -265,22 +298,24 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
         spacing: 10,
         runSpacing: 10,
         children: [
-          _buildIconButton(
-            '语音通话',
-            const IconData(0xe969, fontFamily: 'IconFont'),
-                () => controller.onInviteVideoChat(true),
-          ),
-          _buildIconButton(
-            '视频通话',
-            const IconData(0xe9f5, fontFamily: 'IconFont'),
-                () => controller.onInviteVideoChat(false),
-          ),
-          _buildIconButton(
+          if (controller.chatInfo['type'] == 'user')
+            _buildIconButton2(
+              '语音通话',
+              const IconData(0xe969, fontFamily: 'IconFont'),
+                  () => controller.onInviteVideoChat(true),
+            ),
+          if (controller.chatInfo['type'] == 'user')
+            _buildIconButton2(
+              '视频通话',
+              const IconData(0xe9f5, fontFamily: 'IconFont'),
+                  () => controller.onInviteVideoChat(false),
+            ),
+          _buildIconButton2(
             '图片',
             const IconData(0xe9f4, fontFamily: 'IconFont'),
                 () => {},
           ),
-          _buildIconButton(
+          _buildIconButton2(
             '文件',
             const IconData(0xeac4, fontFamily: 'IconFont'),
                 () => {},
@@ -290,7 +325,20 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
     );
   }
 
-  Widget _buildIconButton(text, iconData, onTap) {
+  Widget _buildIconButton1(iconData, onTap) {
+    return CustomIconButton(
+      onTap: onTap,
+      icon: iconData,
+      width: 36,
+      height: 36,
+      iconSize: 26,
+      iconColor: Colors.black,
+      color: Colors.transparent,
+    );
+  }
+
+
+  Widget _buildIconButton2(text, iconData, onTap) {
     return CustomIconButton(
       onTap: onTap,
       icon: iconData,

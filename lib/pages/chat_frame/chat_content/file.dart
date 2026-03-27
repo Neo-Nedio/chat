@@ -126,10 +126,15 @@ class FileMessage extends StatelessThemeWidget {
               ),
             );
           } else {
-            //加载中
+            //加载中（固定尺寸占位）
             return Container(
-              color: Colors.grey[300],
-              child: const Center(
+              width: MediaQuery.of(Get.context!).size.width * 0.6,
+              color: isRight ? theme.primaryColor : Colors.white,
+              height: 85,
+              alignment: Alignment.center,
+              child: const SizedBox(
+                height: 40,
+                width: 40,
                 child: CircularProgressIndicator(
                   color: Color(0xffffffff),
                   strokeWidth: 2,

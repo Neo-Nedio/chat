@@ -22,7 +22,7 @@ class CallMessage extends StatelessThemeWidget {
     final time = content?['time'] ?? 0;   // 通话时长（秒），0表示未接通
 
     return Container(
-      width: 150,
+      width: 170,
       height: 34,
       decoration: BoxDecoration(
         color: isRight ? theme.primaryColor : Colors.white,
@@ -39,11 +39,13 @@ class CallMessage extends StatelessThemeWidget {
               color: isRight ? Colors.white : Colors.black,
             ),
           ),
-          Text(
-            time > 0 ? "通话时长 ${DateUtil.formatTimingTime(time)}" : "通话未接通",
-            style: TextStyle(
-              color: isRight ? Colors.white : null,
-              fontSize: 14,
+          Expanded(
+            child: Text(
+              time > 0 ? "通话时长 ${DateUtil.formatTimingTime(time)}" : "通话未接通",
+              style: TextStyle(
+                color: isRight ? Colors.white : null,
+                fontSize: 14,
+              ),
             ),
           ),
         ],

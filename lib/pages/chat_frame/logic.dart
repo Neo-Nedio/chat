@@ -1,12 +1,16 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:dio/dio.dart' show FormData, MultipartFile;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide FormData, MultipartFile;
 
+import '../../api/chat_group_member.dart';
 import '../../api/chat_list_api.dart';
 import '../../api/msg_api.dart';
 import '../../api/video_api.dart';
+import '../../components/custom_flutter_toast/index.dart';
 import '../../utils/String.dart';
 import '../../utils/web_socket.dart';
 
@@ -14,14 +18,18 @@ class ChatFrameLogic extends GetxController {
   final _msgApi = MsgApi();           // 消息 API
   final _chatListApi = ChatListApi(); // 聊天列表 API
   final _videoApi = VideoApi();
+  final _chatGroupMemberApi = ChatGroupMemberApi();
   final _wsManager = WebSocketUtil(); // WebSocket 管理
 
   final TextEditingController msgContentController = TextEditingController();
   final ScrollController scrollController = ScrollController();
 
+  final FocusNode focusNode = FocusNode();
+  late Map<String, dynamic> members = {}; //群成员
   late List<dynamic> msgList = [];     // 消息列表
   late String targetId = '';           // 聊天对象ID
   late dynamic chatInfo = {};          // 聊天信息（对方头像、名称等）
+  late RxBool isRecording = false.obs; //录音状态
   late RxBool isSend = false.obs;      // 是否有内容可发送
 
   // 分页相关
@@ -37,6 +45,7 @@ class ChatFrameLogic extends GetxController {
     chatInfo = Get.arguments['chatInfo'] ?? '';
     targetId = chatInfo['fromId'];
     super.onInit();
+    onGetMembers();
     onGetMsgRecode();      // 获取消息记录
     eventListen();         // 监听 WebSocket 消息
     onRead();              // 标记已读
@@ -58,11 +67,25 @@ class ChatFrameLogic extends GetxController {
     // 监听消息
     _subscription = _wsManager.eventStream.listen((event) {
       if (event['type'] == 'on-receive-msg') {
-        if (event['content']['fromId'] == targetId) {
-          msgListAddMsg(event['content']); // 收到新消息，添加到列表
+        final data = event['content'];
+        if ((data['fromId'] == targetId && data['source'] == 'user') || //对方发来的单聊消息
+            (data['toId'] == targetId && data['source'] == 'group')) { //群聊消息
+          msgListAddMsg(event['content']);
         }
       }
     });
+  }
+
+  //获取成员
+  void onGetMembers() async {
+    if (chatInfo['type'] == 'group') {
+      await _chatGroupMemberApi.list(targetId).then((res) {
+        if (res['code'] == 0) {
+          members = res['data'];
+          update([const Key('chat_frame')]);
+        }
+      });
+    }
   }
 
   //获取历史消息
@@ -175,6 +198,7 @@ class ChatFrameLogic extends GetxController {
         onRead();                        // 标记已读
       }
     });
+    isSend.value =false ;//消息发送后改为不可发送
   }
 
   //将新消息添加到消息列表
@@ -194,11 +218,52 @@ class ChatFrameLogic extends GetxController {
   void onInviteVideoChat(isOnlyAudio) {
     _videoApi.invite(targetId, isOnlyAudio).then((res) {
       if (res['code'] == 0) {
-        Get.toNamed('video_chat', arguments: {
+        Get.toNamed('/video_chat', arguments: {
           'userId': targetId,
           'isSender': true,
           'isOnlyAudio': isOnlyAudio,
         });
+      } else {
+        CustomFlutterToast.showErrorToast(res['msg'] ?? '发起通话失败');
+      }
+    });
+  }
+
+  void onSendVoiceMsg(filePath, time) async {
+    if (StringUtil.isNullOrEmpty(filePath)) {
+      return;  // 文件路径为空，不发送
+    }
+    if (time == 0) {
+      CustomFlutterToast.showSuccessToast('录制时间太短~');
+      return;  // 时长太短，提示用户
+    }
+
+    MultipartFile file = await MultipartFile.fromFile(filePath, filename: 'voice.wav');
+    dynamic msg = {
+      'toUserId': targetId,           // 接收者 ID
+      'source': chatInfo['type'],     // 'user' 或 'group'
+      'msgContent': {
+        'type': "voice",              // 消息类型：语音
+        'content': jsonEncode({       // 语音信息（JSON 字符串）
+          'name': 'voice.wav',        // 文件名
+          'size': file.length,        // 文件大小（字节）
+          'time': time,               // 录音时长（秒）
+        })
+      }
+    };
+    _msgApi.send(msg).then((res) {
+      if (res['code'] == 0) {
+        if (StringUtil.isNotNullOrEmpty(res['data']?['id'])) {
+          Map<String, dynamic> map = {};
+          map["file"] = file;                    // 音频文件
+          map['msgId'] = res['data']['id'];      // 消息 ID（关联）
+          //得到消息id后再发送文件
+          FormData formData = FormData.fromMap(map);
+          _msgApi.sendMedia(formData).then((v) {
+            msgListAddMsg(res['data']);          // 添加到消息列表
+            onRead();                             // 标记已读
+          });
+        }
       }
     });
   }
