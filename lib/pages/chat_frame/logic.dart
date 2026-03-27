@@ -37,9 +37,12 @@ class ChatFrameLogic extends GetxController {
 
     // 添加滚动监听
     scrollController.addListener(() {
-      if (scrollController.position.pixels ==
-          scrollController.position.minScrollExtent) { //监听上滑
-        loadMore();
+      //确保 ScrollController 已经附加到 ListView 上，可以安全调用滚动方法。
+      if (scrollController.hasClients) {
+        if (scrollController.position.pixels ==
+            scrollController.position.minScrollExtent) { //监听上滑
+          loadMore();
+        }
       }
     });
   }

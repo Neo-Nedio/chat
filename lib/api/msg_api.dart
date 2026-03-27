@@ -26,4 +26,11 @@ class MsgApi {
     final response = await _dio.post('/v1/api/message/send', data: msg);
     return response.data;
   }
+
+  //获取媒体预览 URL
+  Future<Map<String, dynamic>> getMedia(String msgId) async {
+    final response = await _dio
+        .get('/v1/api/message/get/media', queryParameters: {'msgId': msgId});
+    return response.data;
+  }
 }

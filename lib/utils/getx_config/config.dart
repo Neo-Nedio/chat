@@ -187,6 +187,8 @@ abstract class CustomWidgetNew<T extends Logic> extends StatelessWidget {
 abstract class StatelessThemeWidget extends StatelessWidget {
   const StatelessThemeWidget({super.key});
   GlobalThemeConfig get theme => GetInstance().find<GlobalThemeConfig>();
+
+  GlobalData get globalData => GetInstance().find<GlobalData>();
 }
 
 

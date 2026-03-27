@@ -8,6 +8,7 @@ import '../../components/custom_portrait/index.dart';
 import '../../components/custom_text_field/index.dart';
 import '../../utils/String.dart';
 import '../../utils/getx_config/config.dart';
+import 'chat_content/msg.dart';
 import 'logic.dart';
 
 class ChatFramePage extends CustomWidget<ChatFrameLogic>
@@ -93,8 +94,8 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                                 ),
                               ),
                             // 消息列表
-                            ...controller.msgList
-                                .map((msg) => _buildMsgContent(msg)),
+                            ...controller.msgList.map((msg) => ChatMessage(
+                                msg: msg, chatInfo: controller.chatInfo)),
                           ],
                         ),
                         // 加载指示器
