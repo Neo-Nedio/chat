@@ -16,6 +16,7 @@ import '../../api/video_api.dart';
 import '../../components/custom_flutter_toast/index.dart';
 import '../../utils/String.dart';
 import '../../utils/cropPicture.dart';
+import '../../utils/getx_config/GlobalData.dart';
 import '../../utils/web_socket.dart';
 
 class ChatFrameLogic extends GetxController {
@@ -44,6 +45,7 @@ class ChatFrameLogic extends GetxController {
   bool hasMore = true;     // 是否有更多消息
   late RxBool isShowMore = false.obs; //显示更多
   StreamSubscription? _subscription;
+  final GlobalData _globalData = Get.find<GlobalData>();
 
   @override
   void onInit() {
@@ -217,6 +219,7 @@ class ChatFrameLogic extends GetxController {
   //消息已读
   void onRead() {
     _chatListApi.read(targetId);
+    _globalData.onGetUserUnreadInfo();
   }
 
   //发起视频通话

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
+import '../../../api/chat_list_api.dart';
 import '../../../api/friend_api.dart';
+import '../../../api/video_api.dart';
 import '../../../components/custom_flutter_toast/index.dart';
 import '../../../utils/getx_config/GlobalThemeConfig.dart';
 import '../../../utils/getx_config/config.dart';
@@ -18,8 +20,14 @@ class FriendInformationLogic extends Logic {
   //好友api
   final _friendApi = FriendApi();
 
+  final _videoApi = VideoApi();
+  final _chatListApi = ChatListApi();
+
   //好友id
   String get friendId =>  arguments['friendId'].toString();
+  //真实用户id（用于发消息/视频通话）。优先走路由传入的 userId，避免把 friendId(关系ID)误当用户ID。
+  String get targetUserId =>
+      (arguments['userId'] ?? friendId).toString();
 
   //好友头像
   String _friendPortrait = '';
@@ -175,24 +183,10 @@ class FriendInformationLogic extends Logic {
   //特别关心结果
   void setResult(Map<String, dynamic> response) {
     if (response['code'] == 0) {
-      Fluttertoast.showToast(
-          msg: isConcern ? "已取消特别关心~" : "特别关心成功~",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: _theme.primaryColor,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      CustomFlutterToast.showSuccessToast(isConcern ? "已取消特别关心~" : "特别关心成功~");
       isConcern = !isConcern;
     } else {
-      Fluttertoast.showToast(
-          msg: response['msg'],
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      CustomFlutterToast.showErrorToast(response['msg']);
     }
   }
 
@@ -200,25 +194,35 @@ class FriendInformationLogic extends Logic {
   void deleteFriend() async {
     final response = await _friendApi.delete(friendId);
     if (response['code'] == 0) {
-      Fluttertoast.showToast(
-          msg: "删除成功",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: _theme.primaryColor,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      CustomFlutterToast.showSuccessToast("删除成功~");
       Get.back();
     } else {
-      Fluttertoast.showToast(
-          msg: response['msg'],
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      CustomFlutterToast.showErrorToast(response['msg']);
     }
+  }
+
+  //发送视频聊天
+  void onVideoChat() {
+    _videoApi.invite(targetUserId, false).then((res) {
+      if (res['code'] == 0) {
+        Get.toNamed('/video_chat', arguments: {
+          'userId': targetUserId,
+          'isSender': true,
+          'isOnlyAudio': false,
+        });
+      }
+    });
+  }
+
+  //发送会话页
+  void onToSendMsg() {
+    _chatListApi.create(targetUserId, 'user').then((res) {
+      if (res['code'] == 0) {
+        Get.toNamed('/chat_frame', arguments: {
+          'chatInfo': res['data'],
+        });
+      }
+    });
   }
 
   @override

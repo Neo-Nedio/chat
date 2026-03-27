@@ -54,20 +54,20 @@ class VideoChatLogic extends GetxController {
     isSender = Get.arguments['isSender'];
     smallWindowOffset = Offset(Get.size.width - 116, 16).obs;
 
-    // 2. 监听 WebSocket 视频事件
-    videoEvent();
-
-    // 3. 获取对方用户信息
+    //  获取对方用户信息
     await onGetChatDetail();
 
-    // 4. 初始化渲染器
+    //  初始化渲染器
     await initializeRenderers();
 
-    // 5. 初始化 PeerConnection
+    //  初始化 PeerConnection
     await initRTCPeerConnection();
 
-    // 6. 开始视频通话
+    //  开始视频通话
     await videoCall();
+
+    //  监听 WebSocket 视频事件
+    videoEvent();
   }
 
   Future<void> onGetChatDetail() async {

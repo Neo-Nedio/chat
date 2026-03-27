@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/get_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
@@ -10,6 +9,7 @@ import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/chat_group_api.dart';
+import '../../api/chat_list_api.dart';
 import '../../api/friend_api.dart';
 import '../../api/notify_api.dart';
 import '../../components/custom_flutter_toast/index.dart';
@@ -21,6 +21,7 @@ class ContactsLogic extends GetxController {
   final _friendApi = FriendApi();
   final _chatGroupApi = ChatGroupApi();
   final _notifyApi = NotifyApi();
+  final _chatListApi = ChatListApi();
   //主题配置
   final GlobalThemeConfig _theme = GetInstance().find<GlobalThemeConfig>();
 
@@ -170,6 +171,17 @@ class ContactsLogic extends GetxController {
     } else {
       CustomFlutterToast.showErrorToast(response['msg']);
     }
+  }
+
+  //前往会话页
+  void onToSendGroupMsg(id) {
+    _chatListApi.create(id, 'group').then((res) {
+      if (res['code'] == 0) {
+        Get.toNamed('/chat_frame', arguments: {
+          'chatInfo': res['data'],
+        });
+      }
+    });
   }
 
   @override
