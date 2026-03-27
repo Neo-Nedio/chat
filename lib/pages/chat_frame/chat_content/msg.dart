@@ -1,10 +1,13 @@
+import 'package:chat_mobile/pages/chat_frame/chat_content/retraction.dart';
 import 'package:chat_mobile/pages/chat_frame/chat_content/time.dart';
+import 'package:chat_mobile/pages/chat_frame/chat_content/voice.dart';
 import 'package:flutter/material.dart';
 
 import '../../../components/custom_portrait/index.dart';
 import '../../../utils/date.dart';
 import '../../../utils/getx_config/config.dart';
 import 'call.dart';
+import 'file.dart';
 import 'image.dart';
 import 'text.dart';
 
@@ -47,7 +50,7 @@ class ChatMessage extends StatelessThemeWidget {
                     url: msg['msgContent']?['formUserPortrait'],
                   ),
                 const SizedBox(width: 5),
-                //用户名（自己时不显示）＋消息内容
+                ///用户名（自己时不显示）＋消息内容
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -91,16 +94,14 @@ class ChatMessage extends StatelessThemeWidget {
           value: msg,
           isRight: isRight,
         );
-      // case 'file':
-      //   return (args) =>
-      //       FileMessage(value: args['value'], isRight: args['isRight']);
+      case 'file':
+        return FileMessage(value: msg, isRight: isRight);
       case 'img':
         return ImageMessage(value: msg, isRight: isRight);
-      // case 'retraction':
-      //   return (args) =>
-      //       RetractionMessage(value: args['value'], isRight: args['isRight']);
-      // case 'voice':
-      //   return VoiceMessage(value: msg, isRight: isRight);
+      case 'retraction':
+        return RetractionMessage(isRight: isRight);
+      case 'voice':
+        return VoiceMessage(value: msg, isRight: isRight);
       case 'call':
         return CallMessage(value: msg, isRight: isRight);
       default:
