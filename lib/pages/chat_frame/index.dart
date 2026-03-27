@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../components/app_bar_title/index.dart';
 import '../../components/custom_button/index.dart';
+import '../../components/custom_icon_button/index.dart';
 import '../../components/custom_portrait/index.dart';
 import '../../components/custom_text_field/index.dart';
 import '../../utils/String.dart';
@@ -32,6 +33,12 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
         controller.scrollBottom(); // 键盘弹出时滚动到底部
       }
     });
+
+    //于检测键盘是否收起，当键盘收起时关闭"更多"面板。
+    final keyboardHeight = MediaQuery.of(Get.context!).viewInsets.bottom;
+    if (keyboardHeight == 0) {
+      controller.isShowMore.value = false;
+    }
   }
 
   @override
@@ -68,64 +75,81 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
           children: [
             // 消息列表部分
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: GetBuilder<ChatFrameLogic>(
-                  id: const Key('chat_frame'), // 指定更新 ID
-                  builder: (controller) {
-                    return Stack(
-                      children: [
-                        ListView(
-                          cacheExtent: 99999, // 预加载大量内容，保证滚动流畅
-                          controller: controller.scrollController,
-                          children: [
-                            // 没有更多消息的提示
-                            if (!controller.hasMore)
-                              const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Center(
-                                  child: Text(
-                                    '没有更多消息了',
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 12,
+              child: GestureDetector(
+                //点击消息列表，把“更多”面板收起
+                onTap: (){
+                  controller.isShowMore.value = false;
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: GetBuilder<ChatFrameLogic>(
+                    id: const Key('chat_frame'), // 指定更新 ID
+                    builder: (controller) {
+                      return Stack(
+                        children: [
+                          ListView(
+                            cacheExtent: 99999, // 预加载大量内容，保证滚动流畅
+                            controller: controller.scrollController,
+                            children: [
+                              // 没有更多消息的提示
+                              if (!controller.hasMore)
+                                const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Center(
+                                    child: Text(
+                                      '没有更多消息了',
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            // 消息列表
-                            ...controller.msgList.map((msg) => ChatMessage(
-                                msg: msg, chatInfo: controller.chatInfo)),
-                          ],
-                        ),
-                        // 加载指示器
-                        if (controller.isLoading)
-                          const Positioned(
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            child: Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: CupertinoActivityIndicator(),
+                              // 消息列表
+                              ...controller.msgList.map((msg) => ChatMessage(
+                                  msg: msg, chatInfo: controller.chatInfo)),
+                            ],
+                          ),
+                          // 加载指示器
+                          if (controller.isLoading)
+                            const Positioned(
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              child: Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: CupertinoActivityIndicator(),
+                                ),
                               ),
                             ),
-                          ),
-                      ],
-                    );
-                  },
+                        ],
+                      );
+                    },
+                  ),
                 ),
-              ),
+              )
             ),
             Container(
               color: const Color(0xFFEDF2F9),
               padding:
                   const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
-              child: Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       //语音按钮
-                      const Icon(IconData(0xe602, fontFamily: 'IconFont'), size: 26.0),
+                      CustomIconButton(
+                        onTap: () {},
+                        icon: const IconData(0xe602, fontFamily: 'IconFont'),
+                        width: 36,
+                        height: 36,
+                        iconSize: 26,
+                        iconColor: Colors.black,
+                        color: Colors.transparent,
+                      ),
 
                       const SizedBox(width: 10),
 
@@ -139,17 +163,28 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                           hintText: '请输入消息',
                           vertical: 8,
                           fillColor: Colors.white,
-                          onTap: () => controller.scrollBottom(),
+                          onTap: () {
+                            controller.isShowMore.value = false;
+                            controller.scrollBottom();
+                          },
                           onChanged: (value) {
                             controller.isSend.value = value.trim().isNotEmpty;
                           },
                         ),
                       ),
 
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 5),
 
                       //附件按钮
-                      const Icon(IconData(0xe632, fontFamily: 'IconFont'), size: 26.0),
+                      CustomIconButton(
+                        onTap: () {},
+                        icon: const IconData(0xe632, fontFamily: 'IconFont'),
+                        width: 36,
+                        height: 36,
+                        iconSize: 26,
+                        iconColor: Colors.black,
+                        color: Colors.transparent,
+                      ),
 
                       const SizedBox(width: 10),
 
@@ -164,17 +199,108 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                             height: 34,
                           );
                         } else {
-                          return const Icon(
-                              IconData(0xe636, fontFamily: 'IconFont'),
-                              size: 26.0);
+                          return CustomIconButton(
+                            onTap: () {
+                              // 1. 收起键盘
+                              FocusScope.of(context).unfocus();
+                              // 2. 切换面板显示状态
+                              controller.isShowMore.value =
+                              !controller.isShowMore.value;
+                              // 3. 如果面板打开，延迟后滚动到底部
+                              if (controller.isShowMore.value) {
+                                Future.delayed(
+                                    const Duration(milliseconds: 500), () {
+                                  controller.scrollBottom();
+                                });
+                              }
+                            },
+                            // 表情图标
+                            icon: const IconData(0xe636, fontFamily: 'IconFont'),
+
+                            width: 36,
+                            height: 36,
+                            iconSize: 26,
+                            iconColor: Colors.black,
+                            color: Colors.transparent,
+                          );
                         }
                       }),
                     ],
                   ),
+                  //展示“更多”菜单
+                  Obx(() {
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
+                      height: controller.isShowMore.value ? 240 : 0,
+                      child: controller.isShowMore.value
+                          ? _buildMoreOperation()
+                          : Container(),
+                    );
+                  }),
+                ],
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  //“更多”操作面板
+  Widget _buildMoreOperation() {
+    return Container(
+      width: MediaQuery.of(Get.context!).size.width, //屏幕宽度
+      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.only(top: 10),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: Colors.black.withValues(alpha: 0.1),
+            width: 1.0,
+          ),
+        ),
+      ),
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: [
+          _buildIconButton(
+            '语音通话',
+            const IconData(0xe969, fontFamily: 'IconFont'),
+                () => controller.onInviteVideoChat(true),
+          ),
+          _buildIconButton(
+            '视频通话',
+            const IconData(0xe9f5, fontFamily: 'IconFont'),
+                () => controller.onInviteVideoChat(false),
+          ),
+          _buildIconButton(
+            '图片',
+            const IconData(0xe9f4, fontFamily: 'IconFont'),
+                () => {},
+          ),
+          _buildIconButton(
+            '文件',
+            const IconData(0xeac4, fontFamily: 'IconFont'),
+                () => {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIconButton(text, iconData, onTap) {
+    return CustomIconButton(
+      onTap: onTap,
+      icon: iconData,
+      width: 50,
+      height: 50,
+      radius: 15,
+      iconSize: 26,
+      text: text,
+      color: Colors.white.withValues(alpha: 0.9),
+      iconColor: const Color(0xFF1F1F1F),
     );
   }
 

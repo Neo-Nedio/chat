@@ -72,9 +72,9 @@ class WebSocketUtil {
   WebSocketUtil._internal();
 
   // 事件总线，用于消息分发
-  static final _eventController =
+  static final eventController =
   StreamController<Map<String, dynamic>>.broadcast();
-  Stream<Map<String, dynamic>> get eventStream => _eventController.stream;
+  Stream<Map<String, dynamic>> get eventStream => eventController.stream;
 
   WebSocketChannel? _channel;
   Timer? _heartbeatTimer;
@@ -146,18 +146,22 @@ class WebSocketUtil {
         switch (wsContent['type']) {
           case 'msg':     // 聊天消息
             sendNotification(wsContent['content']);
-            _eventController.add({
+            eventController.add({
               'type': 'on-receive-msg',
               'content': wsContent['content']
             });
             break;
           case 'notify':  // 系统通知
-            _eventController.add(
+            eventController.add(
                 {'type': 'on-receive-notify',
                  'content': wsContent['content']});
             break;
           case 'video':   // 视频通话
-          // 处理视频消息
+            // 分发视频信令事件（invite/offer/answer/candidate/hangup/accept）
+            eventController.add({
+              'type': 'on-receive-video',
+              'content': wsContent['content'],
+            });
             break;
         }
       }
@@ -235,7 +239,7 @@ class WebSocketUtil {
     _clearHeartbeat();
     _clearTimer();
     _channel?.sink.close();
-    _eventController.close();
+    eventController.close();
     _instance = null;
   }
 

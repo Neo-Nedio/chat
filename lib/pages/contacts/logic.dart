@@ -77,6 +77,7 @@ class ContactsLogic extends GetxController {
 
   //群列表
   void onChatGroupList() {
+    globalData.onGetUserUnreadInfo();
     _chatGroupApi.list().then((res) {
       if (res['code'] == 0) {
         chatGroupList = res['data'];

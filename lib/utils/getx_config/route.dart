@@ -39,6 +39,7 @@ import '../../pages/register/index.dart';
 import '../../pages/talk/index.dart';
 import '../../pages/talk/talk_create/index.dart';
 import '../../pages/talk/talk_details/index.dart';
+import '../../pages/video_chat/index.dart';
 import 'ControllerBinding.dart';
 
 class AppRoutes {
@@ -306,6 +307,13 @@ class AppRoutes {
       name: '/file_details',
       page: () => FileDetailsPage(
         key: const Key('file_details'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/video_chat',
+      page: () => VideoChatPage(
+        key: const Key('video_chat'),
       ),
       binding: ControllerBinding(),
     ),

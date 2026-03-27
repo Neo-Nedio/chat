@@ -10,6 +10,7 @@ class CustomIconButton extends StatelessWidget {
   final IconData icon;
   final double iconSize;
   final Color? iconColor;
+  final double? radius;
   final Function() onTap;
   final String? text;
 
@@ -23,6 +24,7 @@ class CustomIconButton extends StatelessWidget {
     this.iconColor,
     required this.icon,
     this.text,
+    this.radius,
   });
 
   @override
@@ -34,7 +36,7 @@ class CustomIconButton extends StatelessWidget {
         //图标按钮部分
         CustomMaterialButton(
           color: color ?? const Color(0xFFE3ECFF),  // 默认浅蓝色背景
-          borderRadius: width / 2,                  // 圆形（半径 = 宽/2）
+          borderRadius: radius ?? width / 2,                 // 圆形（半径 = 宽/2）
           onTap: onTap,
           child: Container(
             width: width,      // 默认 40px

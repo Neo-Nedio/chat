@@ -1,15 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 
 import '../../api/chat_list_api.dart';
 import '../../api/msg_api.dart';
+import '../../api/video_api.dart';
 import '../../utils/String.dart';
 import '../../utils/web_socket.dart';
 
 class ChatFrameLogic extends GetxController {
   final _msgApi = MsgApi();           // 消息 API
   final _chatListApi = ChatListApi(); // 聊天列表 API
+  final _videoApi = VideoApi();
   final _wsManager = WebSocketUtil(); // WebSocket 管理
 
   final TextEditingController msgContentController = TextEditingController();
@@ -25,6 +29,8 @@ class ChatFrameLogic extends GetxController {
   int index = 0;     // 当前索引（不是页数，而是起始位置）
   bool isLoading = false;  // 是否加载中
   bool hasMore = true;     // 是否有更多消息
+  late RxBool isShowMore = false.obs; //显示更多
+  StreamSubscription? _subscription;
 
   @override
   void onInit() {
@@ -50,7 +56,7 @@ class ChatFrameLogic extends GetxController {
   //消息监听
   void eventListen() {
     // 监听消息
-    _wsManager.eventStream.listen((event) {
+    _subscription = _wsManager.eventStream.listen((event) {
       if (event['type'] == 'on-receive-msg') {
         if (event['content']['fromId'] == targetId) {
           msgListAddMsg(event['content']); // 收到新消息，添加到列表
@@ -73,10 +79,7 @@ class ChatFrameLogic extends GetxController {
         index += msgList.length;
         hasMore = res['data'].length >= 0;
         update([const Key('chat_frame')]);
-        // UI 渲染完成后执行
-        SchedulerBinding.instance.addPostFrameCallback((_) {
-          scrollBottom(); //滚动到底部
-        });
+        scrollBottom(); //滚动到底部
       }
     } finally {
       //关闭加载
@@ -137,11 +140,13 @@ class ChatFrameLogic extends GetxController {
   void scrollBottom() {
     //确保 ScrollController 已经附加到 ListView 上，可以安全调用滚动方法。
     if (scrollController.hasClients) {
-      scrollController.animateTo(
-        scrollController.position.maxScrollExtent,  // 滚动到底部
-        duration: const Duration(milliseconds: 500), // 动画时长 500ms
-        curve: Curves.fastOutSlowIn,                 // 动画曲线
-      );
+      SchedulerBinding.instance.addPostFrameCallback( (_){
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,  // 滚动到底部
+          duration: const Duration(milliseconds: 500), // 动画时长 500ms
+          curve: Curves.fastOutSlowIn,                 // 动画曲线
+        );
+      });
     }
   }
 
@@ -177,13 +182,25 @@ class ChatFrameLogic extends GetxController {
     msgList.add(msg);                              // 1. 添加消息到列表末尾
     index = msgList.length;                        // 2. 更新索引（消息总数）
     update([const Key('chat_frame')]);             // 3. 刷新 UI
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      scrollBottom();                              // 4. 滚动到底部
-    });
+    scrollBottom();                              // 4. 滚动到底部
   }
 
+  //消息已读
   void onRead() {
     _chatListApi.read(targetId);
+  }
+
+  //发起视频通话
+  void onInviteVideoChat(isOnlyAudio) {
+    _videoApi.invite(targetId, isOnlyAudio).then((res) {
+      if (res['code'] == 0) {
+        Get.toNamed('video_chat', arguments: {
+          'userId': targetId,
+          'isSender': true,
+          'isOnlyAudio': isOnlyAudio,
+        });
+      }
+    });
   }
 
   @override

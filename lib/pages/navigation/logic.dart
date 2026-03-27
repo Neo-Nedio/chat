@@ -1,6 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/getx_config/GlobalData.dart';
 import '../../utils/getx_config/GlobalThemeConfig.dart';
@@ -11,6 +12,7 @@ import '../../utils/web_socket.dart';
 class NavigationLogic extends GetxController {
   late int currentIndex = 0;
   final _wsManager = WebSocketUtil();
+  StreamSubscription? _subscription;
 
   GlobalData get globalData => GetInstance().find<GlobalData>();
 
@@ -39,8 +41,19 @@ class NavigationLogic extends GetxController {
 
   // 监听消息(收到任何消息，立马刷新)
   void eventListen() {
-    _wsManager.eventStream.listen((event) {
+    _subscription = _wsManager.eventStream.listen((event) {
       globalData.onGetUserUnreadInfo();
+      //如果是视频通话，立马移向通话界面
+      if (event['type'] == 'on-receive-video') {
+        var data = event['content'];
+        if (data['type'] == "invite") {
+          Get.toNamed('/video_chat', arguments: {
+            'userId': data['fromId'],
+            'isSender': false,
+            'isOnlyAudio': data['isOnlyAudio'],
+          });
+        }
+      }
     });
   }
 
