@@ -21,6 +21,7 @@ import '../../pages/contacts/friend_information/set_group/logic.dart';
 import '../../pages/contacts/friend_information/set_remark/logic.dart';
 import '../../pages/contacts/logic.dart';
 import '../../pages/contacts/user_select/logic.dart';
+import '../../pages/file_details/logic.dart';
 import '../../pages/image_viewer/image_viewer_update/logic.dart';
 import '../../pages/image_viewer/logic.dart';
 import '../../pages/login/logic.dart';
@@ -87,5 +88,6 @@ class ControllerBinding extends Bindings {
     Get.lazyPut(() => CreateChatGroupLogic(), fenix: true);
     Get.lazyPut(() => SystemNotifyLogic(), fenix: true);
     Get.lazyPut(() => ChatFrameLogic(), fenix: true);
+    Get.lazyPut(() => FileDetailsLogic(), fenix: true);
   }
 }

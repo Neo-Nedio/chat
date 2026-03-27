@@ -208,7 +208,7 @@ class MinePage extends CustomWidget<MineLogic> {
                   _leastSelectButton('切换账号', () {}),
                   const SizedBox(height: 2),
                   _leastSelectButton(
-                      '退出', color: const Color(0xfffff4c4c), controller.handlerLogout),
+                      '退出', controller.handlerLogout),
                 ],
               ),
             ),

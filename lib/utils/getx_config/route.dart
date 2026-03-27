@@ -19,6 +19,7 @@ import '../../pages/contacts/friend_information/set_group/index.dart';
 import '../../pages/contacts/friend_information/set_remark/index.dart';
 import '../../pages/contacts/index.dart';
 import '../../pages/contacts/user_select/index.dart';
+import '../../pages/file_details/index.dart';
 import '../../pages/image_viewer/image_viewer_update/index.dart';
 import '../../pages/image_viewer/index.dart';
 import '../../pages/login/index.dart';
@@ -298,6 +299,13 @@ class AppRoutes {
       name: '/chat_frame',
       page: () => ChatFramePage(
         key: const Key('chat_frame'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/file_details',
+      page: () => FileDetailsPage(
+        key: const Key('file_details'),
       ),
       binding: ControllerBinding(),
     ),
