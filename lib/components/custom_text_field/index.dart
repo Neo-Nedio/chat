@@ -22,6 +22,7 @@ class CustomTextField extends StatelessWidget {
   final IconData? iconData;
   final VoidCallback? onTap;
   final Color? fillColor;
+  final bool? showCursor; //是否展示光标
 
 
   const CustomTextField({
@@ -44,6 +45,7 @@ class CustomTextField extends StatelessWidget {
     this.iconData,
     this.onTap,
     this.fillColor,
+    this.showCursor,
   });
 
 
@@ -115,6 +117,7 @@ class CustomTextField extends StatelessWidget {
                     readOnly: readOnly,
                     maxLines: maxLines,
                     minLines: minLines,
+                    showCursor: showCursor ?? true,
                     onTap: onTap,
                     inputFormatters: inputLimit != null
                         ? <TextInputFormatter>[

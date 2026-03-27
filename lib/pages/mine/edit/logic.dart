@@ -6,14 +6,12 @@ import 'package:flutter_pickers/time_picker/model/date_type.dart';
 import 'package:flutter_pickers/time_picker/model/pduration.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart' as getx;
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart' show MultipartFile, FormData;
 
 import '../../../api/user_api.dart';
 import '../../../components/custom_flutter_toast/index.dart';
-import '../../../utils/cropPicture.dart';
 import '../../../utils/getx_config/GlobalThemeConfig.dart';
 import '../logic.dart';
 

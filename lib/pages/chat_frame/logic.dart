@@ -28,22 +28,22 @@ class ChatFrameLogic extends GetxController {
 
   final TextEditingController msgContentController = TextEditingController();
   final ScrollController scrollController = ScrollController();
+  final FocusNode focusNode = FocusNode(skipTraversal: true); //按 Tab 键时跳过这个输入框，避免意外打开键盘
+  final RxString panelType = "none".obs; //显示的面板
 
-  final FocusNode focusNode = FocusNode();
   late Map<String, dynamic> members = {}; //群成员
   late List<dynamic> msgList = [];     // 消息列表
   late String targetId = '';           // 聊天对象ID
   late dynamic chatInfo = {};          // 聊天信息（对方头像、名称等）
   late RxBool isRecording = false.obs; //录音状态
   late RxBool isSend = false.obs;      // 是否有内容可发送
-  late RxBool isShowEmoji = false.obs;
+  late RxBool isReadOnly = false.obs; //只读
 
   // 分页相关
   int num = 20;      // 每页数量
   int index = 0;     // 当前索引（不是页数，而是起始位置）
   bool isLoading = false;  // 是否加载中
   bool hasMore = true;     // 是否有更多消息
-  late RxBool isShowMore = false.obs; //显示更多
   StreamSubscription? _subscription;
   final GlobalData _globalData = Get.find<GlobalData>();
 

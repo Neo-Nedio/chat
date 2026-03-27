@@ -164,6 +164,7 @@ class EditMinePage extends CustomWidget<EditMineLogic> {
                         labelText: "生日",
                         controller: controller.birthdayController,
                         readOnly: true,
+                        showCursor: false, //不显示光标
                         suffixIcon: IconButton( //设定右侧可点击图标
                           onPressed: () => controller.selectDate(context),
                           icon: const Icon(Icons.calendar_today, size: 20),

@@ -29,21 +29,15 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
   //	系统指标变化时触发（键盘、状态栏等）
   void didChangeMetrics() {
     super.didChangeMetrics();
+    //于检测键盘是否收起
+    final keyboardHeight = MediaQuery.of(Get.context!).viewInsets.bottom;
     //等待 UI 渲染完成后执行
     WidgetsBinding.instance.addPostFrameCallback((_) {
       //键盘高度（>0 表示键盘弹出）
-      //viewInsets 表示系统 UI 遮盖内容区域的大小，键盘弹出时会增加底部遮盖区域。
-      if (MediaQuery.of(Get.context!).viewInsets.bottom > 0) {
-        controller.scrollBottom(); // 键盘弹出时滚动到底部
-      }
+      if (keyboardHeight > 0) {
+          controller.scrollBottom();
+        }
     });
-
-    //于检测键盘是否收起，当键盘收起时关闭"更多"面板。
-    final keyboardHeight = MediaQuery.of(Get.context!).viewInsets.bottom;
-    if (keyboardHeight == 0) {
-      controller.isShowMore.value = false;
-      controller.isShowEmoji.value = false;
-    }
   }
 
   @override
@@ -109,8 +103,8 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
             Expanded(
               child: GestureDetector(
                 //点击消息列表，把“更多”面板收起
-                onTap: (){
-                  controller.isShowMore.value = false;
+                onTap: () {
+                  controller.panelType.value = 'none';
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -143,7 +137,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                                   behavior: HitTestBehavior.translucent,
                                   // 捕获点击事件并传递
                                   onTap: () {
-                                    FocusScope.of(context).unfocus(); //关闭键盘
+                                    controller.panelType.value = 'none';
                                   },
                                   child: ChatMessage(
                                     msg: msg,
@@ -191,18 +185,18 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                             _buildIconButton1(
                               const IconData(0xe661, fontFamily: 'IconFont'),
                                   () {
-                                controller.isShowMore.value = false;
-                                controller.isShowEmoji.value = false;
+                                controller.panelType.value = 'none';
                                 controller.isRecording.value = false;   // 切换到键盘模式
-                                controller.focusNode.requestFocus();    // 弹出键盘
+                                WidgetsBinding.instance.addPostFrameCallback((_) {
+                                  controller.focusNode.requestFocus(); //弹出键盘
+                                });
                               },
                             )
                           else
                             _buildIconButton1(
                               const IconData(0xe7e2, fontFamily: 'IconFont'),
                                   () {
-                                controller.isShowMore.value = false;
-                                controller.isShowEmoji.value = false;
+                                controller.panelType.value = 'none';
                                 controller.isRecording.value = true;    // 切换到语音模式
                               },
                             ),
@@ -218,24 +212,26 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                             )
                           else
                             Expanded(
-                              child: CustomTextField(
-                                controller: controller.msgContentController,
-                                maxLines: 3,
-                                minLines: 1,
-                                hintTextColor: theme.primaryColor,
-                                hintText: '请输入消息',
-                                vertical: 8,
-                                focusNode: controller.focusNode,
-                                fillColor: Colors.white.withValues(alpha: 0.9),
-                                onTap: () {
-                                  controller.isShowMore.value = false;
-                                  controller.isShowEmoji.value = false;
-                                  controller.scrollBottom();
-                                },
-                                onChanged: (value) {
-                                  controller.isSend.value =
-                                      value.trim().isNotEmpty;
-                                },
+                              child: Obx(
+                                    () => CustomTextField(
+                                  controller: controller.msgContentController,
+                                  maxLines: 3,
+                                  minLines: 1,
+                                  readOnly: controller.isReadOnly.value, //是否只读
+                                  hintTextColor: theme.primaryColor,
+                                  hintText: '请输入消息',
+                                  vertical: 8,
+                                  focusNode: controller.focusNode,
+                                  fillColor: Colors.white.withValues(alpha: 0.9),
+                                  onTap: () {
+                                    controller.isReadOnly.value = false;      // 退出只读模式
+                                    controller.panelType.value = 'keyboard';  // 切换到键盘模式
+                                  },
+                                  onChanged: (value) {
+                                    controller.isSend.value =
+                                        value.trim().isNotEmpty; // 控制发送按钮
+                                  },
+                                ),
                               ),
                             ),
 
@@ -246,24 +242,12 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                             _buildIconButton1(
                               const IconData(0xe632, fontFamily: 'IconFont'),
                                   () {
-                                    // 如果是语音模式，先切换到输入模式
-                                    if (controller.isRecording.value) {
-                                      controller.isRecording.value = false;
-                                    }
-
-                                    // 收起键盘
-                                    FocusScope.of(context).unfocus();
-
-                                    // 关闭更多面板，切换表情面板
-                                    controller.isShowMore.value = false;
-                                    controller.isShowEmoji.value = !controller.isShowEmoji.value;
-
-                                    if (controller.isShowEmoji.value) {
-                                      Future.delayed(const Duration(milliseconds: 500), () {
-                                        controller.scrollBottom();
-                                      });
-                                    }
-                              },
+                                    controller.isReadOnly.value = true;
+                                    controller.panelType.value = 'emoji';
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                                      controller.focusNode.requestFocus(); //获得焦点
+                                    });
+                                  },
                             ),
 
                           const SizedBox(width: 10),
@@ -283,38 +267,14 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                             _buildIconButton1(
                               const IconData(0xe636, fontFamily: 'IconFont'),
                                   () {
-                                FocusScope.of(context).unfocus();          // 收起键盘
-                                controller.isShowEmoji.value = false;
-                                // 切换更多面板显示状态
-                                //todo 刚打开的列表会因为滚到最底层关闭
-                                controller.isShowMore.value = !controller.isShowMore.value;
-                                if (controller.isShowMore.value) {
-                                  Future.delayed(
-                                      const Duration(milliseconds: 500), () {
-                                    controller.scrollBottom();
-                                  });
-                                }
+                                 controller.focusNode.unfocus(); //失去焦点
+                                  controller.panelType.value = 'more';
                               },
                             ),
                         ],
                       ),
                       //展示“更多”菜单
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeInOut,
-                        height: controller.isShowMore.value ? 240 : 0,
-                        child: controller.isShowMore.value
-                            ? _buildMoreOperation()
-                            : Container(),
-                      ),
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeInOut,
-                        height: controller.isShowEmoji.value ? 240 : 0,
-                        child: controller.isShowEmoji.value
-                            ? _buildEmoji()
-                            : Container(),
-                      ),
+                      Obx(() => _buildPanelContainer(controller.panelType.value)),
                     ],
                   ),
                 ),
@@ -325,9 +285,27 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
     );
   }
 
+  Widget _buildPanelContainer(type) {
+    controller.scrollBottom();  // 先滚动到底部
+    switch (type) {
+      case 'emoji':
+        return _buildEmoji(); // 表情面板
+      case 'more':
+        return _buildMoreOperation(); // 更多面板（语音/视频通话等）
+      case 'none':
+        FocusScope.of(Get.context!).unfocus();  // 收起键盘
+        return const SizedBox.shrink();         // 空容器
+      case 'keyboard':
+        return const SizedBox.shrink(); // 空容器
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
   //表情选择面板
   Widget _buildEmoji() {
     return Container(
+      height: 240,
       width: MediaQuery.of(Get.context!).size.width,  // 占满屏幕宽度
       padding: const EdgeInsets.all(10),               // 内边距
       margin: const EdgeInsets.only(top: 10),          // 上边距
@@ -394,6 +372,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
   //“更多”操作面板
   Widget _buildMoreOperation() {
     return Container(
+      height: 240,
       width: MediaQuery.of(Get.context!).size.width, //屏幕宽度
       padding: const EdgeInsets.all(10),
       margin: const EdgeInsets.only(top: 10),
