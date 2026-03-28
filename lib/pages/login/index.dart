@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 
 import '../../components/custom_button/index.dart';
 import '../../components/custom_gradient_line/index.dart';
@@ -198,8 +200,20 @@ class LoginPage extends CustomWidget<LoginPageLogic>  {
                             ),
                             //忘记密码
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Get.toNamed('/set_ip'),
+                                  child: const Text(
+                                    "设置访问ip",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFFb0b0ba),
+                                      // fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
                                 TextButton(
                                   onPressed: () =>
                                       controller.toRetrievePassword(),

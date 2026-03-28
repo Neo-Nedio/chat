@@ -36,6 +36,7 @@ import '../../pages/qr_code_scan/qr_friend_affirm/index.dart';
 import '../../pages/qr_code_scan/qr_login_affirm/index.dart';
 import '../../pages/qr_code_scan/qr_other_result/index.dart';
 import '../../pages/register/index.dart';
+import '../../pages/set_ip/index.dart';
 import '../../pages/talk/index.dart';
 import '../../pages/talk/talk_create/index.dart';
 import '../../pages/talk/talk_details/index.dart';
@@ -314,6 +315,13 @@ class AppRoutes {
       name: '/video_chat',
       page: () => VideoChatPage(
         key: const Key('video_chat'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/set_ip',
+      page: () => SetIpPage(
+        key: const Key('set_ip'),
       ),
       binding: ControllerBinding(),
     ),

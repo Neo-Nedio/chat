@@ -11,12 +11,14 @@ class GlobalData extends GetxController {
   var unread = <String, int>{}.obs; // 未读数据
   var currentUserId = '';
   var currentUserAccount = '';
+  var baseIp = '';
 
   Future<void> init() async {
     await onGetUserUnreadInfo(); // 异步获取未读数据
     SharedPreferences.getInstance().then((prefs) {
       currentUserId = prefs.getString('userId') ?? '';
       currentUserAccount = prefs.getString('account') ?? '';
+      baseIp = prefs.getString('baseIp') ?? '';
     });
   }
 
