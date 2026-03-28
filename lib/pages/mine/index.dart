@@ -200,7 +200,7 @@ class MinePage extends CustomWidget<MineLogic> {
                   const SizedBox(height: 2),
                   const SizedBox(height: 2),
                   _minorSelectButton('关于我们', 'mine-about.png', () {
-                    Get.toNamed('/about');
+                    //todo Get.toNamed('/about');
                   }),
                   const SizedBox(height: 2),
                   _minorSelectButton('设置', 'mine-set.png', () {}),

@@ -245,6 +245,8 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                                     controller.isReadOnly.value = true;
                                     controller.panelType.value = 'emoji';
                                     WidgetsBinding.instance.addPostFrameCallback((_) {
+                                      //移动底部
+                                      controller.scrollBottom();
                                       controller.focusNode.requestFocus(); //获得焦点
                                     });
                                   },
@@ -269,6 +271,10 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                                   () {
                                  controller.focusNode.unfocus(); //失去焦点
                                   controller.panelType.value = 'more';
+                                  //移动底部
+                                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                                    controller.scrollBottom();
+                                  });
                               },
                             ),
                         ],
@@ -286,7 +292,6 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
   }
 
   Widget _buildPanelContainer(type) {
-    controller.scrollBottom();  // 先滚动到底部
     switch (type) {
       case 'emoji':
         return _buildEmoji(); // 表情面板

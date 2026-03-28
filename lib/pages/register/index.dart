@@ -97,8 +97,8 @@ class RegisterPage extends CustomWidget<RegisterPageLogic> {
                         controller: controller.mailController,
                         onChanged: controller.onMailTextChanged,
                         // suffix 里不要直接拼 TextEditingController 对象，否则会显示成 controller#... 的调试信息
-                        suffix: Text('${controller.mailTextLength}/16'),
-                        inputLimit: 16,
+                        suffix: Text('${controller.mailTextLength}/25'),
+                        inputLimit: 25,
                       ),
                       const SizedBox(height: 10.0),
                       CustomTextField(

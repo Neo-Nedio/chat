@@ -54,7 +54,6 @@ class VideoChatLogic extends GetxController {
     isSender = Get.arguments['isSender'];
     smallWindowOffset = Offset(Get.size.width - 116, 16).obs;
 
-    //  获取对方用户信息
     await onGetChatDetail();
 
     //  初始化渲染器
@@ -71,12 +70,13 @@ class VideoChatLogic extends GetxController {
   }
 
   Future<void> onGetChatDetail() async {
-    _chatListApi.detail(userId, 'user').then((res) {
+    try {
+      final res = await _chatListApi.detail(userId, 'user');
       if (res['code'] == 0) {
         userInfo = res['data'];
         update([const Key('video_chat')]);
       }
-    });
+    } catch (_) {}
   }
 
   void updateSmallWindowPosition(Offset delta) {

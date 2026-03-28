@@ -21,9 +21,9 @@ class TextMessage extends StatelessThemeWidget {
         color: isRight ? theme.primaryColor : Colors.white,
         borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
-      //最大为屏幕的0.8倍大小
+      //最大为屏幕的0.6倍大小
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(Get.context!).size.width * 0.8,
+        maxWidth: MediaQuery.of(Get.context!).size.width * 0.6,
       ),
       child: Text(
         value['msgContent']['content'],

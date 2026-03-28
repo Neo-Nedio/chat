@@ -183,7 +183,7 @@ class QRFriendAffirmPage extends CustomWidget<QRFriendAffirmLogic> {
                   const SizedBox(height: 1),
 
                   CustomLabelValue(
-                      label: '签名', value: controller.result['signature']),
+                      label: '签名', value: controller.result['signature'] ?? ''),
                 ],
               ),
 

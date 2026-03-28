@@ -30,16 +30,17 @@ class VideoChatPage extends CustomWidget<VideoChatLogic> {
         child: Scaffold(
           body: Stack(
             children: [
-              StringUtil.isNotNullOrEmpty(controller.userInfo['portrait'] ?? '')
+              StringUtil.isNotNullOrEmpty(
+                      controller.userInfo['portrait'] ?? '')
                   ? Image.network(
                       controller.userInfo['portrait'] ?? '',
                       fit: BoxFit.cover,
                       height: double.infinity,
                       width: double.infinity,
+                      errorBuilder: (context, error, stackTrace) =>
+                          Container(color: Colors.black),
                     )
-                  : Container(
-                      color: Colors.black,
-                    ),
+                  : Container(color: Colors.black),
               // 模糊效果
               BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),

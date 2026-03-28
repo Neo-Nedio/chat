@@ -48,6 +48,7 @@ class ChatMessage extends StatelessThemeWidget {
               children: [
                 /// 别人发的
                 //头像
+                //todo 增加一个添加后转向详情的回调
                 if (!isRight)
                   CustomPortrait(
                     url: msg['msgContent']?['formUserPortrait'],

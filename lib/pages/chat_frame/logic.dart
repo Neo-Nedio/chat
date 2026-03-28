@@ -77,7 +77,7 @@ class ChatFrameLogic extends GetxController {
         final data = event['content'];
         if ((data['fromId'] == targetId && data['source'] == 'user') || //对方发来的单聊消息
             (data['toId'] == targetId && data['source'] == 'group')) { //群聊消息
-          msgListAddMsg(event['content']);
+          msgListAddMsg(event['content'], forceScrollToBottom: false); //不直接到底部
         }
       }
     });
@@ -151,10 +151,10 @@ class ChatFrameLogic extends GetxController {
             //计算新的滚动位置（原来的位置 加上 新增的内容高度）
             final double newOffset = previousScrollOffset +
                 (newMaxScrollExtent - previousMaxScrollExtent);
-            scrollController.animateTo(
+            scrollController.jumpTo(
               newOffset,
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.fastOutSlowIn,
+              //duration: const Duration(milliseconds: 200),
+              //curve: Curves.fastOutSlowIn,
             );
           });
         }
@@ -201,7 +201,7 @@ class ChatFrameLogic extends GetxController {
     _msgApi.send(msg).then((res) {
       if (res['code'] == 0) {
         msgContentController.text = '';  // 清空输入框
-        msgListAddMsg(res['data']);      // 添加消息到列表
+        msgListAddMsg(res['data'], forceScrollToBottom: true); // 添加消息到列表（到底部）
         onRead();                        // 标记已读
       }
     });
@@ -209,11 +209,13 @@ class ChatFrameLogic extends GetxController {
   }
 
   //将新消息添加到消息列表
-  void msgListAddMsg(msg) {
+  void msgListAddMsg(msg, {bool forceScrollToBottom = false}) {
     msgList.add(msg);                              // 1. 添加消息到列表末尾
     index = msgList.length;                        // 2. 更新索引（消息总数）
     update([const Key('chat_frame')]);             // 3. 刷新 UI
-    scrollBottom();                              // 4. 滚动到底部
+    if (forceScrollToBottom) { //判断是否到底部
+      scrollBottom();
+    }
   }
 
   //消息已读
@@ -290,7 +292,7 @@ class ChatFrameLogic extends GetxController {
           map['msgId'] = res['data']['id'];
           FormData formData = FormData.fromMap(map);
           _msgApi.sendMedia(formData).then((v) {
-            msgListAddMsg(res['data']);
+            msgListAddMsg(res['data'], forceScrollToBottom: true);
             onRead();
           });
         }
@@ -329,7 +331,7 @@ class ChatFrameLogic extends GetxController {
           //得到消息id后再发送文件
           FormData formData = FormData.fromMap(map);
           _msgApi.sendMedia(formData).then((v) {
-            msgListAddMsg(res['data']);          // 添加到消息列表
+            msgListAddMsg(res['data'], forceScrollToBottom: true); // 添加到消息列表
             onRead();                             // 标记已读
           });
         }
