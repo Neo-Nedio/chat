@@ -59,13 +59,15 @@ class ChatGroupMemberPage extends CustomWidget<ChatGroupMemberLogic> {
 
             const SizedBox(height: 10),
 
-            SingleChildScrollView(
-              child: Column(
-                //群成员
-                children: [
-                  ...controller.memberList //当前显示的成员列表
-                      .map((user) => _buildUserItem(context, user)),
-                ],
+            //群成员
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: controller.memberList.length,
+                itemBuilder: (context, index) {
+                  return _buildUserItem(
+                      context, controller.memberList[index]);
+                },
               ),
             ),
           ],
