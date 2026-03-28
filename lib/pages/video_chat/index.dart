@@ -173,9 +173,9 @@ class VideoChatPage extends CustomWidget<VideoChatLogic> {
           children: [
             Obx(
               () => CustomIconButton(
-                icon: IconData(
-                    controller.isAudioEnabled.value ? 0xe654 : 0xe653,
-                    fontFamily: 'IconFont'),
+                icon: controller.isAudioEnabled.value
+                    ? const IconData(0xe654, fontFamily: 'IconFont')  // 麦克风开
+                    : const IconData(0xe653, fontFamily: 'IconFont'), // 麦克风关
                 onTap: controller.toggleAudio,
                 color: Colors.black.withValues(alpha: 0.2),
                 iconColor: Colors.white,
@@ -211,9 +211,9 @@ class VideoChatPage extends CustomWidget<VideoChatLogic> {
             if (!controller.isOnlyAudio)
               Obx(
                 () => CustomIconButton(
-                  icon: IconData(
-                      controller.isVideoEnabled.value ? 0xeca6 : 0xeca5,
-                      fontFamily: 'IconFont'),
+                  icon: controller.isVideoEnabled.value
+                      ? const IconData(0xeca6, fontFamily: 'IconFont')  // 视频开
+                      : const IconData(0xeca5, fontFamily: 'IconFont'), // 视频关
                   onTap: controller.toggleVideo,
                   color: Colors.black.withValues(alpha: 0.2),
                   iconColor: Colors.white,
