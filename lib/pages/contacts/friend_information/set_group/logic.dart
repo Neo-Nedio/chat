@@ -15,6 +15,7 @@ class SetGroupLogic extends Logic<SetGroupPage> {
   late List<dynamic> groupList = [];
   late String selectedGroup; //所选分组名字
   late String friendId;
+  final RxInt groupLength = 0.obs;
 
   //好友信息页
   final FriendInformationLogic _friendInformationLogic =
@@ -97,6 +98,7 @@ class SetGroupLogic extends Logic<SetGroupPage> {
   void onUpdateGroupPress(BuildContext context,dynamic group){
     //默认分组，直接返回
     if (group['value'] == '0') {
+      CustomFlutterToast.showSuccessToast("默认分组不能重命名~");
       Get.back();
       return;
     }
@@ -113,7 +115,7 @@ class SetGroupLogic extends Logic<SetGroupPage> {
   void onDeleteGroup(dynamic group) async {
     //不允许删默认分组
     if (group['value'] == '0') {
-      CustomFlutterToast.showErrorToast("操作有误");
+      CustomFlutterToast.showSuccessToast("默认分组不能删除~");
       Get.back();
       return;
     }

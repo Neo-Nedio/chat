@@ -7,6 +7,7 @@ import '../../components/app_bar_title/index.dart';
 import '../../components/custom_button/index.dart';
 import '../../components/custom_portrait/index.dart';
 import '../../components/custom_search_box/index.dart';
+import '../../components/custom_text_button/index.dart';
 import '../../utils/getx_config/config.dart';
 import 'logic.dart';
 
@@ -101,10 +102,11 @@ class AddFriendPage extends CustomWidgetNew<AddFriendLogic> {
         centerTitle: true,
         actions: [
         //取消按钮
-        TextButton(
-          child: const Text('取消'),
-          onPressed: () => Get.back(),
-        ),
+          CustomTextButton('取消',
+              onTap: () => Get.back(),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0, vertical: 5.0),
+              fontSize: 14),
       ]),
       //主体内容
       body: GestureDetector(

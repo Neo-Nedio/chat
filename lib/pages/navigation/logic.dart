@@ -10,13 +10,13 @@ import '../../utils/permission_handler.dart';
 import '../../utils/web_socket.dart';
 
 class NavigationLogic extends GetxController {
-  late int currentIndex = 0;
+  late RxInt currentIndex = 0.obs;
   final _wsManager = WebSocketUtil();
   StreamSubscription? _subscription;
 
   GlobalData get globalData => GetInstance().find<GlobalData>();
 
-  void initData(){
+  Future<void> initThemeData() async {
     //Get.parameters（URL 参数）
     String sex = Get.parameters['sex'] ?? "男"; // 获取路由参数
     final theme = Get.find<GlobalThemeConfig>(); // 获取主题配置实例
@@ -26,7 +26,6 @@ class NavigationLogic extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    initData();
 
     //立即执行
     (() async {
@@ -37,6 +36,12 @@ class NavigationLogic extends GetxController {
       await connectWebSocket(); //建立 WebSocket 连接
       eventListen(); //进行监听
     })();
+
+    //加载主题
+    // Widget 树构建和渲染完成后的下一个微任务中执行代码
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await initThemeData();
+    });
   }
 
   // 监听消息(收到任何消息，立马刷新)
@@ -82,11 +87,6 @@ class NavigationLogic extends GetxController {
     '说说',
     '我的',
   ];
-
-  void onTap(int index) {
-    currentIndex = index;
-    update([const Key("main")]);
-  }
 
   @override
   void onClose() {

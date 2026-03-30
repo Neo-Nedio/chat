@@ -4,6 +4,7 @@ import 'package:get/get_navigation/src/extension_navigation.dart';
 
 import '../../components/custom_material_button/index.dart';
 import '../../components/custom_portrait/index.dart';
+import '../../components/custom_shadow_text/index.dart';
 import '../../utils/getx_config/config.dart';
 import 'logic.dart';
 
@@ -109,48 +110,7 @@ class MinePage extends CustomWidget<MineLogic> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           // 用户名（带特殊效果）
-                          Stack(
-                            alignment: Alignment.center,  // 子组件居中对齐
-                            clipBehavior: Clip.none,      // 允许子组件超出边界
-                            children: [
-                              Positioned(
-                                top: 13, //向下偏移13
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 0, vertical: 0),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 5),  // 左右内边距5
-                                    height: 15,  // 高度15像素
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(  // 线性渐变
-                                        colors: [
-                                          theme.primaryColor.withValues(alpha: 0.1),
-                                          theme.primaryColor,
-                                        ],
-                                        begin: Alignment.centerLeft,   // 从左开始
-                                        end: Alignment.centerRight,    // 到右结束
-                                      ),
-                                      borderRadius: BorderRadius.circular(10),  // 圆角10
-                                    ),
-                                    //用完全透明的字体将特殊效果按文字数展开
-                                    child: Opacity(
-                                      opacity: 0,  // 完全透明
-                                      child: Text(  // 透明文字
-                                        controller.currentUserInfo['name'] ?? '',
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // 实际显示的文字
-                              Text(
-                                controller.currentUserInfo['name'] ?? '',
-                                style: const TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
+                          CustomShadowText(text: controller.currentUserInfo['name'] ?? ''),
 
                           const SizedBox(height: 10), // 间距
 
@@ -207,8 +167,8 @@ class MinePage extends CustomWidget<MineLogic> {
                   const SizedBox(height: 30),
                   _leastSelectButton('切换账号', () {}),
                   const SizedBox(height: 2),
-                  _leastSelectButton(
-                      '退出', controller.handlerLogout),
+                  _leastSelectButton('退出', controller.handlerLogout,
+                      color: theme.errorColor),
                 ],
               ),
             ),

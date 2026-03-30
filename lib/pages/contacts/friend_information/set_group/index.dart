@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 import '../../../../components/app_bar_title/index.dart';
 import '../../../../components/custom_button/index.dart';
@@ -58,8 +59,12 @@ class SetGroupPage extends CustomWidgetNew<SetGroupLogic> {
                     controller: controller.groupController,
                     inputLimit: 10,
                     hintText: hintText!,
-                    suffix:
-                    Text('${controller.groupController.text.length}/10'),
+                    onChanged: (value) {
+                      controller.groupLength.value = value.length;
+                    },
+                    suffix: Obx(
+                          () => Text('${controller.groupLength.value}/10'),
+                    ),
                   ),
                   const SizedBox(height: 20),
                   //确认与取消按钮
@@ -94,36 +99,40 @@ class SetGroupPage extends CustomWidgetNew<SetGroupLogic> {
       );
 
   //底部弹窗（长按触发）
-  void _showGroupBottomSheet(BuildContext context, dynamic group) =>
-      Get.bottomSheet(
-        backgroundColor: Colors.white,
-        Wrap(
+  void _showGroupBottomSheet(BuildContext context, dynamic group) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(10.0)),
+      ),
+      builder: (BuildContext context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            //重新命名按钮
-            Center(
-              child: TextButton(
-                //最终会打开 添加或修改分组弹窗（showAddAndUpdateGroupDialog）
-                //传入group，代表更新分组
-                onPressed: ()=>controller.onUpdateGroupPress(context,group),
-                child: Text(
-                  '重新命名',
-                  style: TextStyle(color: theme.primaryColor),
-                ),
-              ),
+            SizedBox(
+              width: double.infinity,
+              child: CustomTextButton('重新命名',
+                  onTap: () => controller.onUpdateGroupPress(context, group),
+                  textColor: theme.primaryColor,
+                  padding: const EdgeInsets.only(top: 20, bottom: 10),
+                  fontSize: 16),
             ),
-            //删除按钮
-            Center(
-              child: TextButton(
-                onPressed: () => controller.onDeleteGroup(group),
-                child: const Text(
-                  '删除分组',
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
+            SizedBox(
+              width: double.infinity,
+              child: CustomTextButton('删除分组',
+                  onTap: () => controller.onDeleteGroup(group),
+                  textColor: theme.errorColor,
+                  padding: const EdgeInsets.only(top: 10, bottom: 20),
+                  fontSize: 16),
             ),
           ],
-        ),
-      );
+        );
+      },
+    );
+  }
 
   @override
   Widget buildWidget(BuildContext context) => Scaffold(

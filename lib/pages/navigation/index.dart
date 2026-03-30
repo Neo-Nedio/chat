@@ -30,15 +30,15 @@ class NavigationPage extends CustomWidget<NavigationLogic> {
 
   @override
   Widget buildWidget(BuildContext context) {
-    return Scaffold(
-      // 上半部分：页面内容
-      body: _buildPage((controller.currentIndex)),
+    return Obx(
+        ()=>Scaffold(
+          // 上半部分：页面内容
+          body: _buildPage((controller.currentIndex.value)),
 
-      // 下半部分：底部导航栏
-      bottomNavigationBar: Obx(
-          ()=>BottomNavigationBar(
-            currentIndex: controller.currentIndex,
-            onTap: controller.onTap,
+          // 下半部分：底部导航栏
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: controller.currentIndex.value,
+            onTap: (index) => controller.currentIndex.value = index,
 
             selectedItemColor: theme.primaryColor,  // 选中文字颜色
             unselectedItemColor: Colors.grey,  // 未选中文字颜色
@@ -53,7 +53,7 @@ class NavigationPage extends CustomWidget<NavigationLogic> {
                   clipBehavior: Clip.none,
                   children: [
                     Image.asset(
-                      controller.currentIndex == index
+                      controller.currentIndex.value == index
                           ? 'assets/images/${controller.selectedIcons[index]}-${theme.themeMode}.png'
                           : controller.unselectedIcons[index],
                       width: 26,
@@ -72,7 +72,7 @@ class NavigationPage extends CustomWidget<NavigationLogic> {
               );
             }),
           ),
-      )
-      );
+        ),
+    );
   }
 }

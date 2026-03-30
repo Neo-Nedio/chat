@@ -2,10 +2,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import 'package:vibration/vibration.dart';
 
 import '../../utils/getx_config/GlobalThemeConfig.dart';
+import '../custom_flutter_toast/index.dart';
 
 //todo 按住说话的语音录制按钮，支持上滑取消、实时音波动画、时长限制等功能。
 class CustomVoiceRecordButton extends StatefulWidget {
@@ -33,6 +35,12 @@ class _VoiceRecordButtonState extends State<CustomVoiceRecordButton> {
 
   //开始录音
   void startRecording() async {
+    //检查权限
+    var status = await Permission.microphone.request();
+    if (!status.isGranted) {
+      CustomFlutterToast.showErrorToast("权限申请失败，请在设置中手动开启麦克风权限");
+    }
+
     // 振动反馈
     if (await Vibration.hasVibrator()) {
       Vibration.vibrate(duration: 50);

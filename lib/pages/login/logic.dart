@@ -15,30 +15,19 @@ class LoginPageLogic extends GetxController {
   final passwordController = TextEditingController();
 
   // 输入长度状态
-  int _accountTextLength = 0;    // 账号输入长度（私有）
-  int _passwordTextLength = 0;    // 密码输入长度（私有）
-  // Getter/Setter
-  int get accountTextLength =>_accountTextLength;
-  int get passwordTextLength =>_passwordTextLength;
-  set accountTextLength(int value){
-    _accountTextLength = value;
-    update([const Key("login")]);
-  }
-  set passwordTextLength(int value){
-    _passwordTextLength = value;
-    update([const Key("login")]);
-  }
+  RxInt accountTextLength = 0.obs;  // 账号输入长度
+  RxInt passwordTextLength = 0.obs;   // 密码输入长度
 
   //用户账号输入长度
-  void onAccountTextChanged(String value){
-    accountTextLength = value.length;      // 更新长度
-    if (accountTextLength >= 30) accountTextLength = 30;  // 限制最大30
+  void onAccountTextChanged(String value) {
+    accountTextLength.value = value.length;
+    if (accountTextLength.value >= 30) accountTextLength.value = 30;
   }
 
-  //用户密码输入长度
-  void onPasswordTextChanged(String value){
-    passwordTextLength = value.length;      // 更新长度
-    if (passwordTextLength >= 16) passwordTextLength = 16;  // 限制最大16
+//用户密码输入长度
+  void onPasswordTextChanged(String value) {
+    passwordTextLength.value = value.length;
+    if (passwordTextLength.value >= 16) passwordTextLength.value = 16;
   }
 
   //对话框

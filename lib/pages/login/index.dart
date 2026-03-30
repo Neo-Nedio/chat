@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 import '../../components/custom_button/index.dart';
 import '../../components/custom_gradient_line/index.dart';
@@ -77,8 +78,7 @@ class LoginPage extends CustomWidget<LoginPageLogic>  {
 
   @override
   Widget buildWidget(BuildContext context) {
-    //获取屏幕宽度
-    final screenWidth = MediaQuery.of(context).size.width;
+    //获取屏幕高度
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
@@ -87,12 +87,13 @@ class LoginPage extends CustomWidget<LoginPageLogic>  {
       body: Container(
         //明确说明要占满
         height: screenHeight,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFDFF4FF),
-              Color(0xFFFFFFFF),
-              Color(0xFFFFFFFF),
-              Color(0xFFFFFFFF)],
+            colors: [
+              theme.minorColor,
+              const Color(0xFFFFFFFF),
+              const Color(0xFFFFFFFF),
+              const Color(0xFFFFFFFF)],
             begin: Alignment.topLeft,      // 渐变起点：左上角
             end: Alignment.bottomRight,    // 渐变终点：右下角
           ),
@@ -178,25 +179,31 @@ class LoginPage extends CustomWidget<LoginPageLogic>  {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             //输入框
-                            CustomTextField(
-                              hintText: '请输入账号',
-                              iconData:
-                              const IconData(0xe60d, fontFamily: 'IconFont'),
-                              controller: controller.usernameController,
-                              inputLimit: 30,
-                              onChanged: controller.onAccountTextChanged,
-                              suffix: Text('${controller.accountTextLength}/30'),
+                            Obx(
+                                  () => CustomTextField(
+                                hintText: '请输入账号',
+                                iconData: const IconData(0xe60d,
+                                    fontFamily: 'IconFont'),
+                                controller: controller.usernameController,
+                                inputLimit: 30,
+                                onChanged: controller.onAccountTextChanged,
+                                suffix: Text(
+                                    '${controller.accountTextLength.value}/30'),
+                              ),
                             ),
                             const SizedBox(height: 20.0),
-                            CustomTextField(
-                              hintText: '请输入密码',
-                              iconData:
-                              const IconData(0xe620, fontFamily: 'IconFont'),
-                              controller: controller.passwordController,
-                              obscureText: true,
-                              inputLimit: 16,
-                              onChanged: controller.onPasswordTextChanged,
-                              suffix: Text('${controller.passwordTextLength}/16'),
+                            Obx(
+                                  () => CustomTextField(
+                                hintText: '请输入密码',
+                                iconData: const IconData(0xe620,
+                                    fontFamily: 'IconFont'),
+                                controller: controller.passwordController,
+                                obscureText: true,
+                                inputLimit: 16,
+                                onChanged: controller.onPasswordTextChanged,
+                                suffix: Text(
+                                    '${controller.passwordTextLength.value}/16'),
+                              ),
                             ),
                             //忘记密码
                             Row(
@@ -250,10 +257,11 @@ class LoginPage extends CustomWidget<LoginPageLogic>  {
                                 ),
                                 TextButton(//注册按钮
                                   onPressed: () => controller.toRegister(),
-                                  child: const Text(
+                                  child: Text(
                                     "立即注册",
                                     style: TextStyle(
                                       fontSize: 13,
+                                      color: theme.primaryColor,
                                       // fontWeight: FontWeight.bold,
                                     ),
                                   ),

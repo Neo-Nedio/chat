@@ -66,11 +66,4 @@ class AddFriendLogic extends Logic {
       });
     }
   }
-
-
-  @override
-  void onClose() {
-    super.onClose();
-    _navigationLogic.initData();
-  }
 }

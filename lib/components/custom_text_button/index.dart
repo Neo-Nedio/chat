@@ -35,6 +35,9 @@ class CustomTextButton extends StatelessThemeWidget {
       child: Container(
         padding: padding,
         child: Row(
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               value,

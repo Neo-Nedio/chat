@@ -4,6 +4,7 @@ import '../../../components/app_bar_title/index.dart';
 import '../../../components/custom_button/index.dart';
 import '../../../components/custom_label_value/index.dart';
 import '../../../components/custom_portrait/index.dart';
+import '../../../components/custom_shadow_text/index.dart';
 import '../../../utils/date.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
@@ -99,51 +100,8 @@ class QRFriendAffirmPage extends CustomWidget<QRFriendAffirmLogic> {
                                 mainAxisAlignment: MainAxisAlignment.center,   // 垂直居中
                                 children: [
                                   // 用户名（带渐变背景特效）
-                                  Stack(
-                                    alignment: Alignment.center,
-                                    clipBehavior: Clip.none,
-                                    children: [
-                                      // 渐变背景层（透明文字撑开宽度）
-                                      Positioned(
-                                        top: 13, // 向下偏移13像素
-                                        child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 5),
-                                            height: 15,
-                                            decoration: BoxDecoration(
-                                              gradient:  LinearGradient(
-                                                colors: [
-                                                  theme.primaryColor
-                                                      ..withValues(alpha: 0.1),
-                                                  theme.primaryColor,
-                                                ],
-                                                begin: Alignment.centerLeft,
-                                                end: Alignment.centerRight,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      10), // 圆角
-                                            ),
-                                            //透明文字
-                                            child: Opacity(
-                                              opacity: 0,
-                                              child: Text(
-                                                controller.result['name'] ?? '',
-                                                style: const TextStyle(
-                                                    fontSize: 16),
-                                              ),
-                                            ),
-                                          ),
-                                      ),
-                                      // 实际显示的文字
-                                      Text(
-                                        controller.result['name'] ?? '',
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
+                                  CustomShadowText(text: controller.result['name'] ?? ''),
+
 
                                   const SizedBox(height: 10), // 间距
 

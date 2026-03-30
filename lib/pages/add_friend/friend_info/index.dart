@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../components/custom_button/index.dart';
 import '../../../components/custom_label_value_button/index.dart';
 import '../../../components/custom_portrait/index.dart';
+import '../../../components/custom_shadow_text/index.dart';
 import '../../../utils/date.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
@@ -65,58 +66,7 @@ class SearchInfoPage extends CustomWidgetNew<SearchInfoLogic> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       //昵称与特殊效果
-                                      Stack(
-                                        alignment: Alignment.center,
-                                        clipBehavior: Clip.none,
-                                        children: [
-                                          //特殊效果向下偏移13
-                                          Positioned(
-                                            top: 13,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 0,
-                                                      vertical: 0),
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 5),
-                                                height: 15,
-                                                decoration: BoxDecoration(
-                                                  gradient: LinearGradient( //渐变
-                                                    colors: [
-                                                      theme.primaryColor
-                                                        .withValues(alpha: 0.1),
-                                                      theme.primaryColor,
-                                                    ],
-                                                    begin: Alignment.centerLeft,
-                                                    end: Alignment.centerRight,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10), // 圆角
-                                                ),
-                                                //隐藏昵称
-                                                child: Opacity(
-                                                  opacity: 0,
-                                                  child: Text(
-                                                    controller.friendName,
-                                                    style: const TextStyle(
-                                                        fontSize: 16),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          //真正昵称
-                                          Text(
-                                            controller.friendName,
-                                            style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
+                                      CustomShadowText(text: controller.friendName),
 
                                       const SizedBox(height: 10),
 
