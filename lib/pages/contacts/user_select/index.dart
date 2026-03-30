@@ -42,12 +42,13 @@ class UserSelectPage extends CustomWidget<UserSelectLogic> {
 
             const SizedBox(height: 10),
 
-            //// 用户列表（可滚动）
-            SingleChildScrollView(
-              child: Column(
-                children: [
-                  ...controller.userList.map((user) => _buildUserItem(user)),
-                ],
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: controller.userList.length,
+                itemBuilder: (context, index) {
+                  return _buildUserItem(controller.userList[index]);
+                },
               ),
             ),
           ],
