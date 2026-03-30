@@ -1,6 +1,7 @@
+import 'package:chat_bottom_container/panel_container.dart';
+import 'package:chat_bottom_container/typedef.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -15,6 +16,14 @@ import '../../utils/emoji.dart';
 import '../../utils/getx_config/config.dart';
 import 'chat_content/msg.dart';
 import 'logic.dart';
+
+//面板的枚举
+enum PanelType {
+  none,     // 无面板
+  keyboard, // 键盘（由系统提供）
+  emoji,    // 表情面板（自定义）
+  tool,     // 更多工具面板（自定义）
+}
 
 class ChatFramePage extends CustomWidget<ChatFrameLogic>
     with WidgetsBindingObserver {  // ← 监听系统变化（如键盘）
@@ -31,14 +40,30 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
     super.didChangeMetrics();
     //于检测键盘是否收起
     final keyboardHeight = MediaQuery.of(Get.context!).viewInsets.bottom;
-    //等待 UI 渲染完成后执行
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      //键盘高度（>0 表示键盘弹出）
-      if (keyboardHeight > 0) {
-          controller.scrollBottom();
-        }
-    });
+    //键盘高度（>0 表示键盘弹出）
+    if (keyboardHeight > 0) {
+      //等待0.3秒
+      Future.delayed(const Duration(milliseconds: 300), () {
+        //等待 UI 渲染完成后执行
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          // 1. 检查滚动控制器是否已经绑定到具体的 ListView
+          if (controller.scrollController.hasClients) {
+            // 2. 滚动到指定位置
+            controller.scrollController.animateTo(
+              // 最大滚动距离（底部）+ 500px
+              controller.scrollController.position.maxScrollExtent + 500,
+              duration: const Duration(milliseconds: 300),  // 动画时长 300ms
+              curve: Curves.fastOutSlowIn,                  // 缓动曲线：快出慢进
+            );
+          }
+        });
+      });
+    }
   }
+
+  //面板控制器
+  final panelController = ChatBottomPanelContainerController<PanelType>();
+
 
   @override
   Widget buildWidget(BuildContext context) {
@@ -68,13 +93,11 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
     │  └─────────────────────────────────────────────────────────────┘│
     └─────────────────────────────────────────────────────────────────┘*/
     return GestureDetector(
-      //整个区域响应点击，同时事件会穿透到下层(让键盘收起同时，其他组件也能响应)
-      behavior: HitTestBehavior.translucent,
       onTap: () {
-        FocusScope.of(context).unfocus();
+        hidePanel(); //收起面板
       },
       child: Scaffold(
-        resizeToAvoidBottomInset: true, //当键盘弹出时，页面是否自动调整大小以避免键盘遮挡输入框。
+        resizeToAvoidBottomInset: false, //当键盘弹出时，页面是否自动调整大小以避免键盘遮挡输入框。
         backgroundColor: const Color(0xFFF9FBFF),
         appBar: AppBar(
           centerTitle: true,
@@ -104,7 +127,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
               child: GestureDetector(
                 //点击消息列表，把“更多”面板收起
                 onTap: () {
-                  controller.panelType.value = 'none';
+                  hidePanel();
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -137,7 +160,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                                   behavior: HitTestBehavior.translucent,
                                   // 捕获点击事件并传递
                                   onTap: () {
-                                    controller.panelType.value = 'none';
+                                    hidePanel();
                                   },
                                   child: ChatMessage(
                                     msg: msg,
@@ -185,7 +208,6 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                             _buildIconButton1(
                               const IconData(0xe661, fontFamily: 'IconFont'),
                                   () {
-                                controller.panelType.value = 'none';
                                 controller.isRecording.value = false;   // 切换到键盘模式
                                 WidgetsBinding.instance.addPostFrameCallback((_) {
                                   controller.focusNode.requestFocus(); //弹出键盘
@@ -196,8 +218,8 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                             _buildIconButton1(
                               const IconData(0xe7e2, fontFamily: 'IconFont'),
                                   () {
-                                controller.panelType.value = 'none';
                                 controller.isRecording.value = true;    // 切换到语音模式
+                                hidePanel();
                               },
                             ),
 
@@ -224,8 +246,16 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                                   focusNode: controller.focusNode,
                                   fillColor: Colors.white.withValues(alpha: 0.9),
                                   onTap: () {
-                                    controller.isReadOnly.value = false;      // 退出只读模式
-                                    controller.panelType.value = 'keyboard';  // 切换到键盘模式
+                                        controller.isReadOnly.value = false;
+                                        WidgetsBinding.instance
+                                            .addPostFrameCallback((_) {
+                                          panelController.updatePanelType( //切换到键盘
+                                              ChatBottomPanelType.keyboard);
+                                        });
+                                        Future.delayed(
+                                            const Duration(milliseconds: 500), () {
+                                          controller.scrollBottom(); //滚动到底部
+                                        });
                                   },
                                   onChanged: (value) {
                                     controller.isSend.value =
@@ -242,14 +272,20 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                             _buildIconButton1(
                               const IconData(0xe632, fontFamily: 'IconFont'),
                                   () {
-                                    controller.isReadOnly.value = true;
-                                    controller.panelType.value = 'emoji';
-                                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                                      //移动底部
+                                controller.isReadOnly.value = true; // 设置只读模式（防止键盘弹起）
+                                WidgetsBinding.instance.addPostFrameCallback((_) {
+                                  panelController.updatePanelType(
+                                      ChatBottomPanelType.other,      // 切换到"其他面板"模式
+                                      data: PanelType.emoji,          // 指定显示表情面板
+                                      forceHandleFocus:               // 请求焦点
+                                      ChatBottomHandleFocus.requestFocus);
+                                });
+                                // 滚动到底部
+                                Future.delayed(const Duration(milliseconds: 200),
+                                        () {
                                       controller.scrollBottom();
-                                      controller.focusNode.requestFocus(); //获得焦点
                                     });
-                                  },
+                              },
                             ),
 
                           const SizedBox(width: 10),
@@ -269,18 +305,21 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                             _buildIconButton1(
                               const IconData(0xe636, fontFamily: 'IconFont'),
                                   () {
-                                 controller.focusNode.unfocus(); //失去焦点
-                                  controller.panelType.value = 'more';
-                                  //移动底部
-                                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                                    controller.scrollBottom();
+                                WidgetsBinding.instance.addPostFrameCallback((_) {
+                                  panelController.updatePanelType(
+                                      ChatBottomPanelType.other,
+                                      data: PanelType.tool);  // 显示工具面板
+                                  Future.delayed(
+                                      const Duration(milliseconds: 200), () {
+                                    controller.scrollBottom(); //滚到底部
                                   });
+                                });
                               },
                             ),
                         ],
                       ),
                       //展示“更多”菜单
-                      Obx(() => _buildPanelContainer(controller.panelType.value)),
+                      _buildPanelContainer(),
                     ],
                   ),
                 ),
@@ -291,136 +330,184 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
     );
   }
 
-  Widget _buildPanelContainer(type) {
-    switch (type) {
-      case 'emoji':
-        return _buildEmoji(); // 表情面板
-      case 'more':
-        return _buildMoreOperation(); // 更多面板（语音/视频通话等）
-      case 'none':
-        FocusScope.of(Get.context!).unfocus();  // 收起键盘
-        return const SizedBox.shrink();         // 空容器
-      case 'keyboard':
-        return const SizedBox.shrink(); // 空容器
-      default:
-        return const SizedBox.shrink();
+  //底部面板
+  Widget _buildPanelContainer() {
+    return ChatBottomPanelContainer<PanelType>(
+      controller: panelController,           // 绑定控制器
+      inputFocusNode: controller.focusNode,   // 绑定输入框焦点
+      otherPanelWidget: (type) {              // 根据类型构建自定义面板
+        if (type == null) return const SizedBox.shrink();
+        switch (type) {
+          case PanelType.emoji:
+            return _buildEmoji();
+          case PanelType.tool:
+            return _buildMoreOperation();
+          default:
+            return const SizedBox.shrink();
+        }
+      },
+      panelBgColor: Colors.transparent,       // 面板背景透明
+      changeKeyboardPanelHeight: (height) => height, // 键盘高度回调
+    );
+  }
+
+  //收起所有底部面板
+  void hidePanel() {
+    // 1. 如果输入框当前有焦点（键盘弹起）
+    if (controller.focusNode.hasFocus) {
+      controller.focusNode.unfocus();  // 收起键盘
     }
+
+    // 2. 退出只读模式
+    controller.isReadOnly.value = false;
+
+    // 3. 关闭所有面板
+    panelController.updatePanelType(ChatBottomPanelType.none);
   }
 
   //表情选择面板
   Widget _buildEmoji() {
-    return Container(
-      height: 240,
-      width: MediaQuery.of(Get.context!).size.width,  // 占满屏幕宽度
-      padding: const EdgeInsets.all(10),               // 内边距
-      margin: const EdgeInsets.only(top: 10),          // 上边距
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            color: Colors.grey.withValues(alpha: 0.1),  // 淡灰色分割线
-            width: 1.0,
-          ),
-        ),
-      ),
-      alignment: Alignment.center,
-      child: SingleChildScrollView(
-        child: Wrap(
-          alignment: WrapAlignment.center,  // 居中对齐
-          spacing: 10,                       // 水平间距
-          runSpacing: 10,                    // 垂直间距
-          children: Emoji.emojis
-              .map(
-                (emoji) => GestureDetector(
-              onTap: () {
-                // 1. 获取当前输入框的文本
-                final text = controller.msgContentController.text;
-                // 2. 获取当前光标位置
-                final selection = controller.msgContentController.selection;
-                // 光标失焦后可能为 -1，这里兜底到文本末尾，避免 replaceRange 异常
-                final start = (selection.start >= 0 && selection.start <= text.length)
-                    ? selection.start
-                    : text.length;
-                final end = (selection.end >= start && selection.end <= text.length)
-                    ? selection.end
-                    : start;
-                // 3. 替换文本（在光标位置插入表情）
+    double height = 300;
+    final keyboardHeight = panelController.keyboardHeight;
+    if (keyboardHeight != 0) {
+      height = keyboardHeight;
+    }
+    return SizedBox(
+      height: height,
+      child: Column(
+        children: [
+          const SizedBox(height: 10),
+          Expanded(
+            child: Container(
+              width: MediaQuery.of(Get.context!).size.width,  // 占满屏幕宽度
+              padding: const EdgeInsets.all(10),               // 内边距
+              margin: const EdgeInsets.only(top: 10),          // 上边距
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: Colors.grey.withValues(alpha: 0.1),  // 淡灰色分割线
+                    width: 1.0,
+                  ),
+                ),
+              ),
+              alignment: Alignment.center,
+              child: SingleChildScrollView(
+                child: Wrap(
+                  alignment: WrapAlignment.center,  // 居中对齐
+                  spacing: 10,                       // 水平间距
+                  runSpacing: 10,                    // 垂直间距
+                  children: Emoji.emojis
+                      .map(
+                        (emoji) => GestureDetector(
+                      onTap: () {
+                        // 1. 获取当前输入框的文本
+                        final text = controller.msgContentController.text;
+                        // 2. 获取当前光标位置
+                        final selection = controller.msgContentController.selection;
+                        // 光标失焦后可能为 -1，这里兜底到文本末尾，避免 replaceRange 异常
+                        final start = (selection.start >= 0 && selection.start <= text.length)
+                            ? selection.start
+                            : text.length;
+                        final end = (selection.end >= start && selection.end <= text.length)
+                            ? selection.end
+                            : start;
+                        // 3. 替换文本（在光标位置插入表情）
 /*                不同光标状态
                 状态	selection.start	selection.end	含义
                 光标在位置2	2	2	没有选中文本
                 选中位置2-4	2	4	选中了2个字符*/
-                final newText = text.replaceRange(
-                  start,  // 开始位置
-                  end,    // 结束位置
-                  emoji,            // 插入的内容
-                );
-                // 4. 更新输入框
-                controller.msgContentController.value = TextEditingValue(
-                  text: newText,
-                  selection: TextSelection.collapsed(
-                    offset: start + emoji.length,  // 新光标位置
-                  ),
-                );
-                //点击表情代表有了内容，可以发送
-                controller.isSend.value = true;
-              },
-              child: Text(
-                emoji,
-                style: const TextStyle(fontSize: 24),
+                        final newText = text.replaceRange(
+                          start,  // 开始位置
+                          end,    // 结束位置
+                          emoji,            // 插入的内容
+                        );
+                        // 4. 更新输入框
+                        controller.msgContentController.value = TextEditingValue(
+                          text: newText,
+                          selection: TextSelection.collapsed(
+                            offset: start + emoji.length,  // 新光标位置
+                          ),
+                        );
+                        //点击表情代表有了内容，可以发送
+                        controller.isSend.value = true;
+                      },
+                      child: Text(
+                        emoji,
+                        style: const TextStyle(fontSize: 24),
+                      ),
+                    ),
+                  ).toList(),
+                ),
               ),
             ),
-          ).toList(),
-        ),
+          ),
+        ],
       ),
     );
   }
 
   //“更多”操作面板
   Widget _buildMoreOperation() {
-    return Container(
-      height: 240,
-      width: MediaQuery.of(Get.context!).size.width, //屏幕宽度
-      padding: const EdgeInsets.all(10),
-      margin: const EdgeInsets.only(top: 10),
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            color: Colors.grey.withValues(alpha: 0.1),
-            width: 1.0,
-          ),
-        ),
-      ),
-      child: GridView.count(
-        shrinkWrap: true,
-        crossAxisCount: 4,
-        mainAxisSpacing: 10,
+    double height = 300;
+    final keyboardHeight = panelController.keyboardHeight; //键盘高度
+    if (keyboardHeight != 0) {
+      height = keyboardHeight; // 如果键盘弹起，用键盘高度代替
+    }
+    return SizedBox(
+      height: height,
+      child: Column(
         children: [
-          _buildIconButton2(
-            '图片',
-            const IconData(0xe9f4, fontFamily: 'IconFont'),
-                () => controller.cropChatBackgroundPicture(null),
-          ),
-          _buildIconButton2(
-            '拍照',
-            const IconData(0xe9f3, fontFamily: 'IconFont'),
-                () => controller.cropChatBackgroundPicture(ImageSource.camera),
-          ),
-          _buildIconButton2(
-            '文件',
-            const IconData(0xeac4, fontFamily: 'IconFont'),
-                () => controller.selectFile(),
-          ),
-          if (controller.chatInfo['type'] == 'user')
-            _buildIconButton2(
-              '语音通话',
-              const IconData(0xe969, fontFamily: 'IconFont'),
-                  () => controller.onInviteVideoChat(true),
+          const SizedBox(height: 10),
+          Expanded(
+            child: Container(
+              //height: height,
+              width: MediaQuery.of(Get.context!).size.width,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: Colors.grey.withValues(alpha: 0.1),
+                    width: 1.0,
+                  ),
+                ),
+              ),
+              child: GridView.count(
+                shrinkWrap: true,
+                crossAxisCount: 4,
+                mainAxisSpacing: 10,
+                children: [
+                  _buildIconButton2(
+                    '图片',
+                    const IconData(0xe9f4, fontFamily: 'IconFont'),
+                        () => controller.cropChatBackgroundPicture(null),
+                  ),
+                  _buildIconButton2(
+                    '拍照',
+                    const IconData(0xe9f3, fontFamily: 'IconFont'),
+                        () => controller
+                        .cropChatBackgroundPicture(ImageSource.camera),
+                  ),
+                  _buildIconButton2(
+                    '文件',
+                    const IconData(0xeac4, fontFamily: 'IconFont'),
+                        () => controller.selectFile(),
+                  ),
+                  if (controller.chatInfo['type'] == 'user')
+                    _buildIconButton2(
+                      '语音通话',
+                      const IconData(0xe969, fontFamily: 'IconFont'),
+                          () => controller.onInviteVideoChat(true),
+                    ),
+                  if (controller.chatInfo['type'] == 'user')
+                    _buildIconButton2(
+                      '视频通话',
+                      const IconData(0xe9f5, fontFamily: 'IconFont'),
+                          () => controller.onInviteVideoChat(false),
+                    ),
+                ],
+              ),
             ),
-          if (controller.chatInfo['type'] == 'user')
-            _buildIconButton2(
-              '视频通话',
-              const IconData(0xe9f5, fontFamily: 'IconFont'),
-                  () => controller.onInviteVideoChat(false),
-            ),
+          ),
         ],
       ),
     );
@@ -450,35 +537,6 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
       text: text,
       color: Colors.white.withValues(alpha: 0.9),
       iconColor: const Color(0xFF1F1F1F),
-    );
-  }
-
-  //消息气泡
-  Widget _buildMsgContent(msg) {
-    bool isRight = msg['fromId'] == globalData.currentUserId; // 是否自己发的
-    return Column(
-      children: [
-        Align(
-          //自己在左边，对方在右边
-          alignment: isRight ? Alignment.centerRight : Alignment.centerLeft,
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: isRight ? theme.primaryColor : Colors.white, //自己：蓝色，对方：白色
-              borderRadius: const BorderRadius.all(Radius.circular(10)),
-            ),
-            constraints: BoxConstraints(  // 最大宽度 = 屏幕宽度的 80% ,防止消息过长时撑满整个屏幕
-              maxWidth: MediaQuery.of(Get.context!).size.width * 0.8,
-            ),
-            //消息
-            child: Text(
-              msg['msgContent']['content'],
-              style: TextStyle(color: isRight ? Colors.white : Colors.black),
-            ),
-          ),
-        ),
-        const SizedBox(height: 15), // 消息间距
-      ],
     );
   }
 

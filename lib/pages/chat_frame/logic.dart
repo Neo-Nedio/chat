@@ -49,8 +49,8 @@ class ChatFrameLogic extends GetxController {
 
   @override
   void onInit() {
-    chatInfo = Get.arguments['chatInfo'] ?? '';
-    targetId = chatInfo['fromId'];
+    chatInfo = Get.arguments?['chatInfo'] ?? {};
+    targetId = chatInfo['fromId'] ?? '';
     super.onInit();
     onGetMembers();
     onGetMsgRecode();      // 获取消息记录
@@ -76,7 +76,10 @@ class ChatFrameLogic extends GetxController {
       if (event['type'] == 'on-receive-msg') {
         final data = event['content'];
         if ((data['fromId'] == targetId && data['source'] == 'user') || //对方发来的单聊消息
-            (data['toId'] == targetId && data['source'] == 'group')) { //群聊消息
+            (data['toId'] == targetId && data['source'] == 'group') || //群聊消息
+            (data['fromId'] == _globalData.currentUserId &&
+                data['source'] == 'user' &&
+                data['toId'] == targetId)) {
           msgListAddMsg(event['content'], forceScrollToBottom: false); //不直接到底部
         }
       }
@@ -144,7 +147,7 @@ class ChatFrameLogic extends GetxController {
 
           // 保持滚动位置
           // UI 渲染完成后执行
-          SchedulerBinding.instance.addPostFrameCallback((_) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
             //获取加载后的新总高度
             final double newMaxScrollExtent =
                 scrollController.position.maxScrollExtent;
@@ -170,7 +173,7 @@ class ChatFrameLogic extends GetxController {
   void scrollBottom() {
     //确保 ScrollController 已经附加到 ListView 上，可以安全调用滚动方法。
     if (scrollController.hasClients) {
-      SchedulerBinding.instance.addPostFrameCallback( (_){
+      WidgetsBinding.instance.addPostFrameCallback( (_){
         scrollController.animateTo(
           scrollController.position.maxScrollExtent,  // 滚动到底部
           duration: const Duration(milliseconds: 500), // 动画时长 500ms
@@ -200,12 +203,12 @@ class ChatFrameLogic extends GetxController {
 
     _msgApi.send(msg).then((res) {
       if (res['code'] == 0) {
+        isSend.value =false ;//消息发送后改为不可发送
         msgContentController.text = '';  // 清空输入框
         msgListAddMsg(res['data'], forceScrollToBottom: true); // 添加消息到列表（到底部）
         onRead();                        // 标记已读
       }
     });
-    isSend.value =false ;//消息发送后改为不可发送
   }
 
   //将新消息添加到消息列表
