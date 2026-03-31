@@ -10,7 +10,6 @@ import '../../../components/custom_update_portrait/index.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
 
-//todo 弄一个回调，在群聊页面返回时调用打开页面的刷新方法，防止如踢出群聊等操作没有即使刷新
 class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
   ChatGroupInformationPage({super.key});
 /*
@@ -43,20 +42,6 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
   │  [解散群聊] 或 [退出群聊] (红色文字)             │
   └─────────────────────────────────────────────────┘
 */
-
-  //分割线
-  PopupMenuEntry<int> _buildPopupDivider() {
-    return PopupMenuItem<int>(
-      enabled: false,
-      height: 1,
-      child: Container(
-        height: 1,
-        padding: const EdgeInsets.all(0),
-        color: Colors.grey[200],
-      ),
-    );
-  }
-
   @override
   Widget buildWidget(BuildContext context) {
     return Scaffold(
@@ -157,7 +142,7 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
 
                     // 成员列表区域
                     CustomLabelValueButton(
-                      onTap: controller.chatGroupMember,
+                      onTap: () => controller.chatGroupMember(false),
                       width: 140,
                       compact: false, // 宽松模式，内容换行显示
                       label:
@@ -179,6 +164,7 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
                                     //头像
                                     CustomPortrait(
                                       url: member['portrait'],
+                                      onTap: () => controller.handlerFriendTapped(member['userId']),
                                       size: 40,
                                     ),
                                     const SizedBox(height: 4),
@@ -199,13 +185,13 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
                               ),
                               //邀请按钮
                               CustomIconButton(
-                                onTap: controller.chatGroupMember, //todo 点击邀请按钮进入后应该直接打开选择页
+                                onTap: () => controller.chatGroupMember(true), //todo 点击邀请按钮进入后应该直接打开选择页
                                 icon: Icons.add,
                                 text: '邀请成员',
                               ),
                               //移除按钮
                               CustomIconButton(
-                                onTap: controller.chatGroupMember,
+                                onTap: () => controller.chatGroupMember(false),
                                 icon: Icons.remove,
                                 text: '移除成员',
                               ),

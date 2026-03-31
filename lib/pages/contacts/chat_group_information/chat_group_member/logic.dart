@@ -6,6 +6,7 @@ import '../../../../api/chat_group_member.dart';
 import '../../../../api/notify_api.dart';
 import '../../../../components/CustomDialog/index.dart';
 import '../../../../components/custom_flutter_toast/index.dart';
+import '../../../../utils/getx_config/GlobalData.dart';
 
 class ChatGroupMemberLogic extends GetxController {
   final _chatGroupMemberApi = ChatGroupMemberApi();
@@ -20,18 +21,24 @@ class ChatGroupMemberLogic extends GetxController {
   late dynamic chatGroupDetails = {};          // 群聊详情
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
     chatGroupId = Get.arguments['chatGroupId'];           // 获取群ID
     isOwner = Get.arguments['isOwner'] ?? false;          // 是否是群主
     chatGroupDetails = Get.arguments['chatGroupDetails'] ?? {};  // 群详情
 
-    onGetMembers();                                         // 获取成员列表
+    await onGetMembers();                                  // 获取成员列表（加载完成后再处理自动跳转）
+
+    //判断是否点击添加好友
+    final addFriends = Get.arguments['addFriends'] ?? false;
+    if (addFriends) {
+      onInviteFriend();
+    }
   }
 
   // 获取成员列表
-  void onGetMembers() {
-    _chatGroupMemberApi.list(chatGroupId).then((res) {
+  Future<void> onGetMembers() async {
+    await _chatGroupMemberApi.list(chatGroupId).then((res) {
       if (res['code'] == 0) {
         members = res['data'];                           // 原始数据（Map）
         allMemberList = members.values.toList();         // 备份所有成员
@@ -75,7 +82,7 @@ class ChatGroupMemberLogic extends GetxController {
     var result = await Get.toNamed('/user_select',
         arguments: {'onlyUsers': members.keys.toList()}); // 已在群内的成员不可选
 
-    if (result != null || result.length > 0) {
+    if (result != null && result.length > 0) {
       List<dynamic> ids = result.map((item) => item['friendId']).toList();
 
       _chatGroupApi.inviteMember(chatGroupId, ids).then((res) {
@@ -115,5 +122,13 @@ class ChatGroupMemberLogic extends GetxController {
       });
     },
      onCancel: () {});
+  }
+
+  //打开好友详情
+  void handlerFriendTapped(dynamic friendId) {
+    final currentUserId = Get.find<GlobalData>().currentUserId;
+    if(friendId != currentUserId){
+      Get.toNamed('/friend_info', arguments: {'friendId': friendId});
+    }
   }
 }

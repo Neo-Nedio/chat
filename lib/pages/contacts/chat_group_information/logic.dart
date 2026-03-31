@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
-import 'package:get/get.dart' show Get, GetNavigation, GetxController;
+import 'package:get/get.dart' show Get, GetNavigation, GetxController, Inst;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart' show MultipartFile, FormData;
 
@@ -9,6 +9,7 @@ import '../../../api/chat_group_api.dart';
 import '../../../api/chat_group_member.dart';
 import '../../../components/CustomDialog/index.dart';
 import '../../../components/custom_flutter_toast/index.dart';
+import '../../../utils/getx_config/GlobalData.dart';
 
 class ChatGroupInformationLogic extends GetxController {
   final _chatGroupApi = ChatGroupApi();
@@ -59,6 +60,7 @@ class ChatGroupInformationLogic extends GetxController {
 
   //获取群成员列表
   void onGetGroupChatMembers() async {
+    //只获取十个
     _chatGroupMemberApi.listPage(chatGroupId).then((res) {
       if (res['code'] == 0) {
         chatGroupMembers = res['data'];
@@ -144,16 +146,25 @@ class ChatGroupInformationLogic extends GetxController {
     }
   }
 
-  //转向群成员页面
-  void chatGroupMember() async {
+  //转向群成员页面 （根据参数判断是否进入好友选择）
+  void chatGroupMember(bool addFriends) async {
     await Get.toNamed('/chat_group_member', arguments: {
       'chatGroupId': chatGroupId,
       'isOwner': isOwner,
-      'chatGroupDetails': chatGroupDetails
+      'chatGroupDetails': chatGroupDetails,
+      'addFriends' : addFriends
     });
     //回来时刷新数据
     onGetGroupChatMembers();
     onGetGroupChatDetails();
+  }
+
+  //打开好友详情
+  void handlerFriendTapped(dynamic friendId) {
+    final currentUserId = Get.find<GlobalData>().currentUserId;
+    if(friendId != currentUserId){
+      Get.toNamed('/friend_info', arguments: {'friendId': friendId});
+    }
   }
 
   //退出群聊

@@ -101,7 +101,10 @@ class ChatGroupMemberPage extends CustomWidget<ChatGroupMemberLogic> {
         child: Row(
           children: [
             //头像
-            CustomPortrait(url: user['portrait']),
+            CustomPortrait(
+                url: user['portrait'],
+                onTap: () => controller.handlerFriendTapped(user['userId']),
+            ),
 
             const SizedBox(width: 12),
 
