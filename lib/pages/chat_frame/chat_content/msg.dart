@@ -4,10 +4,14 @@ import 'package:chat_mobile/pages/chat_frame/chat_content/time.dart';
 import 'package:chat_mobile/pages/chat_frame/chat_content/voice.dart';
 import 'package:custom_pop_up_menu_fork/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 
 import '../../../components/custom_portrait/index.dart';
 import '../../../components/custom_text_button/index.dart';
 import '../../../utils/date.dart';
+import '../../../utils/getx_config/GlobalData.dart';
 import '../../../utils/getx_config/config.dart';
 import 'call.dart';
 import 'file.dart';
@@ -86,11 +90,18 @@ class ChatMessage extends StatelessThemeWidget {
               children: [
                 /// 别人发的
                 //头像
-                //todo 增加一个点击头像后转向详情的回调
                 if (!isRight && msg['msgContent']['type'] != 'retraction')
                   CustomPortrait(
                     url: msg['msgContent']?['formUserPortrait'] ?? '',
                     size: 40,
+                    //打开详情页
+                    onTap: () {
+                      final friendId = msg['fromId'];
+                      final currentUserId = Get.find<GlobalData>().currentUserId;
+                      if(friendId != currentUserId){
+                        Get.toNamed('/friend_info', arguments: {'friendId': friendId});
+                      }
+                    },
                   ),
                 const SizedBox(width: 5),
                 ///用户名＋消息内容
@@ -159,6 +170,13 @@ class ChatMessage extends StatelessThemeWidget {
                     CustomPortrait(
                       url: chatPortrait ?? '',
                       size: 38.7,
+                      onTap: () {
+                        final friendId = msg['fromId'];
+                        final currentUserId = Get.find<GlobalData>().currentUserId;
+                        if(friendId != currentUserId){
+                          Get.toNamed('/friend_info', arguments: {'friendId': friendId});
+                        }
+                      },
                     ),
 
                   const SizedBox(width: 5),

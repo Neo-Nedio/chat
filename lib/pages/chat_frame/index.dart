@@ -170,7 +170,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                                 msg: msg, //消息
                                 chatPortrait: controller.chatInfo['portrait'], //头像
                                 chatInfo: controller.chatInfo, //聊天详情
-                                member: controller.members[msg['fromId']], //成员id
+                                member: controller.members[msg['fromId']], //成员
                               )),
                             ],
                           ),

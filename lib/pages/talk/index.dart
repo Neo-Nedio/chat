@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 
 import '../../components/app_bar_title/index.dart';
@@ -9,6 +10,7 @@ import '../../components/custom_portrait/index.dart';
 import '../../components/custom_text_button/index.dart';
 import '../../utils/String.dart';
 import '../../utils/date.dart';
+import '../../utils/getx_config/GlobalData.dart';
 import '../../utils/getx_config/config.dart';
 import 'logic.dart';
 
@@ -148,7 +150,16 @@ class TalkPage extends CustomWidget<TalkLogic> {
                   Row(
                     children: [
                       // 头像部分
-                      CustomPortrait(url: talk['portrait'] ?? ''),
+                      CustomPortrait(
+                          url: talk['portrait'] ?? '',
+                          onTap: () {
+                            final friendId = talk['userId'];
+                            final currentUserId = Get.find<GlobalData>().currentUserId;
+                            if(friendId != currentUserId){
+                              Get.toNamed('/friend_info', arguments: {'friendId': friendId});
+                            }
+                          },
+                      ),
 
                       // 头像和文字的间距
                       const SizedBox(width: 10),
