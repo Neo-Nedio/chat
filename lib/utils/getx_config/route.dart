@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
+import 'package:get/get_navigation/src/routes/transitions_type.dart';
 
 import '../../pages/add_friend/friend_info/index.dart';
 import '../../pages/add_friend/friend_request/index.dart';
@@ -14,6 +15,7 @@ import '../../pages/contacts/chat_group_information/set_group_name/index.dart';
 import '../../pages/contacts/chat_group_information/set_group_nickname/index.dart';
 import '../../pages/contacts/chat_group_information/set_group_remark/index.dart';
 import '../../pages/contacts/create_chat_group/index.dart';
+import '../../pages/contacts/create_chat_group/select_user/index.dart';
 import '../../pages/contacts/friend_information/index.dart';
 import '../../pages/contacts/friend_information/set_group/index.dart';
 import '../../pages/contacts/friend_information/set_remark/index.dart';
@@ -47,10 +49,42 @@ class AppRoutes {
   static List<GetPage> pageRoute = [
     GetPage(
       name: '/',
-      page: () =>  NavigationPage(
+      page: () => NavigationPage(
         key: const Key('main'),
       ),
       binding: ControllerBinding(),
+      transition: Transition.fade,
+      children: [
+        //嵌套页面，切换时不销毁，提升性能
+        GetPage(
+          name: '/chat_list',
+          page: () => ChatListPage(
+            key: const Key('chat_list'),
+          ),
+          binding: ControllerBinding(),
+        ),
+        GetPage(
+          name: '/contacts',
+          page: () => ContactsPage(
+            key: const Key('contacts'),
+          ),
+          binding: ControllerBinding(),
+        ),
+        GetPage(
+          name: '/talk',
+          page: () => TalkPage(
+            key: const Key('talk'),
+          ),
+          binding: ControllerBinding(),
+        ),
+        GetPage(
+          name: '/mine',
+          page: () => MinePage(
+            key: const Key('mine'),
+          ),
+          binding: ControllerBinding(),
+        ),
+      ],
     ),
     GetPage(
       name: '/login',
@@ -77,34 +111,6 @@ class AppRoutes {
       name: '/update_password',
       page: () => UpdatePasswordPage(
         key: const Key('update_password'),
-      ),
-      binding: ControllerBinding(),
-    ),
-    GetPage(
-      name: '/chat_list',
-      page: () => ChatListPage(
-        key: const Key('chat_list'),
-      ),
-      binding: ControllerBinding(),
-    ),
-    GetPage(
-      name: '/contacts',
-      page: () => ContactsPage(
-        key: const Key('contacts'),
-      ),
-      binding: ControllerBinding(),
-    ),
-    GetPage(
-      name: '/mine',
-      page: () => MinePage(
-        key: const Key('mine'),
-      ),
-      binding: ControllerBinding(),
-    ),
-    GetPage(
-      name: '/talk',
-      page: () => TalkPage(
-        key: const Key('talk'),
       ),
       binding: ControllerBinding(),
     ),
@@ -184,6 +190,7 @@ class AppRoutes {
         key: const Key('add_friend'),
       ),
       binding: ControllerBinding(),
+      transition: Transition.downToUp, // 从下往上（↓↑）
     ),
     GetPage(
       name: '/search_info',
@@ -233,6 +240,8 @@ class AppRoutes {
         key: const Key('image_viewer'),
       ),
       binding: ControllerBinding(),
+      transition: Transition.size, // 大小变化
+      transitionDuration: const Duration(milliseconds: 350),
     ),
     GetPage(
       name: '/image_viewer_update',
@@ -296,6 +305,14 @@ class AppRoutes {
         key: const Key('system_notify'),
       ),
       binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/chat_group_select_user',
+      page: () => ChatGroupSelectUserPage(
+        key: const Key('chat_group_select_user'),
+      ),
+      binding: ControllerBinding(),
+      transition: Transition.downToUp, // 页面转场动画  从下往上（↓↑）
     ),
     GetPage(
       name: '/chat_frame',

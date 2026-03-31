@@ -10,6 +10,8 @@ class CustomSearchBox extends StatelessThemeWidget {
   final ValueChanged<String> onChanged;  // 输入改变时的回调
   final double? height;
   final String? hintText; //提示文字
+  final Widget? prefix; //左侧图标
+  final TextEditingController? textEditingController;//控制器
 
   const CustomSearchBox({
     super.key,
@@ -19,6 +21,8 @@ class CustomSearchBox extends StatelessThemeWidget {
     required this.onChanged,         // 必须提供回调
     this.height= 40,
     this.hintText= "搜索",
+    this.prefix,
+    this.textEditingController,
   });
 
 /*
@@ -53,8 +57,8 @@ class CustomSearchBox extends StatelessThemeWidget {
             isCentered ? MainAxisAlignment.center : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // 搜索图标
-          Icon(const IconData(0xe669, fontFamily: 'IconFont'),
+          // 搜索图标/自定义图标
+          prefix??Icon(const IconData(0xe669, fontFamily: 'IconFont'),
               size: 20, color: iconColor),
 
           //间距
@@ -63,6 +67,7 @@ class CustomSearchBox extends StatelessThemeWidget {
           //占据剩下内容
           Expanded(
             child: TextField(
+              controller: textEditingController,
               onChanged: onChanged,
               textAlign: isCentered ? TextAlign.center : TextAlign.start,
               style: TextStyle(color: iconColor, fontSize: 16),

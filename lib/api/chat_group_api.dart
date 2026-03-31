@@ -93,6 +93,17 @@ class ChatGroupApi {
     return response.data;
   }
 
+  //创建群聊并邀请好友
+  Future<Map<String, dynamic>> createWithPerson(
+      String name, String? notice, List users) async {
+    final response = await _dio.post('/v1/api/chat-group/create', data: {
+      'name': name,
+      'notice': notice,
+      'users': users,
+    });
+    return response.data;
+  }
+
   //退出群聊
   Future<Map<String, dynamic>> quitChatGroup(String groupId) async {
     final response = await _dio.post('/v1/api/chat-group/quit', data: {
