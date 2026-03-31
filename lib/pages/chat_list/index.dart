@@ -11,6 +11,7 @@ import '../../components/custom_search_box/index.dart';
 import '../../utils/String.dart';
 import '../../utils/date.dart';
 import '../../utils/getx_config/config.dart';
+import '../../utils/msg.dart';
 import 'logic.dart';
 
 
@@ -422,7 +423,8 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
 //Expanded确保了消息文本和未读红点始终在同一行，且红点固定在右侧，消息文本自适应剩余宽度，不会破坏布局。
                           Expanded(  // 消息文本填充剩余空间
                             child: Text(
-                              chat['lastMsgContent']?['content'] ?? '',
+                              MsgUtil.getMsgContent(
+                                  chat['lastMsgContent']),
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey[500],  // 灰色文字
