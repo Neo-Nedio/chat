@@ -374,6 +374,9 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
 
   //撤回消息
   void retractMsg(dynamic data, dynamic msg) async {
+    if(DateTime.now().difference(DateTime.parse(msg['createTime'])).inMinutes > 3) {//大于三分钟不能撤回
+      CustomFlutterToast.showErrorToast('大于三分钟不能撤回');
+    }
     try {
       final result = await _msgApi.retract(msg['id'], targetId);
       if (result['code'] == 0) {

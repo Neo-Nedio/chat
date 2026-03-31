@@ -267,7 +267,8 @@ class ChatMessage extends StatelessThemeWidget {
         callback: onTapDelete ??
                 (data) => debugPrint("data: ${data.toString()}")),
     // 自己发的消息才有撤回菜单
-    if (msg['fromId'] == globalData.currentUserId)
+    if (msg['fromId'] == globalData.currentUserId &&
+        DateTime.now().difference(DateTime.parse(msg['createTime'])).inMinutes < 3) //大于三分钟不能撤回)
       PopMenuItemModel(
           title: '撤回',
           icon: Icons.reply,
