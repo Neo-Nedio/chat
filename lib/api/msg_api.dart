@@ -40,4 +40,23 @@ class MsgApi {
     await _dio.post('/v1/api/message/send/file/form', data: formData);
     return response.data;
   }
+
+  //撤回消息
+  Future<Map<String, dynamic>> retract(String msgId,String? targetId) async {
+    final response =
+    await _dio.post('/v1/api/message/retraction', data: {
+      'msgId': msgId,
+      'targetId':targetId
+    });
+    return response.data;
+  }
+
+  //重新编辑（获取撤回前内容）
+  Future<Map<String, dynamic>> reEdit(String msgId) async {
+    final response =
+    await _dio.post('/v1/api/message/reedit', data: {''
+        'msgId': msgId}
+    );
+    return response.data;
+  }
 }

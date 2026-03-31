@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:dio/dio.dart' show FormData, MultipartFile;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart' hide FormData, MultipartFile;
 import 'package:image_picker/image_picker.dart';
 
@@ -16,10 +15,13 @@ import '../../api/video_api.dart';
 import '../../components/custom_flutter_toast/index.dart';
 import '../../utils/String.dart';
 import '../../utils/cropPicture.dart';
+import '../../utils/extension.dart';
 import '../../utils/getx_config/GlobalData.dart';
+import '../../utils/getx_config/config.dart';
 import '../../utils/web_socket.dart';
+import 'index.dart';
 
-class ChatFrameLogic extends GetxController {
+class ChatFrameLogic extends Logic<ChatFramePage> {
   final _msgApi = MsgApi();           // 消息 API
   final _chatListApi = ChatListApi(); // 聊天列表 API
   final _videoApi = VideoApi();
@@ -52,10 +54,10 @@ class ChatFrameLogic extends GetxController {
     chatInfo = Get.arguments?['chatInfo'] ?? {};
     targetId = chatInfo['fromId'] ?? '';
     super.onInit();
-    onGetMembers();
-    onGetMsgRecode();      // 获取消息记录
-    eventListen();         // 监听 WebSocket 消息
-    onRead();              // 标记已读
+    _onGetMembers();
+    _onGetMsgRecode();      // 获取消息记录
+    _eventListen();         // 监听 WebSocket 消息
+    _onRead();              // 标记已读
 
     // 添加滚动监听
     scrollController.addListener(() {
@@ -70,7 +72,7 @@ class ChatFrameLogic extends GetxController {
   }
 
   //消息监听
-  void eventListen() {
+  void _eventListen() {
     // 监听消息
     _subscription = _wsManager.eventStream.listen((event) {
       if (event['type'] == 'on-receive-msg') {
@@ -78,8 +80,14 @@ class ChatFrameLogic extends GetxController {
         if ((data['fromId'] == targetId && data['source'] == 'user') || //对方发来的单聊消息
             (data['toId'] == targetId && data['source'] == 'group') || //群聊消息
             (data['fromId'] == _globalData.currentUserId &&
-                data['source'] == 'user' &&
                 data['toId'] == targetId)) {
+          if (data['msgContent']['type'] == 'retraction') {
+            msgList = msgList.replace(newValue: data);
+            _onRead();
+            update([const Key('chat_frame')]);
+            return;
+          }
+          _onRead();
           msgListAddMsg(event['content'], forceScrollToBottom: false); //不直接到底部
         }
       }
@@ -87,7 +95,7 @@ class ChatFrameLogic extends GetxController {
   }
 
   //获取成员
-  void onGetMembers() async {
+  void _onGetMembers() async {
     if (chatInfo['type'] == 'group') {
       await _chatGroupMemberApi.list(targetId).then((res) {
         if (res['code'] == 0) {
@@ -99,7 +107,7 @@ class ChatFrameLogic extends GetxController {
   }
 
   //获取历史消息
-  Future<void> onGetMsgRecode() async {
+  Future<void> _onGetMsgRecode() async {
     //正在加载
     isLoading = true;
 
@@ -110,8 +118,7 @@ class ChatFrameLogic extends GetxController {
       if (res['code'] == 0) {
         msgList = res['data'];
         index += msgList.length;
-        hasMore = res['data'].length >= 0;
-        update([const Key('chat_frame')]);
+        hasMore = msgList.isNotEmpty; // 判断是否还有更多数据
         scrollBottom(); //滚动到底部
       }
     } finally {
@@ -195,6 +202,7 @@ class ChatFrameLogic extends GetxController {
   //发送文本消息
   void sendTextMsg() async {
     if (StringUtil.isNullOrEmpty(msgContentController.text)) return;
+
     dynamic msg = {
       'toUserId': targetId,
       'source': chatInfo['type'], // 'friend' 或 'group'
@@ -204,9 +212,9 @@ class ChatFrameLogic extends GetxController {
     _msgApi.send(msg).then((res) {
       if (res['code'] == 0) {
         isSend.value =false ;//消息发送后改为不可发送
-        msgContentController.text = '';  // 清空输入框
+        msgContentController.clear();  // 清空输入框
         msgListAddMsg(res['data'], forceScrollToBottom: true); // 添加消息到列表（到底部）
-        onRead();                        // 标记已读
+        _onRead();                        // 标记已读
       }
     });
   }
@@ -222,7 +230,7 @@ class ChatFrameLogic extends GetxController {
   }
 
   //消息已读
-  void onRead() {
+  void _onRead() {
     _chatListApi.read(targetId);
     _globalData.onGetUserUnreadInfo();
   }
@@ -296,13 +304,14 @@ class ChatFrameLogic extends GetxController {
           FormData formData = FormData.fromMap(map);
           _msgApi.sendMedia(formData).then((v) {
             msgListAddMsg(res['data'], forceScrollToBottom: true);
-            onRead();
+            _onRead();
           });
         }
       }
     });
   }
 
+  //发送语音消息
   void onSendVoiceMsg(filePath, time) async {
     if (StringUtil.isNullOrEmpty(filePath)) {
       return;  // 文件路径为空，不发送
@@ -335,11 +344,68 @@ class ChatFrameLogic extends GetxController {
           FormData formData = FormData.fromMap(map);
           _msgApi.sendMedia(formData).then((v) {
             msgListAddMsg(res['data'], forceScrollToBottom: true); // 添加到消息列表
-            onRead();                             // 标记已读
+            _onRead();                             // 标记已读
           });
         }
       }
     });
+  }
+
+  //点击通话消息记录
+  void onTapMsg(dynamic msg) {
+    widget?.hidePanel(); //收起所有面板
+
+    final msgContent = msg['msgContent'] as Map<String, dynamic>;
+
+    // 点击文本消息（暂不处理）
+    if (msgContent['type'] == 'text') return;
+
+    final Map<String, dynamic> content = jsonDecode(msgContent['content']);
+
+    // 点击通话消息拨打给对方
+    if (msgContent['type'] == 'call') {
+      if (content['type'] == 'video') {
+        onInviteVideoChat(false); // 视频通话
+      } else {
+        onInviteVideoChat(true); // 语音通话
+      }
+    }
+  }
+
+  //撤回消息
+  void retractMsg(dynamic data, dynamic msg) async {
+    try {
+      final result = await _msgApi.retract(msg['id'], targetId);
+      if (result['code'] == 0) {
+        // 替换原消息为撤回消息
+        msgList = msgList.replace(oldValue: msg, newValue: result['data']);
+        CustomFlutterToast.showSuccessToast('撤回成功');
+      } else {
+        CustomFlutterToast.showErrorToast(
+            '撤回失败: ${result['message'] ?? '未知错误'}');
+      }
+    } catch (e) {
+      CustomFlutterToast.showErrorToast('撤回失败');
+    } finally {
+      isLoading = false;
+      update([const Key('chat_frame')]);
+    }
+  }
+
+  // 重新编辑消息
+  void reEditMsg(dynamic msg) async {
+    final result = await _msgApi.reEdit(msg['id']);
+
+    if (result['code'] == 0) {
+      // 获取撤回的内容
+      msgContentController.text = result['data']['msgContent']['content'];
+      // 切换到键盘模式
+      isRecording.value = false;
+      // 弹出键盘
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => focusNode.requestFocus());
+      update([const Key('chat_frame')]);
+    }
   }
 
   @override

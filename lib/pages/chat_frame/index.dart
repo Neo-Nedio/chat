@@ -2,6 +2,7 @@ import 'package:chat_bottom_container/panel_container.dart';
 import 'package:chat_bottom_container/typedef.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -31,6 +32,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
 
   @override
   void init(BuildContext context) {
+    super.init(context);
     WidgetsBinding.instance.addObserver(this); // 添加监听器
   }
 
@@ -155,20 +157,21 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                                   ),
                                 ),
                               // 消息列表
-                              ...controller.msgList.map(
-                                    (msg) => GestureDetector(
-                                  behavior: HitTestBehavior.translucent,
-                                  // 捕获点击事件并传递
-                                  onTap: () {
-                                    hidePanel();
-                                  },
-                                  child: ChatMessage(
-                                    msg: msg,
-                                    chatInfo: controller.chatInfo,
-                                    member: controller.members[msg['fromId']],
-                                  ),
-                                ),
-                              ),
+                              ...controller.msgList.map((msg) => ChatMessage(
+                                key: ValueKey(msg['id']),
+                                reEdit: () => controller.reEditMsg(msg), //重新编写
+                                onTapMsg: () => controller.onTapMsg(msg), //点击通话消息记录
+                                onTapCopy: (data) =>
+                                //复制到剪切板
+                                Clipboard.setData(ClipboardData(
+                                    text: msg['msgContent']['content'])),
+                                onTapRetract: (data) =>
+                                    controller.retractMsg(data, msg), //撤回
+                                msg: msg, //消息
+                                chatPortrait: controller.chatInfo['portrait'], //头像
+                                chatInfo: controller.chatInfo, //聊天详情
+                                member: controller.members[msg['fromId']], //成员id
+                              )),
                             ],
                           ),
                           // 加载指示器
