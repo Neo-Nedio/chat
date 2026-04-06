@@ -311,6 +311,7 @@ class ChatMessage extends StatelessThemeWidget {
         userName: username,
       ),
       'voice': (String? username) => VoiceMessage(value: msg, isRight: isRight),
+      //这里的call是由video_chat的logic在挂断时用onHangup给后端发送消息，把类型写为call
       'call': (String? username) => CallMessage(value: msg, isRight: isRight), // 通话消息
     };
 

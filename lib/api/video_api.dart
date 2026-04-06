@@ -12,8 +12,6 @@ class VideoApi {
   factory VideoApi() {
     return _instance;
   }
-
-  ///todo WebRTC 视频通话的核心信令交换方法，用于建立 P2P 连接。
 /* Offer	呼叫方发起连接请求	SDP 描述（媒体能力、网络信息）
    Answer	被叫方回应连接请求	SDP 描述（媒体能力、网络信息）
    Candidate	交换网络候选地址	IP 地址、端口、协议等*/
