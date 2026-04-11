@@ -92,7 +92,7 @@ class ChatMessage extends StatelessThemeWidget {
                 //头像
                 if (!isRight && msg['msgContent']['type'] != 'retraction')
                   CustomPortrait(
-                    url: msg['msgContent']?['formUserPortrait'] ?? '',
+                    url: msg['msgContent']?['fromUserPortrait'] ?? '',
                     size: 40,
                     //打开详情页
                     onTap: () {
@@ -146,7 +146,7 @@ class ChatMessage extends StatelessThemeWidget {
                 // 自己的头像
                 if (isRight && msg['msgContent']['type'] != 'retraction')
                   CustomPortrait(
-                    url:  msg['msgContent']?['formUserPortrait'] ?? '',
+                    url: msg['msgContent']?['fromUserPortrait'] ?? '',
                     size: 40,
                   ),
               ],
@@ -204,7 +204,7 @@ class ChatMessage extends StatelessThemeWidget {
                   // 自己的头像
                   if (isRight && msg['msgContent']['type'] != 'retraction')
                     CustomPortrait(
-                      url:  msg['msgContent']?['formUserPortrait'] ?? '',
+                      url: msg['msgContent']?['fromUserPortrait'] ?? '',
                       size: 40,
                     ),
                 ],
@@ -218,7 +218,7 @@ class ChatMessage extends StatelessThemeWidget {
   String _handlerGroupDisplayName() {
     // 1. 如果没有成员信息，返回消息中的用户名
     if (member == null) {
-      return msg['msgContent']?['formUserName'] ?? '';
+      return msg['msgContent']?['fromUserName'] ?? '';
     }
     // 2. 有成员信息，按优先级返回
     if (member!.containsKey('groupName') && member!['groupName'] != null) {
@@ -319,7 +319,7 @@ class ChatMessage extends StatelessThemeWidget {
     if (messageMap.containsKey(type)) {
       // 构建消息组件
       final messageWidget =
-      messageMap[type]!(msg['msgContent']['formUserName']);
+      messageMap[type]!(msg['msgContent']['fromUserName']);
 
       return type == 'retraction'
           ? messageWidget  // 撤回消息：直接返回，不需要菜单

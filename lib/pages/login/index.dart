@@ -311,7 +311,7 @@ class LoginPage extends CustomWidget<LoginPageLogic>  {
                                   const SizedBox(height: 15),
 
                                   //图标(带链接)
-                                  Row(
+                                  /*Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       //github
@@ -338,7 +338,7 @@ class LoginPage extends CustomWidget<LoginPageLogic>  {
                                             'https://space.bilibili.com/135427028/channel/series'),
                                       ),
                                     ],
-                                  )
+                                  )*/
                                 ],
                               ),
                             ),
