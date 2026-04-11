@@ -91,7 +91,8 @@ class ContactsLogic extends GetxController {
   void onNotifyFriendList() {
     _notifyApi.friendList().then((res) {
       if (res['code'] == 0) {
-        notifyFriendList = res['data'];
+        final data = res['data'];
+        notifyFriendList = data is List ? data : <dynamic>[];
         update([const Key("contacts")]);
       }
     });

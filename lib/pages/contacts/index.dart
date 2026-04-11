@@ -205,6 +205,13 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
     );
   }
 
+  /// 好友申请附言：后端可能给 String 或其它类型，统一成可展示的字符串
+  String _notifyApplyContent(dynamic raw) {
+    if (raw == null) return '';
+    if (raw is String) return raw;
+    return raw.toString();
+  }
+
   //好友通知项
   Widget _buildNotifyFriendItem(dynamic notify) {
     //判断通知方向
@@ -233,11 +240,13 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Row(
               children: [
-                //头像
+                //头像（接口可能 null，避免传入非 String 导致构建崩溃）
                 CustomPortrait(
-                    url: isFromCurrentUser
-                        ? notify['toPortrait'] // 我发起的 → 显示对方头像
-                        : notify['fromPortrait']),// 别人发来的 → 显示对方头像
+                    url: (isFromCurrentUser
+                            ? notify['toPortrait'] // 我发起的 → 显示对方头像
+                            : notify['fromPortrait']) // 别人发来的 → 显示对方头像
+                        ?.toString() ??
+                        ''),
 
                 //间隔
                 const SizedBox(width: 12),
@@ -251,9 +260,11 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
                       Row(
                         children: [
                           Text(
-                            isFromCurrentUser
-                                ? notify['toName']// 我发起的 → 显示对方名字
-                                : notify['fromName'], // 别人发来的 → 显示对方名字
+                            (isFromCurrentUser
+                                    ? notify['toName'] // 我发起的 → 显示对方名字
+                                    : notify['fromName']) // 别人发来的 → 显示对方名字
+                                ?.toString() ??
+                                '',
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -293,7 +304,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
                             child: Text(
                               overflow: TextOverflow.ellipsis,  // 超出显示省略号
                               maxLines: 1,                       // 最多1行
-                              notify['content'],                  // 申请内容
+                              _notifyApplyContent(notify['content']),
                               style: TextStyle(
                                   fontSize: 12, color: Colors.grey[600]),
                             ),
@@ -688,7 +699,12 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
               //内容切换动画的组件
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
-                child: getContent(controller.tabs[controller.selectedIndex]),
+                // 三个 Tab 根节点都是 RefreshIndicator，必须加 Key，否则切换「好友通知」时子树复用错乱甚至崩溃
+                child: KeyedSubtree(
+                  key: ValueKey<String>(
+                      controller.tabs[controller.selectedIndex]),
+                  child: getContent(controller.tabs[controller.selectedIndex]),
+                ),
               ),
             ),
           ],

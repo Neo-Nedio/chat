@@ -44,6 +44,8 @@ class SystemNotifyPage extends CustomWidget<SystemNotifyLogic> {
 
   //好友通知项
   Widget _buildNotifyItem(notify) {
+    final imgUrl = notify['content']?['img']?.toString().trim() ?? '';
+
     return Column(
       mainAxisSize: MainAxisSize.max,
       children: [
@@ -73,10 +75,10 @@ class SystemNotifyPage extends CustomWidget<SystemNotifyLogic> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CustomImage(
-                url: notify['content']['img'],
-              ),
-              const SizedBox(height: 5),
+              if (imgUrl.isNotEmpty) ...[
+                CustomImage(url: imgUrl),
+                const SizedBox(height: 5),
+              ],
               Text(
                 notify['content']['title'] ?? '',
                 style:
