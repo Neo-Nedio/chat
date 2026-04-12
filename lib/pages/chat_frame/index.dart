@@ -169,6 +169,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                                     controller.retractMsg(data, msg), //撤回
                                 msg: msg, //消息
                                 chatPortrait: controller.chatInfo['portrait'], //头像
+                                selfPortrait: controller.selfPortrait,
                                 chatInfo: controller.chatInfo, //聊天详情
                                 member: controller.members[msg['fromId']], //成员
                               )),

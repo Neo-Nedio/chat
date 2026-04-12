@@ -185,7 +185,7 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
                               ),
                               //邀请按钮
                               CustomIconButton(
-                                onTap: () => controller.chatGroupMember(true), //todo 点击邀请按钮进入后应该直接打开选择页
+                                onTap: () => controller.chatGroupMember(true),
                                 icon: Icons.add,
                                 text: '邀请成员',
                               ),

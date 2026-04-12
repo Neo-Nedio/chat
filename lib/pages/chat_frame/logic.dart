@@ -7,10 +7,12 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart' hide FormData, MultipartFile;
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/chat_group_member.dart';
 import '../../api/chat_list_api.dart';
 import '../../api/msg_api.dart';
+import '../../api/user_api.dart';
 import '../../api/video_api.dart';
 import '../../components/custom_flutter_toast/index.dart';
 import '../../utils/String.dart';
@@ -24,6 +26,7 @@ import 'index.dart';
 class ChatFrameLogic extends Logic<ChatFramePage> {
   final _msgApi = MsgApi();           // 消息 API
   final _chatListApi = ChatListApi(); // 聊天列表 API
+  final _userApi = UserApi();
   final _videoApi = VideoApi();
   final _chatGroupMemberApi = ChatGroupMemberApi();
   final _wsManager = WebSocketUtil(); // WebSocket 管理
@@ -37,6 +40,7 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
   late List<dynamic> msgList = [];     // 消息列表
   late String targetId = '';           // 聊天对象ID
   late dynamic chatInfo = {};          // 聊天信息（对方头像、名称等）
+  String selfPortrait = '';
   late RxBool isRecording = false.obs; //录音状态
   late RxBool isSend = false.obs;      // 是否有内容可发送
   late RxBool isReadOnly = false.obs; //只读
@@ -56,6 +60,7 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
     super.onInit();
     _onGetMembers();
     _onGetMsgRecode();      // 获取消息记录
+    _refreshAvatarsOnEnter();
     _eventListen();         // 监听 WebSocket 消息
     _onRead();              // 标记已读
 
@@ -69,6 +74,25 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
         }
       }
     });
+  }
+
+  // 本人头像：先本地 prefs，没有再请求 info（chatInfo 仅用入口参数）
+  Future<void> _refreshAvatarsOnEnter() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final local = prefs.getString('portrait')?.trim();
+      if (local != null && local.isNotEmpty) {
+        selfPortrait = local;
+      } else {
+        final info = await _userApi.info();
+        final data = info['code'] == 0 ? info['data'] : null;
+        selfPortrait = data?['portrait']?.toString() ?? '';
+      }
+    } catch (_) {
+      selfPortrait =
+          (await SharedPreferences.getInstance()).getString('portrait') ?? '';
+    }
+    update([const Key('chat_frame')]);
   }
 
   //消息监听

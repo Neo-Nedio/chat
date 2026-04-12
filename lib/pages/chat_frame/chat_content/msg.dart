@@ -26,6 +26,7 @@ class ChatMessage extends StatelessThemeWidget {
   final Map<String, dynamic> chatInfo;
   final Map<String, dynamic>? member;
   final String? chatPortrait;
+  final String? selfPortrait;
   final void Function()? onTapMsg;
   final void Function()? reEdit;
 
@@ -50,6 +51,7 @@ class ChatMessage extends StatelessThemeWidget {
   const ChatMessage({
     super.key,
     this.chatPortrait,
+    this.selfPortrait,
     this.onTapCopy,
     this.onTapRetransmission,
     this.onTapDelete,
@@ -67,6 +69,11 @@ class ChatMessage extends StatelessThemeWidget {
   Widget build(BuildContext context) {
     //判断用户是否是发送方
     bool isRight = msg['fromId'] == globalData.currentUserId;
+    //自己的头像文件名
+    final selfTrim = selfPortrait?.trim() ?? '';
+    final selfAv = selfTrim.isNotEmpty
+        ? selfTrim
+        : (msg['msgContent']?['fromUserPortrait']?.toString() ?? '');
     return Column(
       children: [
         // 时间组件
@@ -92,7 +99,7 @@ class ChatMessage extends StatelessThemeWidget {
                 //头像
                 if (!isRight && msg['msgContent']['type'] != 'retraction')
                   CustomPortrait(
-                    portrait: msg['msgContent']?['fromUserPortrait'] ?? '',
+                    portrait: member?['portrait']?.toString() ?? '',
                     size: 40,
                     //打开详情页
                     onTap: () {
@@ -146,7 +153,7 @@ class ChatMessage extends StatelessThemeWidget {
                 // 自己的头像
                 if (isRight && msg['msgContent']['type'] != 'retraction')
                   CustomPortrait(
-                    portrait: msg['msgContent']?['fromUserPortrait'] ?? '',
+                    portrait: selfAv,
                     size: 40,
                   ),
               ],
@@ -204,7 +211,7 @@ class ChatMessage extends StatelessThemeWidget {
                   // 自己的头像
                   if (isRight && msg['msgContent']['type'] != 'retraction')
                     CustomPortrait(
-                      portrait: msg['msgContent']?['fromUserPortrait'] ?? '',
+                      portrait: selfAv,
                       size: 40,
                     ),
                 ],
