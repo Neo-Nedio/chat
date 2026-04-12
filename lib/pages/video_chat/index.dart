@@ -57,17 +57,20 @@ class VideoChatPage extends CustomWidget<VideoChatLogic> {
           body: Stack(
             children: [
               // 第1层：背景头像图片
-              StringUtil.isNotNullOrEmpty(
+              Positioned.fill(
+                child: ColoredBox(
+                  color: Colors.black,
+                  child: StringUtil.isNotNullOrEmpty(
                       controller.userInfo['portrait'] ?? '')
-                  ? Image.network(
-                      controller.userInfo['portrait'] ?? '',
-                      fit: BoxFit.cover, // 覆盖模式，保持比例裁剪
-                      height: double.infinity,
-                      width: double.infinity,
-                      errorBuilder: (context, error, stackTrace) =>
-                          Container(color: Colors.black), // 加载失败显示黑色
-                    )
-                  : Container(color: Colors.black),  // 无头像显示黑色
+                      ? CustomPortrait(
+                    portrait: controller.userInfo['portrait'] ?? '',
+                    size: double.infinity,
+                    radius: 0,
+                    openImage: false,
+                  )
+                      : Container(color: Colors.black),  // 无头像显示黑色
+                ),
+              ),
               // 第2层：高斯模糊层
               BackdropFilter( //会对其后面的所有内容应用滤镜
                 //sigma 模糊程度（越大越模糊）

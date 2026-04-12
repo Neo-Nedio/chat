@@ -244,10 +244,10 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
 
                         if (controller.otherList.isNotEmpty) ...[
                           Padding(
-                            // "全部"标题
+                            // "未置顶"标题
                             padding: EdgeInsets.symmetric(vertical: 8.0),
                             child: Text(
-                              "全部",
+                              "未置顶",
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -513,8 +513,11 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
       color: Colors.white,                       // 白色背景
       // InkWell 必须放在 Material 内才能工作
       child: InkWell(
-        onTap: () {
-          // 添加点击事件
+        onTap: () async {
+          await Get.toNamed('/chat_frame', arguments: {
+            'chatInfo': friend,
+          });
+          controller.onGetChatList();
         },
         borderRadius: BorderRadius.circular(12),  // 和Material一致的圆角
 
