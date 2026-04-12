@@ -87,8 +87,8 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
                             ),
                             child: CustomUpdatePortrait(
                                 isEdit: controller.isOwner, //不是群主时没有编辑遮罩层，点击后前往不能编辑的图片页面
-                                onTap: () => controller.selectPortrait(),
-                                url: controller.chatGroupDetails['portrait'] ?? '',
+                                onTap: (url) => controller.selectPortrait(url),
+                                portrait: controller.chatGroupDetails['portrait'] ?? '',
                                 ),
                           ),
                           const SizedBox(width: 20),
@@ -163,7 +163,7 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
                                   children: [
                                     //头像
                                     CustomPortrait(
-                                      url: member['portrait'],
+                                      portrait: member['portrait'],
                                       onTap: () => controller.handlerFriendTapped(member['userId']),
                                       size: 40,
                                     ),

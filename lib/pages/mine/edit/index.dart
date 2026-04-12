@@ -48,8 +48,8 @@ class EditMinePage extends CustomWidget<EditMineLogic> {
                   //头像
                   CustomUpdatePortrait(
                       isEdit: controller.isEdit,
-                      onTap: () => controller.selectPortrait(),
-                      url: controller.currentUserInfo['portrait'] ?? '',
+                      onTap: (url) => controller.selectPortrait(url),
+                      portrait: controller.currentUserInfo['portrait'] ?? '',
                       size: 80,
                       radius: 50),
 

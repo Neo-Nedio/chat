@@ -130,8 +130,9 @@ class EditMineLogic extends getx.GetxController {
       CustomFlutterToast.showSuccessToast('头像修改成功');
       //保存头像并更新
       currentUserInfo['portrait'] = result['data'];
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('portrait', currentUserInfo['portrait']);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('portrait', currentUserInfo['portrait']);
+      await _mineLogic.init();
       update([const Key("edit_mine")]);
     } else {
       // 失败：显示错误提示
@@ -139,11 +140,11 @@ class EditMineLogic extends getx.GetxController {
     }
   }
 
-  //点击头像按钮弹出底部选择框
-  void selectPortrait() {
+  //点击头像按钮弹出底部选择框（[previewUrl] 为 getPortrait 后的地址，便于大图页直接加载）
+  void selectPortrait([String imageUrl = '']) {
     if (!isEdit) return;
     getx.Get.toNamed('/image_viewer_update', arguments: {
-      'imageUrl': currentUserInfo['portrait'],
+      'imageUrl': imageUrl,
       'onConfirm': _uploadPicture
     });
   }

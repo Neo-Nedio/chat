@@ -75,6 +75,15 @@ class UserApi {
     return response.data;
   }
 
+  //获取头像url
+  Future<Map<String, dynamic>> getPortrait(String fileName) async {
+    final response = await _dio.get(
+      '/v1/api/user/get/portrait',
+      queryParameters: {'fileName': fileName},
+    );
+    return response.data;
+  }
+
   //修改用户信息（birthday：UTC 日历日 0 点的毫秒时间戳，与 Jackson 默认 Date 反序列化一致）
   Future<Map<String, dynamic>> update({
     required String name,

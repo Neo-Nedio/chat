@@ -5,18 +5,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 class MineLogic extends GetxController {
   late dynamic currentUserInfo = {};
 
-  void init() async {
-    _onGetCurrentUserInfo();
+  Future<void> init() async {
+    await _onGetCurrentUserInfo(); //更新储存后再update
     update([const Key("mine")]);
   }
 
   //获取用户信息
-  void _onGetCurrentUserInfo() async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      currentUserInfo['name'] = prefs.getString('username');
-      currentUserInfo['portrait'] = prefs.getString('portrait');
-      currentUserInfo['account'] = prefs.getString('account');
-      currentUserInfo['sex'] = prefs.getString('sex');
+  Future<void> _onGetCurrentUserInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    currentUserInfo['name'] = prefs.getString('username');
+    currentUserInfo['portrait'] = prefs.getString('portrait');
+    currentUserInfo['account'] = prefs.getString('account');
+    currentUserInfo['sex'] = prefs.getString('sex');
   }
 
   void handlerLogout() async {

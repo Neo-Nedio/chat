@@ -90,10 +90,10 @@ class ChatGroupInformationLogic extends GetxController {
     }
   }
 
-  //选择头像
-  void selectPortrait() {
+  //选择头像（[previewUrl] 为解析后的图片地址，便于大图页加载）
+  void selectPortrait([String imageUrl = '']) {
     Get.toNamed('/image_viewer_update', arguments: {
-      'imageUrl': chatGroupDetails['portrait'],
+      'imageUrl': imageUrl,
       'onConfirm': _onUpdateChatGroupPortrait,
       'isUpdate': isOwner //不是群主时不可编辑
     });
