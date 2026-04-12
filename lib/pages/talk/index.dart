@@ -151,7 +151,7 @@ class TalkPage extends CustomWidget<TalkLogic> {
                     children: [
                       // 头像部分
                       CustomPortrait(
-                          url: talk['portrait'] ?? '',
+                        portrait: talk['portrait'] ?? '',
                           onTap: () {
                             final friendId = talk['userId'];
                             final currentUserId = Get.find<GlobalData>().currentUserId;

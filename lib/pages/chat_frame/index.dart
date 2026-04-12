@@ -116,7 +116,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
               child: GestureDetector(
                 onTap: controller.toDetailsPage, // 点击跳转详情页
                 child: CustomPortrait(
-                    url: controller.chatInfo['portrait'], size: 32),
+                    portrait: controller.chatInfo['portrait'], size: 32),
               ),
             )
           ],

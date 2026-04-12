@@ -39,7 +39,7 @@ class AddFriendPage extends CustomWidgetNew<AddFriendLogic> {
               child: Row(
                 children: [
                   //头像
-                  CustomPortrait(url: friend['portrait']),
+                  CustomPortrait(portrait: friend['portrait']),
 
                   const SizedBox(width: 12),
 

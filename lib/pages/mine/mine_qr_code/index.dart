@@ -80,7 +80,7 @@ class MineQRCodePage extends CustomWidget<MineQRCodeLogic> {
                                 borderRadius: BorderRadius.circular(40), // 圆形
                               ),
                               child: CustomPortrait(
-                                  url: // 头像URL
+                                  portrait: // 头像URL
                                   controller.currentUserInfo['portrait'] ?? '',
                                   size: 80,
                                   radius: 40),

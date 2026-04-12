@@ -85,7 +85,7 @@ class QRFriendAffirmPage extends CustomWidget<QRFriendAffirmLogic> {
                             borderRadius: BorderRadius.circular(35), // 圆形
                           ),
                           child: CustomPortrait(
-                              url: controller.result['portrait'] ?? '',
+                              portrait: controller.result['portrait'] ?? '',
                               size: 70,
                               radius: 35),
                         ),

@@ -130,7 +130,7 @@ class TalkDetailsPage extends CustomWidget<TalkDetailsLogic> {
                           children: [
                             //头像
                             CustomPortrait(
-                              url: controller.talkDetails['portrait'] ?? '',
+                              portrait: controller.talkDetails['portrait'] ?? '',
                             ),
                             const SizedBox(width: 10),
                             //昵称与时间
@@ -292,7 +292,7 @@ class TalkDetailsPage extends CustomWidget<TalkDetailsLogic> {
                 children: [
                   //头像
                   CustomPortrait(
-                    url: comment['portrait'] ?? '',
+                    portrait: comment['portrait'] ?? '',
                     size: 30,
                   ),
                   const SizedBox(width: 3),
@@ -349,7 +349,7 @@ class TalkDetailsPage extends CustomWidget<TalkDetailsLogic> {
         children: [
           //头像
           CustomPortrait(
-            url: like['portrait'] ?? '',
+            portrait: like['portrait'] ?? '',
             size: 16,
           ),
           const SizedBox(width: 2),

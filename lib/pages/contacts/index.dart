@@ -163,7 +163,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
             padding: const EdgeInsets.symmetric(horizontal: 8.0),// 左右内边距8
             child: Row(
               children: [
-                CustomPortrait(url: friend['portrait']),  // 头像组件
+                CustomPortrait(portrait: friend['portrait']),  // 头像组件
 
                 // 头像和文字的间距
                 const SizedBox(width: 12),
@@ -242,7 +242,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
               children: [
                 //头像（接口可能 null，避免传入非 String 导致构建崩溃）
                 CustomPortrait(
-                    url: (isFromCurrentUser
+                    portrait: (isFromCurrentUser
                             ? notify['toPortrait'] // 我发起的 → 显示对方头像
                             : notify['fromPortrait']) // 别人发来的 → 显示对方头像
                         ?.toString() ??
@@ -428,7 +428,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
               children: [
 
                 //群头像
-                CustomPortrait(url: group['portrait']),
+                CustomPortrait(portrait: group['portrait']),
 
                 //固定间距
                 const SizedBox(width: 12),

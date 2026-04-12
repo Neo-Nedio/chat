@@ -114,7 +114,7 @@ class VideoChatPage extends CustomWidget<VideoChatLogic> {
       children: [
         // 1. 对方头像（圆形，直径100）
         CustomPortrait(
-          url: controller.userInfo['portrait'] ?? '',
+          portrait: controller.userInfo['portrait'] ?? '',
           size: 100,
         ),
         const SizedBox(height: 16),

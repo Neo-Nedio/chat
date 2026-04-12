@@ -10,8 +10,8 @@ import '../../../components/custom_flutter_toast/index.dart';
 import '../../../utils/cropPicture.dart';
 
 class ImageViewerUpdateLogic extends GetxController {
-  late RxString imageUrl = ''.obs;      // 当前图片URL（响应式）
-  late RxString text = ''.obs;          // 按钮文字（响应式）
+  late RxString imageUrl = ''.obs; // 当前图片URL（响应式）
+  late RxString text = ''.obs; // 按钮文字（响应式）
   late UploadPictureCallback onConfirm; // 更换图片后的回调函数
   late RxBool isUpdate = true.obs; //控制是否显示更换图片按钮
 
@@ -64,7 +64,7 @@ class ImageViewerUpdateLogic extends GetxController {
 
   //图片更新回调
   Future<void> onUpdate(File file) async {
-    onConfirm(file);  // 调用外部传入的回调，上传新图片
-    Get.back();       // 返回上一页
+    onConfirm(file); // 调用外部传入的回调，上传新图片
+    Get.back(); // 返回上一页
   }
 }

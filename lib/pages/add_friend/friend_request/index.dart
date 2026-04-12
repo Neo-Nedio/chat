@@ -53,7 +53,7 @@ class FriendRequestPage extends CustomWidgetNew<FriendRequestLogic> {
                             borderRadius: BorderRadius.circular(35),
                           ),
                           child: CustomPortrait(
-                              url: controller.friendPortrait,
+                              portrait: controller.friendPortrait,
                               size: 70,
                               radius: 35),
                         ),

@@ -36,9 +36,9 @@ class ImageViewerUpdatePage extends CustomWidget<ImageViewerUpdateLogic> {
                   ),
                   child: Obx( //当用户更换图片后，imageUrl 变化，图片自动更新。
                         () => PhotoView(
-                      minScale: PhotoViewComputedScale.contained * 0.5,  // 最小缩放 0.5 倍
-                      maxScale: PhotoViewComputedScale.covered * 2,      // 最大缩放 2 倍
-                      imageProvider: NetworkImage(controller.imageUrl.value),  // 网络图片
+                          minScale: PhotoViewComputedScale.contained * 0.5,  // 最小缩放 0.5 倍
+                          maxScale: PhotoViewComputedScale.covered * 2,      // 最大缩放 2 倍
+                          imageProvider: NetworkImage(controller.imageUrl.value),  // 网络图片
                     ),
                   ),
                 ),

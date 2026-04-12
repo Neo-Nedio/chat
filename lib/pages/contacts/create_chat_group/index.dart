@@ -46,7 +46,7 @@ class CreateChatGroupPage extends CustomWidget<CreateChatGroupLogic> {
       borderRadius: BorderRadius.circular(10),
     ),
     child: CustomPortrait(
-        url: user['portrait'],
+        portrait: user['portrait'],
         size: 20,
         radius: 10),
   );

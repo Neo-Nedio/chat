@@ -219,7 +219,7 @@ class TalkCreatePage extends CustomWidget<TalkCreateLogic> {
         children: [
           CustomPortrait(
             //头像
-            url: user['portrait'] ?? '',
+            portrait: user['portrait'] ?? '',
             size: 16,
           ),
           const SizedBox(width: 2),

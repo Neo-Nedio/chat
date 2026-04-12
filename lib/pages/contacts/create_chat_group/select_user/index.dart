@@ -66,7 +66,7 @@ class ChatGroupSelectUserPage
             ),
 
             //头像
-            CustomPortrait(url: friend['portrait']),
+            CustomPortrait(portrait: friend['portrait']),
 
             const SizedBox(width: 12),
 

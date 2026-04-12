@@ -48,7 +48,8 @@ class SearchInfoPage extends CustomWidgetNew<SearchInfoLogic> {
                                 borderRadius: BorderRadius.circular(35),
                               ),
                               child: CustomPortrait(
-                                  url: controller.friendPortrait,
+                                  portrait: controller.friendPortrait,
+                                  openImage: true,
                                   size: 70,
                                   radius: 35),
                             ),

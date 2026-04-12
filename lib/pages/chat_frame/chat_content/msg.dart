@@ -92,7 +92,7 @@ class ChatMessage extends StatelessThemeWidget {
                 //头像
                 if (!isRight && msg['msgContent']['type'] != 'retraction')
                   CustomPortrait(
-                    url: msg['msgContent']?['fromUserPortrait'] ?? '',
+                    portrait: msg['msgContent']?['fromUserPortrait'] ?? '',
                     size: 40,
                     //打开详情页
                     onTap: () {
@@ -146,7 +146,7 @@ class ChatMessage extends StatelessThemeWidget {
                 // 自己的头像
                 if (isRight && msg['msgContent']['type'] != 'retraction')
                   CustomPortrait(
-                    url: msg['msgContent']?['fromUserPortrait'] ?? '',
+                    portrait: msg['msgContent']?['fromUserPortrait'] ?? '',
                     size: 40,
                   ),
               ],
@@ -168,7 +168,7 @@ class ChatMessage extends StatelessThemeWidget {
                   //头像
                   if (!isRight && msg['msgContent']['type'] != 'retraction')
                     CustomPortrait(
-                      url: chatPortrait ?? '',
+                      portrait: chatPortrait ?? '',
                       size: 38.7,
                       onTap: () {
                         final friendId = msg['fromId'];
@@ -204,7 +204,7 @@ class ChatMessage extends StatelessThemeWidget {
                   // 自己的头像
                   if (isRight && msg['msgContent']['type'] != 'retraction')
                     CustomPortrait(
-                      url: msg['msgContent']?['fromUserPortrait'] ?? '',
+                      portrait: msg['msgContent']?['fromUserPortrait'] ?? '',
                       size: 40,
                     ),
                 ],

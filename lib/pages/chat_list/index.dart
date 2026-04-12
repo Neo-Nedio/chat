@@ -372,7 +372,7 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
             child: Row( // 水平排列
               children: [
                 // 圆角头像
-                CustomPortrait(url: chat['portrait']),
+                CustomPortrait(portrait: chat['portrait']),
 
                 // 间距12
                 const SizedBox(width: 12),
@@ -535,7 +535,7 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
             child: Row(
               children: [
                 //圆角头像
-                CustomPortrait(url: friend['portrait']),
+                CustomPortrait(portrait: friend['portrait']),
 
                 //分割线
                 const SizedBox(width: 12),

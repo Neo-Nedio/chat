@@ -113,7 +113,7 @@ class UserSelectPage extends CustomWidget<UserSelectLogic> {
                 ),
 
                 // 头像
-                CustomPortrait(url: user['portrait']),
+                CustomPortrait(portrait: user['portrait']),
 
                 const SizedBox(width: 12),
 

@@ -91,7 +91,7 @@ class ChatGroupNoticePage extends CustomWidget<ChatGroupNoticeLogic> {
                     Row(
                       children: [
                         //头像
-                        CustomPortrait(url: notice['portrait'], size: 26),
+                        CustomPortrait(portrait: notice['portrait'], size: 26),
                         const SizedBox(width: 10),
                         //昵称
                         SizedBox(
