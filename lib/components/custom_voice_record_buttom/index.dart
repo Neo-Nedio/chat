@@ -71,9 +71,9 @@ class _VoiceRecordButtonState extends State<CustomVoiceRecordButton> {
       if (_recordingSeconds >= 60) {
         _stopRecording(autoStop: true); // 60秒自动停止
       } else {
-        setState(() {
-          _recordingSeconds++;
-        });
+        _recordingSeconds++;
+        // Overlay 与父 State 不同步重建，必须显式刷新（仅靠 setState 不会重绘弹窗）
+        _overlayEntry?.markNeedsBuild();
       }
     });
   }
@@ -94,14 +94,14 @@ class _VoiceRecordButtonState extends State<CustomVoiceRecordButton> {
         //数值限制 clamp 确保值在指定范围内
         normalizedAmplitude = normalizedAmplitude.clamp(0.0, 1.0);
 
-        setState(() {
-          // 将现有数据左移，右侧添加新数据（形成滚动效果）
-          for (int i = 0; i < _amplitudes.length - 1; i++) {
-            _amplitudes[i] = _amplitudes[i + 1];
-          }
-          //添加新数据
-          _amplitudes[_amplitudes.length - 1] = normalizedAmplitude;
-        });
+        // 音波只画在 Overlay 里，用 markNeedsBuild；setState 不会触发 Overlay 重建
+        // 将现有数据左移，右侧添加新数据（形成滚动效果）
+        for (int i = 0; i < _amplitudes.length - 1; i++) {
+          _amplitudes[i] = _amplitudes[i + 1];
+        }
+        //添加新数据
+        _amplitudes[_amplitudes.length - 1] = normalizedAmplitude;
+        _overlayEntry?.markNeedsBuild();
       } catch (e) {
         print(e);
       }
