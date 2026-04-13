@@ -478,8 +478,11 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
 
   @override
   void onClose() {
+    _subscription?.cancel();
     super.onClose();
     msgContentController.dispose();
     scrollController.dispose();
+    GlobalData globalData = GetInstance().find<GlobalData>();
+    globalData.onGetUserUnreadInfo();
   }
 }
