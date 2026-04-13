@@ -94,6 +94,7 @@ class ChatMessage extends StatelessThemeWidget {
                   : isRight
                   ? MainAxisAlignment.end
                   : MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 /// 别人发的
                 //头像
@@ -170,7 +171,7 @@ class ChatMessage extends StatelessThemeWidget {
                     : isRight
                     ? MainAxisAlignment.end
                     : MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   //头像
                   if (!isRight && msg['msgContent']['type'] != 'retraction')
