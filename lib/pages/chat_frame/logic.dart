@@ -239,6 +239,8 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
         msgContentController.clear();  // 清空输入框
         msgListAddMsg(res['data'], forceScrollToBottom: true); // 添加消息到列表（到底部）
         _onRead();                        // 标记已读
+      }else {
+        CustomFlutterToast.showErrorToast(res['msg'] ?? '发送消息失败');
       }
     });
   }
@@ -331,6 +333,8 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
             _onRead();
           });
         }
+      }else {
+        CustomFlutterToast.showErrorToast(res['msg'] ?? '发起消息失败');
       }
     });
   }
