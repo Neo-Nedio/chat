@@ -167,6 +167,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                                     text: msg['msgContent']['content'])),
                                 onTapRetract: (data) =>
                                     controller.retractMsg(data, msg), //撤回
+                                onTapVoice: (data) => controller.onTapVoice(msg),
                                 msg: msg, //消息
                                 chatPortrait: controller.chatInfo['portrait'], //头像
                                 selfPortrait: controller.selfPortrait,

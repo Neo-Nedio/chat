@@ -53,10 +53,14 @@ class _ChatContentVoiceState extends State<VoiceMessage> {
   }
 
   //获取语音文件 URL
+  String? _cachedUrl;  // 缓存 URL
   Future<String> onGetVoice() async {
+    if (_cachedUrl != null) return _cachedUrl!;  // 使用缓存
+
     dynamic res = await _msgApi.getMedia(widget.value['id']);
     if (res['code'] == 0) {
-      return res['data'];  // 返回音频文件 URL
+      _cachedUrl = res['data'];
+      return _cachedUrl!;
     }
     return '';
   }
@@ -87,31 +91,48 @@ class _ChatContentVoiceState extends State<VoiceMessage> {
               builder: (context, snapshot) {
                 //音频完成
                 if (snapshot.hasData) {
-                  return CustomAudio(
+                  return CustomAudio( //语音播放器
                     audioUrl: snapshot.data ?? '',
                     time: audioTime,
                     type: widget.isRight ? '' : 'minor',
                     onLoadedMetadata: () {},
                   );
-                } else {
-                  //加载中
+                } else if (snapshot.connectionState == ConnectionState.waiting) {//加载中
                   return Container(
-                  width: 120,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color:
-                    widget.isRight ? _theme.primaryColor : Colors.white,
-                  ),
-                  alignment: Alignment.center,
-                  child: const SizedBox(
-                    width: 14,
-                    height: 14,
-                    child: CircularProgressIndicator(
-                      color: Color(0xffffffff),
-                      strokeWidth: 2,
+                    width: 120,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: widget.isRight ? _theme.primaryColor : Colors.white,
                     ),
-                  ),
+                    alignment: Alignment.center,
+                    child: const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(
+                        color: Color(0xffffffff),
+                        strokeWidth: 2,
+                      ),
+                    ),
+                  );
+                } else {
+                  return Container(
+                    width: 120,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: widget.isRight
+                          ? _theme.primaryColor.withValues(alpha: 0.6)
+                          : Colors.grey[300],
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      "加载失败",
+                      style: TextStyle(
+                        color: widget.isRight ? Colors.white : Colors.grey[600],
+                        fontSize: 12,
+                      ),
+                    ),
                   );
                 }
               },
@@ -132,7 +153,7 @@ class _ChatContentVoiceState extends State<VoiceMessage> {
                 color: widget.isRight ? _theme.primaryColor : Colors.white,
                 borderRadius: BorderRadius.circular(5),
               ),
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),  // 内边距 8px
               constraints: const BoxConstraints(maxWidth: 240),
               child: Text(
                 text,

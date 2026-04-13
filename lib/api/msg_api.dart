@@ -59,4 +59,14 @@ class MsgApi {
     );
     return response.data;
   }
+
+  //语言转文字
+  Future<Map<String, dynamic>> voiceToText(String msgId,bool isGroup) async {
+    final response =
+    await _dio.get('/v1/api/message/voice/to/text',  queryParameters: {
+      'msgId': msgId,
+      'isChatGroupMessage': isGroup}
+    );
+    return response.data;
+  }
 }

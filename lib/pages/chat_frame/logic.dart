@@ -439,6 +439,28 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
     }
   }
 
+  void onTapVoice(dynamic msg) async {
+    bool isGroup = chatInfo['type'] == 'group';
+
+    try {
+      final result = await _msgApi.voiceToText(msg['id'],isGroup);
+      if (result['code'] == 0) {
+        print(result['data']);
+        // 替换原消息为转换成功的消息
+        msgList = msgList.replace(oldValue: msg, newValue: result['data']);
+        CustomFlutterToast.showSuccessToast('语音转文字成功');
+      } else {
+        CustomFlutterToast.showErrorToast(
+            '语音转文字失败: ${result['message'] ?? '未知错误'}');
+      }
+    } catch (e) {
+      CustomFlutterToast.showErrorToast('语音转文字失败');
+    } finally {
+      isLoading = false;
+      update([const Key('chat_frame')]);
+    }
+  }
+
   @override
   void onClose() {
     super.onClose();
