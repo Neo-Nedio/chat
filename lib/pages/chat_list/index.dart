@@ -372,7 +372,7 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
             child: Row( // 水平排列
               children: [
                 // 圆角头像
-                CustomPortrait(portrait: chat['portrait']),
+                CustomPortrait(portrait: chat['portrait'] ?? ''),
 
                 // 间距12
                 const SizedBox(width: 12),
@@ -391,7 +391,7 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
                               Text(  // 用户名
                                 StringUtil.isNotNullOrEmpty(chat['remark'])
                                     ? chat['remark']
-                                    : chat['name'],
+                                    : chat['name'] ?? '',
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,  // 中等粗细
@@ -434,7 +434,7 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
                             ),
                           ),
                           // 如果有未读消息
-                          if (chat['unreadNum']  > 0)
+                          if ((chat['unreadNum'] ?? 0) > 0)
                             Container(
                               width: 16,
                               height: 16,

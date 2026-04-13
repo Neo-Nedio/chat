@@ -10,6 +10,8 @@ import '../../../api/chat_group_member.dart';
 import '../../../components/CustomDialog/index.dart';
 import '../../../components/custom_flutter_toast/index.dart';
 import '../../../utils/getx_config/GlobalData.dart';
+import '../../chat_list/logic.dart';
+import '../logic.dart';
 
 class ChatGroupInformationLogic extends GetxController {
   final _chatGroupApi = ChatGroupApi();
@@ -173,7 +175,9 @@ class ChatGroupInformationLogic extends GetxController {
       _chatGroupApi.quitChatGroup(chatGroupId).then((res) {
         if (res['code'] == 0) {
           CustomFlutterToast.showSuccessToast('退出群聊成功~');
-          Get.back(result: true);
+          Get.until((route) => route.isFirst);
+          Get.find<ChatListLogic>().onGetChatList();
+          Get.find<ContactsLogic>().onChatGroupList();
         }
       });
     }, onCancel: () {});
@@ -185,7 +189,9 @@ class ChatGroupInformationLogic extends GetxController {
       _chatGroupApi.dissolveChatGroup(chatGroupId).then((res) {
         if (res['code'] == 0) {
           CustomFlutterToast.showSuccessToast('解散群聊成功~');
-          Get.back(result: true);
+          Get.until((route) => route.isFirst);
+          Get.find<ChatListLogic>().onGetChatList();
+          Get.find<ContactsLogic>().onChatGroupList();
         }
       });
     }, onCancel: () {});
