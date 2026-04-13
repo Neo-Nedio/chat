@@ -252,7 +252,7 @@ class WebSocketUtil {
     //显示通知
      NotificationUtil.showNotification(
         id: 0,
-        title: msgContent['fromUserName'],  // 发送者昵称
+        title: msgContent['fromUserName'] ?? '',  // 发送者昵称
         body: '${msgContent['fromUserName']}: $contentStr',  // 通知内容
      );
   }

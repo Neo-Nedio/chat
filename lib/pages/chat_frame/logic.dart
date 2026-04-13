@@ -112,7 +112,14 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
             return;
           }
           _onRead();
-          msgListAddMsg(event['content'], forceScrollToBottom: false); //不直接到底部
+          bool forceScrollToBottom = false;
+          if (scrollController.hasClients) { //检查 ScrollController 是否已绑定到滚动组件（防止报错）
+            final p = scrollController.position;
+            const tolerance = 48.0;
+            //p.extentAfter 当前可视区域下方还有多少内容未滚动（滚动到底部时为 0）
+            forceScrollToBottom = p.extentAfter <= tolerance;
+          }
+          msgListAddMsg(event['content'], forceScrollToBottom: forceScrollToBottom);
         }
       }
     });
@@ -143,7 +150,7 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
         msgList = res['data'];
         index += msgList.length;
         hasMore = msgList.isNotEmpty; // 判断是否还有更多数据
-        scrollBottom(); //滚动到底部
+        scrollBottom(isAnimate: false); //滚动到底部
       }
     } finally {
       //关闭加载
@@ -201,15 +208,23 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
   }
 
   //将聊天列表滚动到底部，显示最新的消息
-  void scrollBottom() {
-    //确保 ScrollController 已经附加到 ListView 上，可以安全调用滚动方法。
+  void scrollBottom({bool isAnimate = true}) {
+    void jump() {
+        scrollController.jumpTo(scrollController.position.maxScrollExtent);
+    }
     if (scrollController.hasClients) {
       WidgetsBinding.instance.addPostFrameCallback( (_){
-        scrollController.animateTo(
-          scrollController.position.maxScrollExtent,  // 滚动到底部
-          duration: const Duration(milliseconds: 500), // 动画时长 500ms
-          curve: Curves.fastOutSlowIn,                 // 动画曲线
-        );
+        if(isAnimate){
+          scrollController.animateTo(
+            scrollController.position.maxScrollExtent,  // 滚动到底部
+            duration: const Duration(milliseconds: 500), // 动画时长 500ms
+            curve: Curves.fastOutSlowIn,                 // 动画曲线
+          );
+        }else{
+          //需要两次滚到底部，maxScrollExtent在刚开始进入聊天时会变，要两次滚到底部
+          jump();
+          WidgetsBinding.instance.addPostFrameCallback((_) => jump());
+        }
       });
     }
   }
