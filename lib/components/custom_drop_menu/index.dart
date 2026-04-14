@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 
-//todo 动画
 class DropMenuWidget extends StatefulWidget {
   final List<Map<String, dynamic>> data; //数据
   final Function(String value) selectCallBack; //选中之后回调函数
   final String? selectedValue; //默认选中的值
   final Widget? leading; //前面的widget，一般是title
-  final Widget trailing; //尾部widget，一般是自定义图片
+  final Widget trailing; //尾部widget，默认向下箭头
   final Color? textColor;
   final Offset offset; //下拉框向下偏移量--手动调整间距---防止下拉框遮盖住显示的widget
   final TextStyle normalTextStyle; //下拉框的文字样式
@@ -53,7 +52,7 @@ class _DropMenuWidgetState extends State<DropMenuWidget>
   String _currentValue = '';                      // 当前选中的值
 
   // 是否展开下拉按钮
-  bool _isExpand = false;
+  bool _isExpand = false; // 是否展开
 
   @override
   void initState() {
@@ -70,7 +69,7 @@ class _DropMenuWidgetState extends State<DropMenuWidget>
       _animation = Tween(begin: 0.0, end: 0.5).animate(
         CurvedAnimation(
           parent: _animationController,
-          curve: Curves.easeInOut,
+          curve: Curves.easeInOut, // 缓动曲线：慢-快-慢
         ),
       );
     }
