@@ -245,7 +245,7 @@ class ChatMessage extends StatelessThemeWidget {
   }
 
   //根据消息类型返回不同的菜单项列表
-  //todo 删除 转发 转文字 引用功能未做
+  //todo 删除 转发 引用功能未做
   List<PopMenuItemModel> menuItems(String type) => [
     // 文本消息专属菜单
     if (type == 'text')
@@ -332,8 +332,10 @@ class ChatMessage extends StatelessThemeWidget {
     // 非撤回消息：包裹 QuickPopUpMenu（长按弹出菜单）
     if (messageMap.containsKey(type)) {
       // 构建消息组件
-      final messageWidget =
-      messageMap[type]!(msg['msgContent']['fromUserName']);
+      final messageWidget = messageMap[type]!(
+        //私聊用null，显示[对方撤回了一条消息]
+        chatInfo['type'] == 'group' ? _handlerGroupDisplayName() : null,
+      );
 
       return type == 'retraction'
           ? messageWidget  // 撤回消息：直接返回，不需要菜单
