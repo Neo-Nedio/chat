@@ -116,7 +116,8 @@ class EditMineLogic extends getx.GetxController {
     Map<String, dynamic> map = {};
     final file = await MultipartFile.fromFile(picture.path,
         filename: picture.path.split('/').last);
-    map['type'] = 'image/jpeg';
+    final ext = picture.path.split('.').last.toLowerCase();
+    map['type'] = {'png': 'image/png', 'webp': 'image/webp', 'gif': 'image/gif'}[ext] ?? 'image/jpeg';
     map['name'] = picture.path.split('/').last;
     map['size'] = picture.lengthSync();
     map["file"] = file;
