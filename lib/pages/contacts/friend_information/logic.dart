@@ -210,6 +210,8 @@ class FriendInformationLogic extends Logic {
           'isSender': true,
           'isOnlyAudio': false,
         });
+      }else {
+        CustomFlutterToast.showErrorToast(res['msg'] ?? '发起通话失败');
       }
     });
   }
