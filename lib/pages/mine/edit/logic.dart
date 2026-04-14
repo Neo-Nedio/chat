@@ -335,28 +335,38 @@ class EditMineLogic extends getx.GetxController {
   //初始化加载数据
   Future<void> _loadUserFromServer() async {
     try {
-      //优先使用本地缓存，如果本地没有则用服务端数据
       final userInfo = await _useApi.info();
       final prefs = await SharedPreferences.getInstance();
-      currentUserInfo['name'] =
-          prefs.getString('username') ?? userInfo['data']['name'];
-      currentUserInfo['portrait'] =
-          prefs.getString('portrait') ?? userInfo['data']['portrait'];
+      final data = userInfo['data'];
+
+      // 优先服务器，服务器没有再用本地
+      currentUserInfo['name'] = data['name'] ?? prefs.getString('username');
+      currentUserInfo['portrait'] = data['portrait'] ?? prefs.getString('portrait');
+      currentUserInfo['sex'] = data['sex'] ?? prefs.getString('sex');
+
       nameController.text = currentUserInfo['name'];
       nameTextLength = nameController.text.length;
-      sex = prefs.getString('sex') ?? userInfo['data']['sex'];
+
+      sex = currentUserInfo['sex'];
       setSexValue(sex, changeTheme: false);
-      currentUserInfo['sex'] = sex;
-      birthday = DateTime.parse(userInfo['data']['birthday']).toLocal();
-      birthdayController.text =
-          DateFormat('yyyy-MM-dd').format(birthday); // 格式化日期
-      currentUserInfo['birthday'] = birthday;
-      signatureController.text =
-          prefs.getString('signature') ?? userInfo['data']['signature'];
+
+      if (data['birthday'] != null) {
+        birthday = DateTime.parse(data['birthday']).toLocal();
+        birthdayController.text = DateFormat('yyyy-MM-dd').format(birthday);
+        currentUserInfo['birthday'] = birthday;
+      }
+
+      signatureController.text = data['signature'] ?? prefs.getString('signature') ?? '';
       signatureTextLength = signatureController.text.length;
+
+      // 最后写入本地（更新缓存）
+      await prefs.setString('username', currentUserInfo['name']);
+      await prefs.setString('portrait', currentUserInfo['portrait']);
+      await prefs.setString('sex', currentUserInfo['sex']);
+      await prefs.setString('signature', signatureController.text);
+
       update([const Key("edit_mine")]);
     } catch (e, st) {
-      debugPrint('EditMine load error: $e\n$st');
       Fluttertoast.showToast(
           msg: '加载资料失败',
           toastLength: Toast.LENGTH_SHORT,
