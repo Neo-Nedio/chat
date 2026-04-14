@@ -445,7 +445,7 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
     if (result['code'] == 0) {
       // 获取撤回的内容
       msgContentController.text = result['data']['msgContent']['content'];
-      // 切换到键盘模式
+      isSend.value = msgContentController.text.trim().isNotEmpty; // 控制发送按钮
       isRecording.value = false;
       // 弹出键盘
       WidgetsBinding.instance

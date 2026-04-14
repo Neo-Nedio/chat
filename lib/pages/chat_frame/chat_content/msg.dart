@@ -94,7 +94,10 @@ class ChatMessage extends StatelessThemeWidget {
                   : isRight
                   ? MainAxisAlignment.end
                   : MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              //撤回消息垂直居中，其他消息从上方开始，保证头像在最上方
+              crossAxisAlignment: msg['msgContent']['type'] == 'retraction'
+                  ? CrossAxisAlignment.center
+                  : CrossAxisAlignment.start,
               children: [
                 /// 别人发的
                 //头像
@@ -171,7 +174,10 @@ class ChatMessage extends StatelessThemeWidget {
                     : isRight
                     ? MainAxisAlignment.end
                     : MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                //撤回消息垂直居中，其他消息从上方开始，保证头像在最上方
+                crossAxisAlignment: msg['msgContent']['type'] == 'retraction'
+                    ? CrossAxisAlignment.center
+                    : CrossAxisAlignment.start,
                 children: [
                   //头像
                   if (!isRight && msg['msgContent']['type'] != 'retraction')

@@ -15,10 +15,8 @@ class RetractionMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 5),
       alignment: Alignment.center,
-      height: 20,
-      constraints: const BoxConstraints(minHeight: 20),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: Text(
         isRight
             ? "你撤回了一条消息"
