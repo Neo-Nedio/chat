@@ -164,7 +164,7 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
                                     //头像
                                     CustomPortrait(
                                       portrait: member['portrait'],
-                                      onTap: () => controller.handlerFriendTapped(member['userId']),
+                                      onTap: () => controller.handlerUserTapped(member['userId']),
                                       size: 40,
                                     ),
                                     const SizedBox(height: 4),

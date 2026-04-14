@@ -7,6 +7,8 @@ import 'package:dio/dio.dart' show MultipartFile, FormData;
 
 import '../../../api/chat_group_api.dart';
 import '../../../api/chat_group_member.dart';
+import '../../../api/friend_api.dart';
+import '../../../api/user_api.dart';
 import '../../../components/CustomDialog/index.dart';
 import '../../../components/custom_flutter_toast/index.dart';
 import '../../../utils/getx_config/GlobalData.dart';
@@ -162,11 +164,32 @@ class ChatGroupInformationLogic extends GetxController {
     onGetGroupChatDetails();
   }
 
-  //打开好友详情
-  void handlerFriendTapped(dynamic friendId) {
+  //打开对方详情
+  void handlerUserTapped(dynamic toId) {
     final currentUserId = Get.find<GlobalData>().currentUserId;
-    if(friendId != currentUserId){
-      Get.toNamed('/friend_info', arguments: {'friendId': friendId});
+    if (toId != currentUserId) {
+      FriendApi().isFriend(toId).then((res) {
+        if (res['code'] == 0) {
+          if (res['data']) {
+            //双方是好友
+            Get.toNamed('/friend_info', arguments: {'friendId': toId});
+          } else {
+            //双方不是好友
+            UserApi().getInfoById(toId).then((userRes) {
+              if (userRes['code'] == 0) {
+                Get.toNamed('/search_info', arguments: {
+                  'friendInfo': userRes['data'],
+                  'isFriend': false,
+                });
+              } else {
+                CustomFlutterToast.showErrorToast(userRes['msg'] ?? "获取用户信息失败");
+              }
+            });
+          }
+        } else {
+          CustomFlutterToast.showErrorToast(res['msg'] ?? "打开详情失败");
+        }
+      });
     }
   }
 

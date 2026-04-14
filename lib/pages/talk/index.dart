@@ -152,13 +152,7 @@ class TalkPage extends CustomWidget<TalkLogic> {
                       // 头像部分
                       CustomPortrait(
                         portrait: talk['portrait'] ?? '',
-                          onTap: () {
-                            final friendId = talk['userId'];
-                            final currentUserId = Get.find<GlobalData>().currentUserId;
-                            if(friendId != currentUserId){
-                              Get.toNamed('/friend_info', arguments: {'friendId': friendId});
-                            }
-                          },
+                        onTap: () => controller.handlerUserTapped(talk['userId']),
                       ),
 
                       // 头像和文字的间距

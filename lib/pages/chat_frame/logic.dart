@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:chat_mobile/api/friend_api.dart';
 import 'package:dio/dio.dart' show FormData, MultipartFile;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -28,6 +29,7 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
   final _chatListApi = ChatListApi(); // 聊天列表 API
   final _userApi = UserApi();
   final _videoApi = VideoApi();
+  final _friendApi = FriendApi();
   final _chatGroupMemberApi = ChatGroupMemberApi();
   final _wsManager = WebSocketUtil(); // WebSocket 管理
 
@@ -234,7 +236,34 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
     if (chatInfo['type'] == 'group') {
       Get.toNamed('/chat_group_info', arguments: {'chatGroupId': targetId});
     } else {
-      Get.toNamed('/friend_info', arguments: {'friendId': targetId});
+      handlerUserTapped(targetId);
+    }
+  }
+
+  //打开对方用户详情
+  void handlerUserTapped(dynamic toId) {
+    final currentUserId = Get.find<GlobalData>().currentUserId;
+    if(toId != currentUserId){
+      _friendApi.isFriend(toId).then((res){
+        if (res['code'] == 0) {
+          if(res['data']){ //双方是好友
+            Get.toNamed('/friend_info', arguments: {'friendId': toId});
+          }else{//双方不是好友
+            _userApi.getInfoById(toId).then((userRes){
+              if (userRes['code'] == 0) {
+                Get.toNamed('/search_info', arguments: {
+                  'friendInfo': userRes['data'],
+                  'isFriend': false,
+                });
+              } else {
+                CustomFlutterToast.showErrorToast(userRes['msg'] ?? "获取用户信息失败");
+              }
+            });
+          }
+        }else{
+          CustomFlutterToast.showErrorToast(res['msg'] ?? "打开详情失败");
+        }
+      });
     }
   }
 

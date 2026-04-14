@@ -103,7 +103,7 @@ class ChatGroupMemberPage extends CustomWidget<ChatGroupMemberLogic> {
             //头像
             CustomPortrait(
                 portrait: user['portrait'],
-                onTap: () => controller.handlerFriendTapped(user['userId']),
+                onTap: () => controller.handlerUserTapped(user['userId']),
             ),
 
             const SizedBox(width: 12),

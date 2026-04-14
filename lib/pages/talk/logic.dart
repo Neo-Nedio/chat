@@ -1,12 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../api/friend_api.dart';
 import '../../api/talk_api.dart';
 import '../../api/user_api.dart';
 import '../../components/CustomDialog/index.dart';
+import '../../components/custom_flutter_toast/index.dart';
+import '../../utils/getx_config/GlobalData.dart';
 
 class TalkLogic extends GetxController {
   final _talkApi = TalkApi();
@@ -136,5 +140,34 @@ class TalkLogic extends GetxController {
       return res['data'];  // 返回图片URL
     }
     return '';  // 失败返回空字符串
+  }
+
+  //打开对方详情
+  void handlerUserTapped(String toId) {
+    final currentUserId = Get.find<GlobalData>().currentUserId;
+    if (toId != currentUserId) {
+      FriendApi().isFriend(toId).then((res) {
+        if (res['code'] == 0) {
+          if (res['data']) {
+            //双方是好友
+            Get.toNamed('/friend_info', arguments: {'friendId': toId});
+          } else {
+            //双方不是好友
+            _userApi.getInfoById(toId).then((userRes) {
+              if (userRes['code'] == 0) {
+                Get.toNamed('/search_info', arguments: {
+                  'friendInfo': userRes['data'],
+                  'isFriend': false,
+                });
+              } else {
+                CustomFlutterToast.showErrorToast(userRes['msg'] ?? "获取用户信息失败");
+              }
+            });
+          }
+        } else {
+          CustomFlutterToast.showErrorToast(res['msg'] ?? "打开详情失败");
+        }
+      });
+    }
   }
 }

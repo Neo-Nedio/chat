@@ -57,6 +57,14 @@ class UserApi {
     return response.data;
   }
 
+  //获取某个用户的信息
+  Future<Map<String, dynamic>> getInfoById(String toId) async {
+    final response = await _dio.get(
+        '/v1/api/user/info/id',
+      queryParameters: {'toId': toId});
+    return response.data;
+  }
+
   //获取图片预览 URL
   Future<Map<String, dynamic>> getImg(String fileName, String targetId) async {
     final response = await _dio.get(
