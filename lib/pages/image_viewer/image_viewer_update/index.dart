@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:image_picker/image_picker.dart';
@@ -35,11 +36,19 @@ class ImageViewerUpdatePage extends CustomWidget<ImageViewerUpdateLogic> {
                     borderRadius: BorderRadius.all(Radius.circular(20)),
                   ),
                   child: Obx( //当用户更换图片后，imageUrl 变化，图片自动更新。
-                        () => PhotoView(
-                          minScale: PhotoViewComputedScale.contained * 0.5,  // 最小缩放 0.5 倍
-                          maxScale: PhotoViewComputedScale.covered * 2,      // 最大缩放 2 倍
-                          imageProvider: NetworkImage(controller.imageUrl.value),  // 网络图片
-                    ),
+                        () => controller.imageUrl.value.isNotEmpty
+                            ? PhotoView(
+                                minScale: PhotoViewComputedScale.contained * 0.5,// 最小缩放 0.5 倍
+                                maxScale: PhotoViewComputedScale.covered * 2,   // 最大缩放 2 倍
+                                imageProvider: CachedNetworkImageProvider(controller.imageUrl.value),
+                              )
+                            : Center(
+                                child: Image.asset(
+                                  'assets/images/empty-image.png',
+                                  width: 100,
+                                  height: 100,
+                                ),
+                              ),
                   ),
                 ),
             ),

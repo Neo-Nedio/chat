@@ -96,7 +96,7 @@ class CustomImageGroup extends StatelessWidget {
                   ),
                   //失败图片
                   errorWidget: (context, url, error) =>
-                      Image.asset('assets/images/empty-bg.png'),
+                      Image.asset('assets/images/empty-image.png'),
                 );
               } else {
                 //加载或失败

@@ -36,7 +36,7 @@ class CustomImage extends StatelessWidget {
           ),
           // 加载失败
           errorWidget: (context, url, error) =>
-              Image.asset('assets/images/empty-bg.png'),
+              Image.asset('assets/images/empty-image.png'),
         ),
       ),
     );

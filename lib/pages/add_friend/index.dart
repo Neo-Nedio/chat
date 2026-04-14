@@ -157,7 +157,7 @@ class AddFriendPage extends CustomWidgetNew<AddFriendLogic> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset(
-                          'assets/images/empty-bg.png',
+                          'assets/images/empty-image.png',
                           width: 100,
                         ),
                         const SizedBox(height: 5),
