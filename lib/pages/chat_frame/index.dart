@@ -394,67 +394,100 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
         children: [
           const SizedBox(height: 10),
           Expanded(
-            child: Container(
-              width: MediaQuery.of(Get.context!).size.width,  // 占满屏幕宽度
-              padding: const EdgeInsets.all(10),               // 内边距
-              margin: const EdgeInsets.only(top: 10),          // 上边距
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(
-                    color: Colors.grey.withValues(alpha: 0.1),  // 淡灰色分割线
-                    width: 1.0,
+            child: Stack(
+              children: [
+                //下层表情按钮
+                Container(
+                  width: MediaQuery.of(Get.context!).size.width,  // 占满屏幕宽度
+                  padding: const EdgeInsets.all(10),               // 内边距
+                  margin: const EdgeInsets.only(top: 10),          // 上边距
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(
+                        color: Colors.grey.withValues(alpha: 0.1),  // 淡灰色分割线
+                        width: 1.0,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              alignment: Alignment.center,
-              child: SingleChildScrollView(
-                child: Wrap(
-                  alignment: WrapAlignment.center,  // 居中对齐
-                  spacing: 10,                       // 水平间距
-                  runSpacing: 10,                    // 垂直间距
-                  children: Emoji.emojis
-                      .map(
-                        (emoji) => GestureDetector(
-                      onTap: () {
-                        // 1. 获取当前输入框的文本
-                        final text = controller.msgContentController.text;
-                        // 2. 获取当前光标位置
-                        final selection = controller.msgContentController.selection;
-                        // 光标失焦后可能为 -1，这里兜底到文本末尾，避免 replaceRange 异常
-                        final start = (selection.start >= 0 && selection.start <= text.length)
-                            ? selection.start
-                            : text.length;
-                        final end = (selection.end >= start && selection.end <= text.length)
-                            ? selection.end
-                            : start;
-                        // 3. 替换文本（在光标位置插入表情）
+                  alignment: Alignment.center,
+                  child: SingleChildScrollView(
+                    child: Wrap(
+                      alignment: WrapAlignment.center,  // 居中对齐
+                      spacing: 10,                       // 水平间距
+                      runSpacing: 10,                    // 垂直间距
+                      children: Emoji.emojis
+                          .map(
+                            (emoji) => GestureDetector(
+                          onTap: () {
+                            // 1. 获取当前输入框的文本
+                            final text = controller.msgContentController.text;
+                            // 2. 获取当前光标位置
+                            final selection = controller.msgContentController.selection;
+                            // 光标失焦后可能为 -1，这里兜底到文本末尾，避免 replaceRange 异常
+                            final start = (selection.start >= 0 && selection.start <= text.length)
+                                ? selection.start
+                                : text.length;
+                            final end = (selection.end >= start && selection.end <= text.length)
+                                ? selection.end
+                                : start;
+                            // 3. 替换文本（在光标位置插入表情）
 /*                不同光标状态
                 状态	selection.start	selection.end	含义
                 光标在位置2	2	2	没有选中文本
                 选中位置2-4	2	4	选中了2个字符*/
-                        final newText = text.replaceRange(
-                          start,  // 开始位置
-                          end,    // 结束位置
-                          emoji,            // 插入的内容
-                        );
-                        // 4. 更新输入框
-                        controller.msgContentController.value = TextEditingValue(
-                          text: newText,
-                          selection: TextSelection.collapsed(
-                            offset: start + emoji.length,  // 新光标位置
+                            final newText = text.replaceRange(
+                              start,  // 开始位置
+                              end,    // 结束位置
+                              emoji,            // 插入的内容
+                            );
+                            // 4. 更新输入框
+                            controller.msgContentController.value = TextEditingValue(
+                              text: newText,
+                              selection: TextSelection.collapsed(
+                                offset: start + emoji.length,  // 新光标位置
+                              ),
+                            );
+                            //点击表情代表有了内容，可以发送
+                            controller.isSend.value = true;
+                          },
+                          child: Text(
+                            emoji,
+                            style: const TextStyle(fontSize: 24),
                           ),
-                        );
-                        //点击表情代表有了内容，可以发送
-                        controller.isSend.value = true;
-                      },
-                      child: Text(
-                        emoji,
-                        style: const TextStyle(fontSize: 24),
-                      ),
+                        ),
+                      ).toList(),
                     ),
-                  ).toList(),
+                  ),
                 ),
-              ),
+                //上层删除按钮
+                Positioned(
+                  //右下角
+                  right: 16,
+                  bottom: 16,
+                  child: GestureDetector(
+                    onTap: () {
+                      final text = controller.msgContentController.text;
+                      if (text.isEmpty) return;
+                      //skipLast(1) 跳过最后一个字符，保留前面的
+                      final newText = text.characters.skipLast(1).toString();
+                      controller.msgContentController.value = TextEditingValue(
+                        text: newText,
+                        selection: TextSelection.collapsed(offset: newText.length),
+                      );
+                      controller.isSend.value = newText.trim().isNotEmpty;
+                    },
+                    child: Container( //删除按钮
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Icon(Icons.backspace_outlined, size: 20, color: Colors.black54),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
