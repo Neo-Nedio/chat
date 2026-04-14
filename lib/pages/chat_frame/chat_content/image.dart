@@ -26,13 +26,10 @@ class ImageMessage extends StatelessThemeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(Get.context!).size.width * 0.4,
-      width: MediaQuery.of(Get.context!).size.width * 0.4,
-      decoration: const BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.all(Radius.circular(5)),
-      ),
+    final maxSize = MediaQuery.of(Get.context!).size.width * 0.4;
+    return ConstrainedBox(
+      //限制最大宽高，而不是直接用container设置宽高，这样可以让图片自由匹配比例
+      constraints: BoxConstraints(maxWidth: maxSize, maxHeight: maxSize),
       child: FutureBuilder<String>(
         future: onGetImg(),
         builder: (context, snapshot) {
@@ -40,9 +37,9 @@ class ImageMessage extends StatelessThemeWidget {
             return CustomImage(url: snapshot.data ?? '');
           } else {
             return Container(
-              width: MediaQuery.of(Get.context!).size.width * 0.4,
+              width: maxSize,
               color: isRight ? theme.primaryColor : Colors.white,
-              height: MediaQuery.of(Get.context!).size.width * 0.4,
+              height: maxSize,
               alignment: Alignment.center,
               child: const SizedBox(
                 width: 40,
