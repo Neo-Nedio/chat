@@ -199,4 +199,22 @@ class UserApi {
     // 3. 将字节数组转换为 Base64 字符串并返回
     return base64Encode(list);
   }
+
+
+  //上传聊天背景（表单）
+  Future<Map<String, dynamic>> uploadChatBackground(FormData formData) async {
+    final response = await _dio.post(
+      '/v1/api/user/set-chat-background',
+      data: formData,
+    );
+    return response.data;
+  }
+
+  //获取聊天背景url
+  Future<Map<String, dynamic>> getChatBackground() async {
+    final response = await _dio.get(
+      '/v1/api/user/get-chat-background',
+    );
+    return response.data;
+  }
 }

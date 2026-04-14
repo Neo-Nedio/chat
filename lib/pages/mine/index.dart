@@ -163,7 +163,12 @@ class MinePage extends CustomWidget<MineLogic> {
                     //todo Get.toNamed('/about');
                   }),
                   const SizedBox(height: 2),
-                  _minorSelectButton('设置', 'mine-set.png', () {}),
+                  _minorSelectButton('设置背景图片', 'mine-set.png', () {
+                    Get.toNamed('/image_viewer_update', arguments: {
+                      'imageUrl': globalData.chatBgUrl,
+                      'onConfirm': controller.uploadChatBackground
+                    });
+                  }),
                   const SizedBox(height: 30),
                   _leastSelectButton('切换账号', () {}),
                   const SizedBox(height: 2),

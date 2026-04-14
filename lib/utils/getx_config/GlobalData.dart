@@ -12,6 +12,7 @@ class GlobalData extends GetxController {
   var currentUserId = '';
   var currentUserAccount = '';
   var baseIp = '';
+  String? chatBgUrl;
 
   Future<void> init() async {
     await onGetUserUnreadInfo(); // 异步获取未读数据
@@ -20,6 +21,18 @@ class GlobalData extends GetxController {
       currentUserAccount = prefs.getString('account') ?? '';
       baseIp = prefs.getString('baseIp') ?? '';
     });
+    _fetchChatBgUrl();
+  }
+
+  //获取聊天背景url
+  Future<void> _fetchChatBgUrl() async {
+    if (chatBgUrl != null) return;
+    try {
+      final res = await _userApi.getChatBackground();
+      if (res['code'] == 0) {
+        chatBgUrl = res['data'];
+      }
+    } catch (_) {}
   }
 
   // 获取未读信息
