@@ -166,7 +166,8 @@ class MinePage extends CustomWidget<MineLogic> {
                   _minorSelectButton('设置背景图片', 'mine-set.png', () {
                     Get.toNamed('/image_viewer_update', arguments: {
                       'imageUrl': globalData.chatBgUrl,
-                      'onConfirm': controller.uploadChatBackground
+                      'onConfirm': controller.uploadChatBackground,
+                      'text' : '更换背景图片'
                     });
                   }),
                   const SizedBox(height: 30),

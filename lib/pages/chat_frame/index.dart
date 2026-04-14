@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_bottom_container/panel_container.dart';
 import 'package:chat_bottom_container/typedef.dart';
 import 'package:flutter/cupertino.dart';
@@ -126,7 +127,16 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
           children: [
             // 消息列表部分
             Expanded(
-              child: GestureDetector(
+              child: Container(
+                decoration: globalData.chatBgUrl != null
+                    ? BoxDecoration(
+                        image: DecorationImage(
+                          image: CachedNetworkImageProvider(globalData.chatBgUrl!),
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : null,
+                child: GestureDetector(
                 //点击消息列表，把“更多”面板收起
                 onTap: () {
                   hidePanel();
@@ -194,6 +204,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                     },
                   ),
                 ),
+              ),
               )
             ),
             //下部操作栏
