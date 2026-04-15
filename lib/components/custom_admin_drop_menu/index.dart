@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AdminDropMenu extends StatefulWidget {
   final Offset offset;
   final Color? backGroundColor;
+  final bool isDisable;
   final int duration;
 
   const AdminDropMenu({
@@ -10,6 +11,7 @@ class AdminDropMenu extends StatefulWidget {
     this.offset = const Offset(0, 30),
     this.backGroundColor = Colors.white,
     this.duration = 200,
+    required this.isDisable
   });
 
   @override
@@ -67,7 +69,11 @@ class _AdminDropMenuDropMenuState extends State<AdminDropMenu>
           onTap: () {},
         ),
         PopupMenuItem(
-          child: Text('禁用/解除禁用'),
+          child: Text(
+              widget.isDisable
+                  ? '解除'
+                  : '禁用'
+          ),
           onTap: () {},
         ),
       ],

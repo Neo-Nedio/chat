@@ -109,4 +109,17 @@ class DateUtil {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     return '${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(seconds)}';
   }
+
+  //计算加入天数
+  static int calculateDaysSinceJoined(dynamic createTime) {
+    if (createTime == null) return 0;
+    DateTime? created;
+    if (createTime is String) {
+      created = DateTime.tryParse(createTime);
+    } else if (createTime is int) {
+      created = DateTime.fromMillisecondsSinceEpoch(createTime);
+    }
+    if (created == null) return 0;
+    return DateTime.now().difference(created).inDays;
+  }
 }
