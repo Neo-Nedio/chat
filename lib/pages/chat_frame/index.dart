@@ -459,33 +459,35 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                     ),
                   ),
                 ),
-                //上层删除按钮
-                Positioned(
-                  //右下角
-                  right: 16,
-                  bottom: 16,
-                  child: GestureDetector(
-                    onTap: () {
-                      final text = controller.msgContentController.text;
-                      if (text.isEmpty) return;
-                      //skipLast(1) 跳过最后一个字符，保留前面的
-                      final newText = text.characters.skipLast(1).toString();
-                      controller.msgContentController.value = TextEditingValue(
-                        text: newText,
-                        selection: TextSelection.collapsed(offset: newText.length),
-                      );
-                      controller.isSend.value = newText.trim().isNotEmpty;
-                    },
-                    child: Container( //删除按钮
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Icon(Icons.backspace_outlined, size: 20, color: Colors.black54),
-                    ),
-                  ),
+                //上层删除按钮（有内容时才显示）
+                Obx(() => controller.isSend.value
+                    ? Positioned(
+                        right: 16,
+                        bottom: 16,
+                        child: GestureDetector(
+                          onTap: () {
+                            final text = controller.msgContentController.text;
+                            if (text.isEmpty) return;
+                            //skipLast(1) 跳过最后一个字符，保留前面的
+                            final newText = text.characters.skipLast(1).toString();
+                            controller.msgContentController.value = TextEditingValue(
+                              text: newText,
+                              selection: TextSelection.collapsed(offset: newText.length),
+                            );
+                            controller.isSend.value = newText.trim().isNotEmpty;
+                          },
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Icon(Icons.backspace_outlined, size: 20, color: Colors.black54),
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
                 ),
               ],
             ),
