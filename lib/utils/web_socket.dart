@@ -158,9 +158,16 @@ class WebSocketUtil {
                  'content': wsContent['content']});
             break;
           case 'video':   // 视频通话
-            // 分发视频信令事件（invite/offer/answer/candidate/hangup/accept）
+           // 分发视频信令事件（invite/offer/answer/candidate/hangup/accept）
             eventController.add({
               'type': 'on-receive-video',
+              'content': wsContent['content'],
+            });
+            break;
+            //强制下线通知
+          case 'disable':
+            eventController.add({
+              'type': 'on-force-logout',
               'content': wsContent['content'],
             });
             break;
@@ -234,6 +241,19 @@ class WebSocketUtil {
   void _clearTimer() {
     _reconnectTimer?.cancel();
     _reconnectTimer = null;
+  }
+
+  // 强制关闭，不触发自动重连
+  void forceClose() {
+    _clearHeartbeat();
+    _clearTimer();
+    if (_channel != null) {
+      _channel!.sink.close();
+      _channel = null;
+    }
+    _isConnected = false;
+    _lockReconnect = false;
+    _reconnectCount = 0;
   }
 
   void dispose() {

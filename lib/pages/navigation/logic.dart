@@ -1,8 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../components/custom_button/index.dart';
 import '../../utils/getx_config/GlobalData.dart';
 import '../../utils/getx_config/GlobalThemeConfig.dart';
 import '../../utils/notification.dart';
@@ -47,6 +49,10 @@ class NavigationLogic extends GetxController {
   // 监听消息(收到任何消息，立马刷新)
   void eventListen() {
     _subscription = _wsManager.eventStream.listen((event) {
+      if (event['type'] == 'on-force-logout') { //强制下线
+        _showDisableDialog();
+        return;
+      }
       globalData.onGetUserUnreadInfo();
       //如果是视频通话，立马移向通话界面
       if (event['type'] == 'on-receive-video') {
@@ -60,6 +66,63 @@ class NavigationLogic extends GetxController {
         }
       }
     });
+  }
+
+  //强制下线对话框
+  void _showDisableDialog() {
+    final theme = Get.find<GlobalThemeConfig>();
+    showDialog(
+      context: Get.context!,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '提示',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: theme.primaryColor,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  '您的账号已被管理员禁用，请联系管理员处理',
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                CustomButton(
+                  text: '确定',
+                  onTap: () {
+                    Navigator.of(context).pop(); //把对话框弹出
+                    _handleForceLogout(); //转向登录页
+                  },
+                  width: 120,
+                  height: 34,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  //强制退出，转向登录页
+  Future<void> _handleForceLogout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final baseIp = prefs.getString('baseIp')?.trim() ?? '';
+    await prefs.clear();
+    prefs.setString("baseIp", baseIp);
+    _wsManager.forceClose();
+    Get.offAndToNamed('/login');
   }
 
   Future<void> connectWebSocket() async {
