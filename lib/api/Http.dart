@@ -63,7 +63,6 @@ class Http {
             case 0://成功
               break;
             case 1: //失败
-              CustomFlutterToast.showErrorToast(msg);
               break;
             case -1:// 认证失效 - 清除token并跳转登录
               CustomFlutterToast.showErrorToast(msg.isNotEmpty ? msg : '认证失效,请重新登录~');
