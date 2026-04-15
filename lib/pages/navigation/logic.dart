@@ -102,6 +102,7 @@ class NavigationLogic extends GetxController {
                   text: '确定',
                   onTap: () {
                     Navigator.of(context).pop(); //把对话框弹出
+                    Get.find<GlobalData>().reset(); //清空不该有的数据
                     _handleForceLogout(); //转向登录页
                   },
                   width: 120,

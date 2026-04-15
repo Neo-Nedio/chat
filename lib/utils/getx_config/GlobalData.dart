@@ -24,6 +24,14 @@ class GlobalData extends GetxController {
     _fetchChatBgUrl();
   }
 
+  //退出登录时清空不该有的数据
+  void reset() {
+    chatBgUrl = null;
+    currentUserId = '';
+    currentUserAccount = '';
+    unread.clear();
+  }
+
   //获取聊天背景url
   Future<void> _fetchChatBgUrl() async {
     if (chatBgUrl != null) return;

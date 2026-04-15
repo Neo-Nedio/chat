@@ -51,6 +51,7 @@ class MineLogic extends GetxController {
     final baseIp = prefs.getString('baseIp')?.trim() ?? '';
     await prefs.clear();
     prefs.setString("baseIp", baseIp);
+    Get.find<GlobalData>().reset();
     Get.offAndToNamed('/login');
   }
 
