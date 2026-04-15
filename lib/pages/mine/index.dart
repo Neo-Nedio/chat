@@ -171,7 +171,7 @@ class MinePage extends CustomWidget<MineLogic> {
                     });
                   }),
                   const SizedBox(height: 30),
-                  _leastSelectButton('切换账号', () {}),
+                  _leastSelectButton('管理员模式', () => controller.toAdmin()),
                   const SizedBox(height: 2),
                   _leastSelectButton('退出', controller.handlerLogout,
                       color: theme.errorColor),

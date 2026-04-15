@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chat_mobile/api/admin_api.dart';
 import 'package:dio/dio.dart' show FormData, MultipartFile;
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart' hide MultipartFile, FormData;
@@ -11,6 +12,7 @@ import '../../utils/getx_config/GlobalData.dart';
 
 class MineLogic extends GetxController {
   final _userApi = UserApi();
+  final _adminApi = AdminApi();
 
   late dynamic currentUserInfo = {};
 
@@ -75,6 +77,17 @@ class MineLogic extends GetxController {
     } else {
       CustomFlutterToast.showErrorToast(result['msg'] ?? '设置失败');
     }
+  }
+
+  //前往管理员页面
+  void toAdmin() {
+    _adminApi.isAdmin().then((res) {
+      if (res['code'] == 0) {
+        Get.toNamed('/admin');
+      }else{
+        CustomFlutterToast.showErrorToast('你不是管理员~');
+      }
+    });
   }
 
   @override

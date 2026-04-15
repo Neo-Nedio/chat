@@ -42,6 +42,7 @@ import '../../pages/register/logic.dart';
 import '../../pages/talk/logic.dart';
 import '../../pages/talk/talk_create/logic.dart';
 import '../../pages/talk/talk_details/logic.dart';
+import '../../pages/admin/logic.dart';
 import '../../pages/video_chat/logic.dart';
 import 'GlobalData.dart';
 import 'GlobalThemeConfig.dart';
@@ -93,5 +94,6 @@ class ControllerBinding extends Bindings {
     Get.lazyPut(() => ChatFrameLogic(), fenix: true);
     Get.lazyPut(() => FileDetailsLogic(), fenix: true);
     Get.lazyPut(() => VideoChatLogic(), fenix: true);
+    Get.lazyPut(() => AdminUserManageLogic(), fenix: true);
   }
 }

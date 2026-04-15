@@ -8,8 +8,9 @@ import '../custom_portrait/index.dart';
 
 class CustomUserCard extends StatelessWidget {
   final Map<String, dynamic> user;
+  final VoidCallback? onActionCompleted;
 
-  const CustomUserCard({super.key, required this.user});
+  const CustomUserCard({super.key, required this.user, this.onActionCompleted});
 
   GlobalThemeConfig get theme => Get.find<GlobalThemeConfig>();
 
@@ -263,7 +264,11 @@ class CustomUserCard extends StatelessWidget {
                 Expanded(
                   child: Column(
                     children: [
-                      AdminDropMenu(isDisable: status != 'normal'),
+                      AdminDropMenu(
+                          isDisable: status != 'normal',
+                          userId: user['id'],
+                          onActionCompleted: onActionCompleted,
+                          ),
                       const SizedBox(height: 2),
                       const Text(
                         '更多操作',

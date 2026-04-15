@@ -1,17 +1,24 @@
+import 'package:chat_mobile/api/admin_api.dart';
 import 'package:flutter/material.dart';
+
+import '../custom_flutter_toast/index.dart';
 
 class AdminDropMenu extends StatefulWidget {
   final Offset offset;
   final Color? backGroundColor;
   final bool isDisable;
+  final String userId;
   final int duration;
+  final VoidCallback? onActionCompleted;
 
   const AdminDropMenu({
     super.key,
     this.offset = const Offset(0, 30),
     this.backGroundColor = Colors.white,
     this.duration = 200,
-    required this.isDisable
+    required this.isDisable,
+    required this.userId,
+    this.onActionCompleted,
   });
 
   @override
@@ -22,6 +29,7 @@ class _AdminDropMenuDropMenuState extends State<AdminDropMenu>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
+  final _adminApi = AdminApi();
 
   @override
   void initState() {
@@ -65,16 +73,38 @@ class _AdminDropMenuDropMenuState extends State<AdminDropMenu>
       ),
       itemBuilder: (context) => [
         PopupMenuItem(
-          child: Text('修改密码'),
-          onTap: () {},
+          child: Text('重置密码'),
+          onTap: () {
+            _adminApi.restPassword(widget.userId).then((res){
+              if(res['code'] == 0){
+                CustomFlutterToast.showSuccessToast('他的新密码是${res['data']}');
+              }else{
+                CustomFlutterToast.showErrorToast('重置密码失败');
+              }
+            });
+          },
         ),
         PopupMenuItem(
           child: Text(
               widget.isDisable
-                  ? '解除'
+                  ? '解禁'
                   : '禁用'
           ),
-          onTap: () {},
+          onTap: ()  async {
+            final Map<String, dynamic> result;
+            if(widget.isDisable){
+              result = await _adminApi.unDisableUser(widget.userId);
+            }else {
+              result = await _adminApi.disableUser(widget.userId);
+            }
+
+            if(result['code'] == 0){
+              CustomFlutterToast.showSuccessToast('修改成功');
+              widget.onActionCompleted?.call();
+            }else{
+              CustomFlutterToast.showErrorToast(result['msg'] ?? '修改失败');
+            }
+          },
         ),
       ],
     );

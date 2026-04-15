@@ -88,7 +88,7 @@ class DateUtil {
         (monthDifference == 0 && today.day < birth.day)) {
       age--;
     }
-    return '$age岁';
+    return '$age';
   }
 
   static String formatTimingTime(dynamic time) {

@@ -42,6 +42,7 @@ import '../../pages/set_ip/index.dart';
 import '../../pages/talk/index.dart';
 import '../../pages/talk/talk_create/index.dart';
 import '../../pages/talk/talk_details/index.dart';
+import '../../pages/admin/index.dart';
 import '../../pages/video_chat/index.dart';
 import 'ControllerBinding.dart';
 
@@ -339,6 +340,13 @@ class AppRoutes {
       name: '/set_ip',
       page: () => SetIpPage(
         key: const Key('set_ip'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/admin',
+      page: () => AdminUserManagePage(
+        key: const Key('admin'),
       ),
       binding: ControllerBinding(),
     ),
