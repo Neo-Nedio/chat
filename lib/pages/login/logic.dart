@@ -81,7 +81,7 @@ class LoginPageLogic extends GetxController {
       //跳转到首页
       Get.offAllNamed('/?sex=${loginResult['data']['sex']}');
     } else {
-      _dialog("用户名或密码错误，请重试尝试~", context = context);
+      _dialog(loginResult['msg'], context = context);
     }
   }
 
