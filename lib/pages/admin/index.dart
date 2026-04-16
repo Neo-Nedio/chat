@@ -4,6 +4,7 @@ import '../../components/app_bar_title/index.dart';
 import '../../components/custom_search_box/index.dart';
 import '../../components/custom_user_card/index.dart';
 import '../../utils/getx_config/config.dart';
+import 'package:get/get.dart';
 import 'logic.dart';
 
 class AdminUserManagePage extends CustomWidget<AdminUserManageLogic> {
@@ -26,6 +27,28 @@ class AdminUserManagePage extends CustomWidget<AdminUserManageLogic> {
         centerTitle: true,
         title: const AppBarTitle('用户管理'),
         backgroundColor: const Color(0xFFF9FBFF),
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) {
+              if (value == 'create_notify') {
+                Get.toNamed('/admin_notify');
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'create_notify',
+                child: Row(
+                  children: [
+                    Icon(Icons.campaign_outlined, size: 20),
+                    SizedBox(width: 8),
+                    Text('发布通知'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       //主题
       body: Padding(

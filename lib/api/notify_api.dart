@@ -45,7 +45,14 @@ class NotifyApi {
   //获取通知图片url
   Future<Map<String, dynamic>> getImgUrl(String fileName) async {
     final response = await _dio.get('/v1/api/notify/get/img',
-        queryParameters: {'msgId': fileName});
+        queryParameters: {'fileName': fileName});
+    return response.data;
+  }
+
+  //创建系统通知
+  Future<Map<String, dynamic>> createNotify(FormData formData) async {
+    final response =
+        await _dio.post('/admin/v1/api/notify/system/create', data: formData);
     return response.data;
   }
 }
