@@ -44,7 +44,7 @@ class SystemNotifyPage extends CustomWidget<SystemNotifyLogic> {
 
   //好友通知项
   Widget _buildNotifyItem(notify) {
-    final imgUrl = notify['content']?['img']?.toString().trim() ?? '';
+    final fileName = notify['content']?['img']?.toString().trim() ?? '';
 
     return Column(
       mainAxisSize: MainAxisSize.max,
@@ -75,8 +75,23 @@ class SystemNotifyPage extends CustomWidget<SystemNotifyLogic> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (imgUrl.isNotEmpty) ...[
-                CustomImage(url: imgUrl),
+              if (fileName.isNotEmpty) ...[
+                FutureBuilder<String>(
+                  future: controller.getImgUrl(fileName),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState != ConnectionState.done) {
+                      return const SizedBox(
+                        height: 100,
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+                    if (snapshot.hasError ||
+                        (snapshot.data ?? '').isEmpty) {
+                      return Image.asset('assets/images/empty-image.png');
+                    }
+                    return CustomImage(url: snapshot.data!);
+                  },
+                ),
                 const SizedBox(height: 5),
               ],
               Text(
