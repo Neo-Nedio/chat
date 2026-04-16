@@ -49,6 +49,18 @@ class NotifyApi {
     return response.data;
   }
 
+  //最新未读系统通知
+  Future<Map<String, dynamic>> systemLatest() async {
+    final response = await _dio.get('/v1/api/notify/system/latest');
+    return response.data;
+  }
+
+  //系统通知已读
+  Future<Map<String, dynamic>> systemRead() async {
+    final response = await _dio.get('/v1/api/notify/system/read');
+    return response.data;
+  }
+
   //创建系统通知
   Future<Map<String, dynamic>> createNotify(FormData formData) async {
     final response =

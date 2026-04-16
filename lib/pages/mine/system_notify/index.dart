@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../components/app_bar_title/index.dart';
-import '../../../components/custom_image/index.dart';
+import '../../../components/custom_notify_content/index.dart';
 import '../../../utils/date.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
@@ -42,10 +42,7 @@ class SystemNotifyPage extends CustomWidget<SystemNotifyLogic> {
     );
   }
 
-  //好友通知项
   Widget _buildNotifyItem(notify) {
-    final fileName = notify['content']?['img']?.toString().trim() ?? '';
-
     return Column(
       mainAxisSize: MainAxisSize.max,
       children: [
@@ -64,7 +61,6 @@ class SystemNotifyPage extends CustomWidget<SystemNotifyLogic> {
 
         const SizedBox(height: 5),
 
-        //通知
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(10),
@@ -72,41 +68,7 @@ class SystemNotifyPage extends CustomWidget<SystemNotifyLogic> {
             borderRadius: BorderRadius.all(Radius.circular(10)),
             color: Colors.white,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Text(
-                  notify['content']['title'] ?? '',
-                  style:
-                      const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-              ),
-              if (fileName.isNotEmpty) ...[
-                FutureBuilder<String>(
-                  future: controller.getImgUrl(fileName),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState != ConnectionState.done) {
-                      return const SizedBox(
-                        height: 100,
-                        child: Center(child: CircularProgressIndicator()),
-                      );
-                    }
-                    if (snapshot.hasError ||
-                        (snapshot.data ?? '').isEmpty) {
-                      return Image.asset('assets/images/empty-image.png');
-                    }
-                    return CustomImage(url: snapshot.data!);
-                  },
-                ),
-                const SizedBox(height: 5),
-              ],
-              Text(
-                notify['content']['text'] ?? '',
-                style: const TextStyle(fontSize: 14, color: Colors.black54),
-              ),
-            ],
-          ),
+          child: CustomNotifyContent.fromNotify(notify, titleSize: 24),
         ),
 
         const SizedBox(height: 15),

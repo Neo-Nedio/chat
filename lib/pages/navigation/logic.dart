@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../api/notify_api.dart';
 import '../../components/custom_button/index.dart';
+import '../../components/custom_notify_content/index.dart';
 import '../../utils/getx_config/GlobalData.dart';
 import '../../utils/getx_config/GlobalThemeConfig.dart';
 import '../../utils/notification.dart';
@@ -14,7 +16,9 @@ import '../../utils/web_socket.dart';
 class NavigationLogic extends GetxController {
   late RxInt currentIndex = 0.obs;
   final _wsManager = WebSocketUtil();
+  final _notifyApi = NotifyApi();
   StreamSubscription? _subscription;
+  bool _isShowingNotifyDialog = false;
 
   GlobalData get globalData => GetInstance().find<GlobalData>();
 
@@ -43,6 +47,7 @@ class NavigationLogic extends GetxController {
     // Widget 树构建和渲染完成后的下一个微任务中执行代码
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await initThemeData();
+      _checkLatestSystemNotify(); // 登录补偿：页面构建完成后检查是否有通知未读
     });
   }
 
@@ -51,6 +56,11 @@ class NavigationLogic extends GetxController {
     _subscription = _wsManager.eventStream.listen((event) {
       if (event['type'] == 'on-force-logout') { //强制下线
         _showDisableDialog();
+        return;
+      }
+      //监听系统通知
+      if (event['type'] == 'on-system-notify') {
+        _showSystemNotifyDialog(event['content']);
         return;
       }
       globalData.onGetUserUnreadInfo();
@@ -124,6 +134,118 @@ class NavigationLogic extends GetxController {
     prefs.setString("baseIp", baseIp);
     _wsManager.forceClose();
     Get.offAndToNamed('/login');
+  }
+
+  // 登录补偿：获取最新未读系统通知
+  Future<void> _checkLatestSystemNotify() async {
+    try {
+      final res = await _notifyApi.systemLatest();
+      if (res['code'] == 0 && res['data'] != null) {
+        _showSystemNotifyDialog(res['data']);
+      }
+    } catch (e) {
+      debugPrint('checkLatestSystemNotify error: $e');
+    }
+  }
+
+  // 展示系统通知弹窗
+  void _showSystemNotifyDialog(Map<String, dynamic> notify) {
+    if (_isShowingNotifyDialog) return;
+    _isShowingNotifyDialog = true;
+
+    final theme = Get.find<GlobalThemeConfig>();
+
+    showDialog(
+      context: Get.context!,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints( //约束大小
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 标题栏
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: theme.primaryColor,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(12),
+                    ),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.campaign, color: Colors.white, size: 22),
+                      SizedBox(width: 6),
+                      Text(
+                        '系统通知',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // 内容区
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: CustomNotifyContent.fromNotify(notify),
+                  ),
+                ),
+
+                // 底部按钮
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: CustomButton(
+                          text: '查看全部',
+                          type: 'minor',
+                          height: 38,
+                          textSize: 14,
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            _isShowingNotifyDialog = false;
+                            _notifyApi.systemRead();
+                            Get.toNamed('/system_notify');
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: CustomButton(
+                          text: '我知道了',
+                          height: 38,
+                          textSize: 14,
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            _isShowingNotifyDialog = false;
+                            _notifyApi.systemRead();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    ).then((_) => _isShowingNotifyDialog = false);
   }
 
   Future<void> connectWebSocket() async {

@@ -8,7 +8,6 @@ import 'date.dart';
 import 'msg.dart';
 import 'notification.dart';
 
-//todo WebSocket 是一种全双工通信协议，允许客户端和服务器之间建立持久连接，双方可以随时发送消息
 /*
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                         WebSocketUtil (单例)                            │
@@ -168,6 +167,13 @@ class WebSocketUtil {
           case 'disable':
             eventController.add({
               'type': 'on-force-logout',
+              'content': wsContent['content'],
+            });
+            break;
+            //系统通知
+          case 'system_notify':
+            eventController.add({
+              'type': 'on-system-notify',
               'content': wsContent['content'],
             });
             break;
