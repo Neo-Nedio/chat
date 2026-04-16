@@ -90,6 +90,21 @@ class MineLogic extends GetxController {
     });
   }
 
+  //前往系统通知页面
+  void toSystemNotify() {
+    _adminApi.isAdmin().then((res) {
+      if (res['code'] == 0) {
+        Get.toNamed('/system_notify', arguments: {
+          'isAdmin': true,
+        });
+      }else{
+        Get.toNamed('/system_notify', arguments: {
+          'isAdmin': false,
+        });
+      }
+    });
+  }
+
   @override
   void onInit() {
     super.onInit();

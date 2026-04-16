@@ -61,10 +61,19 @@ class NotifyApi {
     return response.data;
   }
 
-  //创建系统通知
+  //管理员创建系统通知
   Future<Map<String, dynamic>> createNotify(FormData formData) async {
     final response =
         await _dio.post('/admin/v1/api/notify/system/create', data: formData);
+    return response.data;
+  }
+
+  //管理员删除系统通知
+  Future<Map<String, dynamic>> deleteNotify(String notifyId) async {
+    final response = await _dio.post(
+      '/admin/v1/api/notify/system/delete',
+      data: {'notifyId': notifyId},  // 包装成 Map
+    );
     return response.data;
   }
 }

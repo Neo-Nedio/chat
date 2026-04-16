@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/notify_api.dart';
 import '../../components/custom_button/index.dart';
-import '../../components/custom_notify_content/index.dart';
+import '../../components/custom_system_notify_content/index.dart';
 import '../../utils/getx_config/GlobalData.dart';
 import '../../utils/getx_config/GlobalThemeConfig.dart';
 import '../../utils/notification.dart';

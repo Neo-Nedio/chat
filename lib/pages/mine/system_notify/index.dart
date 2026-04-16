@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../components/app_bar_title/index.dart';
-import '../../../components/custom_notify_content/index.dart';
+import '../../../components/custom_system_notify_content/index.dart';
 import '../../../utils/date.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
@@ -68,7 +68,8 @@ class SystemNotifyPage extends CustomWidget<SystemNotifyLogic> {
             borderRadius: BorderRadius.all(Radius.circular(10)),
             color: Colors.white,
           ),
-          child: CustomNotifyContent.fromNotify(notify, titleSize: 24),
+          child: CustomNotifyContent.fromNotify(
+            notify, titleSize: 24, showDelete: controller.isAdmin,update: controller.onUpdate,),
         ),
 
         const SizedBox(height: 15),

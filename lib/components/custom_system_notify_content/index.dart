@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../api/notify_api.dart';
+import '../CustomDialog/index.dart';
+import '../custom_flutter_toast/index.dart';
 import '../custom_image/index.dart';
 
 //系统通知展示
@@ -13,34 +15,58 @@ class CustomNotifyContent extends StatelessWidget {
   final String imgFileName;
   final double titleSize;
   final double textSize;
+  final bool showDelete;
+  final String notifyId;
+  final VoidCallback? update;
 
   const CustomNotifyContent({
     super.key,
     required this.title,
     required this.text,
     required this.imgFileName,
+    required this.notifyId,
     this.titleSize = 18,
     this.textSize = 14,
+    this.showDelete = false, //是否展示删除按钮
+    this.update //删除后更新页面
   });
 
   factory CustomNotifyContent.fromNotify(
     Map<String, dynamic> notify, {
     double titleSize = 18,
     double textSize = 14,
+    bool showDelete = false,
+    VoidCallback? update
   }) {
     final content = notify['content'] ?? {};
     return CustomNotifyContent(
       title: content['title']?.toString() ?? '',
       text: content['text']?.toString() ?? '',
       imgFileName: content['img']?.toString().trim() ?? '',
+      notifyId: notify['id'] ?? '',
       titleSize: titleSize,
       textSize: textSize,
+      showDelete : showDelete,
+      update: update,
     );
+  }
+
+  Future<void> onDelete()async {
+    _notifyApi.deleteNotify(notifyId).then((res){
+      if(res['code'] == 0){
+        CustomFlutterToast.showSuccessToast('删除成功');
+        update?.call(); //不为空时调用
+      }else{
+        CustomFlutterToast.showErrorToast(res['msg'] ?? '');
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Stack(
+    children: [
+      Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -75,7 +101,37 @@ class CustomNotifyContent extends StatelessWidget {
             child: _buildImage(),
           ),
       ],
-    );
+    ),
+    //右上角删除按钮
+    if (showDelete)
+        Positioned(
+          top: 0,
+          right: 0,
+          child: GestureDetector(
+            onTap: () =>{
+              CustomDialog.showTipDialog(
+                  context,
+                  text: '删除通知',
+                  onOk: onDelete,
+                  onCancel: () =>{}
+              )
+            },
+            child: Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.7),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.close,
+                size: 16,
+                color: Colors.white,
+              ),
+            ),
+        ),
+        )
+  ]);
   }
 
   //获取图片url
