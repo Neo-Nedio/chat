@@ -75,6 +75,13 @@ class SystemNotifyPage extends CustomWidget<SystemNotifyLogic> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Center(
+                child: Text(
+                  notify['content']['title'] ?? '',
+                  style:
+                      const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+              ),
               if (fileName.isNotEmpty) ...[
                 FutureBuilder<String>(
                   future: controller.getImgUrl(fileName),
@@ -94,11 +101,6 @@ class SystemNotifyPage extends CustomWidget<SystemNotifyLogic> {
                 ),
                 const SizedBox(height: 5),
               ],
-              Text(
-                notify['content']['title'] ?? '',
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
               Text(
                 notify['content']['text'] ?? '',
                 style: const TextStyle(fontSize: 14, color: Colors.black54),
