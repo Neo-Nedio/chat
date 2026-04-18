@@ -8,7 +8,19 @@ import '../app_badger.dart';
 //全局数据管理类
 class GlobalData extends GetxController {
   final _userApi = UserApi();
-  var unread = <String, int>{}.obs; // 未读数据
+  // 未读数据，可能包含的 key：
+  //   chat         - 聊天消息未读数
+  //   notify       - 通知未读总数（friendNotify + groupNotify + systemNotify）
+  //   friendNotify - 好友申请未读数
+  //   groupNotify  - 群申请未读数
+  //   systemNotify - 系统通知未读数
+  var unread = <String, int>{
+    'chat': 0,
+    'notify': 0,
+    'friendNotify': 0,
+    'groupNotify': 0,
+    'systemNotify': 0,
+  }.obs;
   var currentUserId = '';
   var currentUserAccount = '';
   var baseIp = '';
@@ -29,7 +41,9 @@ class GlobalData extends GetxController {
     chatBgUrl = null;
     currentUserId = '';
     currentUserAccount = '';
-    unread.clear();
+    // 把所有未读项重置为 0，同时清空桌面角标
+    unread.updateAll((key, value) => 0);
+    AppBadger.setCount(0, 0);
   }
 
   //获取聊天背景url
@@ -47,12 +61,17 @@ class GlobalData extends GetxController {
   Future<void> onGetUserUnreadInfo() async {
     final result = await _userApi.unread();
     if (result['code'] == 0) {
-      // 更新响应式 Map（会触发 UI 更新）
-      unread.assignAll(Map<String, int>.from(result['data']));
-      // 更新桌面角标
+      // 用后端返回的数据覆盖对应 key，
+      // 未返回的 key 保留默认 0，避免 UI 取值异常。
+      final data = Map<String, dynamic>.from(result['data'] ?? {});
+      data.forEach((key, value) {
+        unread[key] = (value as num?)?.toInt() ?? 0;
+      });
+      unread.refresh();
+      // 更新桌面角标（notify 已经是包含 friend/group/system 的总和）
       AppBadger.setCount(
-          getUnreadCount('chat'),  // 聊天未读数
-          getUnreadCount('notify')); // 通知未读数
+          getUnreadCount('chat'),    // 聊天未读数
+          getUnreadCount('notify')); // 通知未读总数
     }
   }
 

@@ -6,6 +6,7 @@ class AppBadger {
   static int _notifyCount = 0;
 
   // 同时设置聊天和通知未读数
+  // 注意：notifyCount 是通知未读「总数」，已包含 friendNotify + groupNotify + systemNotify
   static void setCount(int chatCount, int notifyCount) {
     _chatCount = chatCount;
     _notifyCount = notifyCount;
@@ -27,21 +28,16 @@ class AppBadger {
   //更新角标
   static void _updateBadgeCount() async {
     // 1. 检查设备是否支持角标
-    if (await AppBadgePlus.isSupported()) {
+    if (!await AppBadgePlus.isSupported()) return;
 
-      // 2. 计算总未读数
-      int total = _chatCount + _notifyCount;
+    // 2. 防止脏数据导致负数
+    if (_chatCount < 0) _chatCount = 0;
+    if (_notifyCount < 0) _notifyCount = 0;
 
-      // 3. 根据总数决定显示什么
-      if (total > 0) {
-        // 有未读：显示总数量
-        await AppBadgePlus.updateBadge(total);
-      } else {
-        // 无未读：清零
-        _notifyCount = 0;
-        _chatCount = 0;
-        await AppBadgePlus.updateBadge(0);
-      }
-    }
+    // 3. 计算总未读数（聊天 + 通知总数，通知里已包含 friend/group/system）
+    final int total = _chatCount + _notifyCount;
+
+    // 4. 更新角标（为 0 时即清零）
+    await AppBadgePlus.updateBadge(total);
   }
 }

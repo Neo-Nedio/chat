@@ -188,6 +188,12 @@ class UserApi {
   }
 
   //获取未读数
+  // 返回 data 字段结构：
+  //   chat         - 聊天消息未读数
+  //   notify       - 通知未读总数（包含 friendNotify + groupNotify + systemNotify）
+  //   friendNotify - 好友申请未读数
+  //   groupNotify  - 群申请未读数
+  //   systemNotify - 系统通知未读数
   Future<Map<String, dynamic>> unread() async {
     final response = await _dio.get('/v1/api/user/unread');
     return response.data;
