@@ -115,6 +115,12 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
                         value: controller.chatGroupDetails['name']),
                     const SizedBox(height: 1),
                     CustomLabelValueButton(
+                        onTap: () =>{},
+                        width: 60,
+                        label: '群号',
+                        value: controller.chatGroupDetails['chatGroupNumber']),
+                    const SizedBox(height: 1),
+                    CustomLabelValueButton(
                         onTap: controller.setGroupRemark,
                         width: 60,
                         label: '群备注',

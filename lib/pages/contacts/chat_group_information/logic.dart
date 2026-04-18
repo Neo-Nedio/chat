@@ -24,6 +24,7 @@ class ChatGroupInformationLogic extends GetxController {
   //群聊详情
   late dynamic chatGroupDetails = {
     'id': '',
+    'chatGroupNumber' : '',
     'userId': '',
     'ownerUserId': '',
     'portrait': '',
@@ -106,6 +107,9 @@ class ChatGroupInformationLogic extends GetxController {
 
   //设置群名
   void setGroupName() async {
+    if(!isOwner){
+      return;
+    }
     var result = await Get.toNamed('/set_group_name', arguments: {
       'chatGroupId': chatGroupId,
       'name': chatGroupDetails['name']
