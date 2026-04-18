@@ -119,4 +119,12 @@ class ChatGroupApi {
     });
     return response.data;
   }
+
+  //查看群聊是否解散
+  Future<Map<String, dynamic>> isDissolveChatGroup(String groupId) async {
+    final response = await _dio.post('/v1/api/chat-group/isDissolve', data: {
+      'groupId': groupId,
+    });
+    return response.data;
+  }
 }

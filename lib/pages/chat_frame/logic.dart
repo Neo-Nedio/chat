@@ -10,6 +10,7 @@ import 'package:get/get.dart' hide FormData, MultipartFile;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../api/chat_group_api.dart';
 import '../../api/chat_group_member.dart';
 import '../../api/chat_list_api.dart';
 import '../../api/msg_api.dart';
@@ -30,6 +31,7 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
   final _userApi = UserApi();
   final _videoApi = VideoApi();
   final _friendApi = FriendApi();
+  final _chatGroupApi = ChatGroupApi();
   final _chatGroupMemberApi = ChatGroupMemberApi();
   final _wsManager = WebSocketUtil(); // WebSocket 管理
 
@@ -234,10 +236,23 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
   //根据聊天类型，跳转到对应的详情页面
   void toDetailsPage() {
     if (chatInfo['type'] == 'group') {
-      Get.toNamed('/chat_group_info', arguments: {'chatGroupId': targetId});
+      //打开群聊详情
+      handlerGroupTapped(targetId);
     } else {
+      //前往用户详情
       handlerUserTapped(targetId);
     }
+  }
+
+  //打开群聊详情
+  void handlerGroupTapped(dynamic toId) async{
+    //跳转前先校验群聊是否存在（未解散）
+    final res = await _chatGroupApi.isDissolveChatGroup(toId);
+    if (res['code'] == 0) {
+      CustomFlutterToast.showErrorToast('该群聊不存在或已解散');
+      return;
+    }
+    Get.toNamed('/chat_group_info', arguments: {'chatGroupId': toId});
   }
 
   //打开对方用户详情
