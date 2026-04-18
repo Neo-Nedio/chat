@@ -287,7 +287,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
                       //状态提示行
                       Text(
                         _getNotifyContentTip(
-                            notify['status'], isFromCurrentUser),
+                            notify['status'], isFromCurrentUser,notify['type']),
                         style: TextStyle(
                             fontSize: 12, color: theme.primaryColor),
                       ),
@@ -329,9 +329,11 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
   }
 
   //获得状态提示
-  String _getNotifyContentTip(status, isFromCurrentUser) {
+  String _getNotifyContentTip(status, isFromCurrentUser,String type) {
     // 别人发来的请求（我是接收方）
-    if (!isFromCurrentUser) return "请求加你为好友";
+    if (!isFromCurrentUser){
+      return type == 'friend' ? "请求加你为好友" : '申请加入群聊';
+    }
 
     switch (status) {
       case "wait":

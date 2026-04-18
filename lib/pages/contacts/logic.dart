@@ -27,7 +27,7 @@ class ContactsLogic extends GetxController {
 
   final GlobalData _globalData = GetInstance().find<GlobalData>();
 
-  List<String> tabs = ['我的群聊', '我的好友', '好友通知']; // 标签页
+  List<String> tabs = ['我的群聊', '我的好友', '通知']; // 标签页
 
   int selectedIndex = 1;        // 当前选中的标签索引（默认选中"我的好友"）
   String currentUserId = '';   //获取当前用户id
@@ -99,8 +99,10 @@ class ContactsLogic extends GetxController {
   }
 
   //消息已读
-  void onReadNotify() async {
-    await _notifyApi.read('friend'); //消息已读
+  // type: 'friend' 好友申请通知 / 'group' 群申请通知
+  Future<void> onReadNotify() async {
+    await _notifyApi.read('friend');
+    await _notifyApi.read('group');
     await _globalData.onGetUserUnreadInfo();
   }
 
@@ -120,7 +122,6 @@ class ContactsLogic extends GetxController {
 
   //同意添加好友
   void handlerAgreeFriend(dynamic notify) async {
-    onReadNotify(); //消息已读
     final result = await _friendApi.agree(notify['id'], notify['fromId']);
     if (result['code'] == 0) {
       init();
@@ -132,7 +133,6 @@ class ContactsLogic extends GetxController {
 
   //拒绝添加好友
   void handlerRejectFriend(dynamic notify) async {
-    onReadNotify(); //消息已读
     final result = await _friendApi.reject(notify['fromId']);
     if (result['code'] == 0) {
       init();
