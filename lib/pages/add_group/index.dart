@@ -150,7 +150,7 @@ class AddGroupPage extends CustomWidgetNew<AddGroupLogic> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset(
-                            'assets/images/empty-image.png',
+                            'assets/images/empty-bg.png',
                             width: 100,
                           ),
                           const SizedBox(height: 5),
