@@ -56,7 +56,7 @@ class GroupRequestLogic extends Logic {
     );
     if (result['code'] == 0) {
       CustomFlutterToast.showSuccessToast("申请成功，等待群主验证~");
-      Future.delayed(const Duration(milliseconds: 2300), () => Get.back());
+      Future.delayed(const Duration(milliseconds: 500), () => Get.back());
     } else {
       CustomFlutterToast.showErrorToast(result['msg']);
     }

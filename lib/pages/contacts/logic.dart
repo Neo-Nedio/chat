@@ -120,25 +120,53 @@ class ContactsLogic extends GetxController {
     Get.toNamed('/friend_info', arguments: {'friendId': friend['friendId']});
   }
 
-  //同意添加好友
+  //同意申请（按 notify.type 分发：friend → 好友申请；group → 入群申请）
   void handlerAgreeFriend(dynamic notify) async {
-    final result = await _friendApi.agree(notify['id'], notify['fromId']);
+    final type = notify['type']?.toString();
+    Map<String, dynamic> result;
+    String successTip;
+    String failTip;
+    if (type == 'group') {
+      // 入群申请：fromId=申请人，toId=群id
+      result = await _chatGroupApi.agreeGroupApply(
+        notify['fromId'].toString(),
+        notify['toId'].toString(),
+      );
+      successTip = "同意入群申请成功";
+      failTip = "同意入群申请失败";
+    } else {
+      // 默认按好友申请处理
+      result = await _friendApi.agree(notify['id'], notify['fromId']);
+      successTip = "同意好友请求成功";
+      failTip = "同意好友请求失败";
+    }
     if (result['code'] == 0) {
       init();
-      CustomFlutterToast.showSuccessToast("同意好友请求成功");
+      CustomFlutterToast.showSuccessToast(successTip);
     } else {
-      CustomFlutterToast.showErrorToast("同意好友请求失败");
+      CustomFlutterToast.showErrorToast(result['msg'] ?? failTip);
     }
   }
 
-  //拒绝添加好友
+  //拒绝申请（按 notify.type 分发：friend → 好友申请；group → 入群申请）
   void handlerRejectFriend(dynamic notify) async {
-    final result = await _friendApi.reject(notify['fromId']);
+    final type = notify['type']?.toString();
+    Map<String, dynamic> result;
+    if (type == 'group') {
+      // 入群申请：fromId=申请人，toId=群id
+      result = await _chatGroupApi.rejectGroupApply(
+        notify['fromId'].toString(),
+        notify['toId'].toString(),
+      );
+    } else {
+      // 默认按好友申请处理
+      result = await _friendApi.reject(notify['fromId']);
+    }
     if (result['code'] == 0) {
       init();
-      CustomFlutterToast.showSuccessToast("操作成功");
+      CustomFlutterToast.showSuccessToast("已拒绝");
     } else {
-      CustomFlutterToast.showErrorToast("网络错误");
+      CustomFlutterToast.showErrorToast(result['msg'] ?? "网络错误");
     }
   }
 

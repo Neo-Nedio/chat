@@ -136,4 +136,24 @@ class ChatGroupApi {
     });
     return response.data;
   }
+
+  //同意入群申请（群主操作）
+  Future<Map<String, dynamic>> agreeGroupApply(
+      String fromId, String groupId) async {
+    final response = await _dio.post('/v1/api/chat-group/agree', data: {
+      'fromId': fromId,
+      'groupId': groupId,
+    });
+    return response.data;
+  }
+
+  //拒绝入群申请（群主操作）
+  Future<Map<String, dynamic>> rejectGroupApply(
+      String fromId, String groupId) async {
+    final response = await _dio.post('/v1/api/chat-group/reject', data: {
+      'fromId': fromId,
+      'groupId': groupId,
+    });
+    return response.data;
+  }
 }
