@@ -28,15 +28,15 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
       case '通知':
         return RefreshIndicator(
           onRefresh: () async {
-            controller.onNotifyFriendList();
+            controller.onNotifyList();
             return Future.delayed(const Duration(milliseconds: 700));
           },
           child: ListView(
             children: [
               // 用...将列表展开
-              ...controller.notifyFriendList.map((notify) => Container(
+              ...controller.notifyList.map((notify) => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: _buildNotifyFriendItem(notify),
+                child: _buildNotifyItem(notify),
               )),
             ],
           ),
@@ -212,8 +212,8 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
     return raw.toString();
   }
 
-  //好友通知项
-  Widget _buildNotifyFriendItem(dynamic notify) {
+  //通知项（好友申请 + 群申请共用）
+  Widget _buildNotifyItem(dynamic notify) {
     //判断通知方向
     bool isFromCurrentUser = controller.currentUserId == notify['fromId'];
 
@@ -235,7 +235,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
             ),
           ),
 
-          //好友通知
+          //通知主体
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Row(
@@ -286,8 +286,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
 
                       //状态提示行
                       Text(
-                        _getNotifyContentTip(
-                            notify['status'], isFromCurrentUser,notify['type']),
+                        _getNotifyContentTip(notify, isFromCurrentUser),
                         style: TextStyle(
                             fontSize: 12, color: theme.primaryColor),
                       ),
@@ -329,25 +328,30 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
   }
 
   //获得状态提示
-  String _getNotifyContentTip(status, isFromCurrentUser,String type) {
+  String _getNotifyContentTip(dynamic notify, bool isFromCurrentUser) {
+    final String type = notify['type']?.toString() ?? 'friend';
+    final String status = notify['status']?.toString() ?? '';
+
     // 别人发来的请求（我是接收方）
-    if (!isFromCurrentUser){
-      return type == 'friend' ? "请求加你为好友" : '申请加入群聊';
+    if (!isFromCurrentUser) {
+      if (type == 'group') {
+        // 群申请：toName 是群名（后端 ApplyNotifyDto 在 group 类型上返回群名）
+        final String groupName = notify['toName']?.toString() ?? '';
+        return groupName.isEmpty
+            ? '申请加入群聊'
+            : '申请加入「$groupName」';
+      }
+      return "请求加你为好友";
     }
 
+    // 我方发起的请求 → 显示状态
     switch (status) {
       case "wait":
-        {
-          return "正在验证请求";
-        }
+        return "正在验证请求";
       case "reject":
-        {
-          return "已拒绝申请请求";
-        }
+        return "已拒绝申请请求";
       case "agree":
-        {
-          return "已同意申请请求";
-        }
+        return "已同意申请请求";
     }
     return "";
   }
@@ -360,14 +364,14 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
         children: [
           CustomTextButton(
             "同意",
-            onTap: () => controller.handlerAgreeFriend(notify),
+            onTap: () => controller.handlerAgreeNotify(notify),
           ),
 
           const SizedBox(width: 10),
 
           CustomTextButton(
             "拒绝",
-            onTap: () => controller.handlerRejectFriend(notify),
+            onTap: () => controller.handlerRejectNotify(notify),
             textColor: Colors.grey[600],
           ),
           const SizedBox(width: 5), // 右边距
@@ -499,7 +503,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
     │  │  │  │  Row (水平布局, 两端对齐)                         │ │ │ │
     │  │  │  │  ┌──────────┬──────────┬──────────┐            │ │ │ │
     │  │  │  │  │ Expanded │ Expanded │ Expanded │            │ │ │ │
-    │  │  │  │  │ 我的群聊 │ 我的好友 │ 好友通知 │            │ │ │ │
+    │  │  │  │  │ 我的群聊 │ 我的好友 │     通知 │            │ │ │ │
     │  │  │  │  │  (黑色)  │  (蓝色)  │  (黑色)  │            │ │ │ │
     │  │  │  │  │  ─────── │          │          │            │ │ │ │
     │  │  │  │  └──────────┴──────────┴──────────┘            │ │ │ │
@@ -530,7 +534,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
     │  │  │  │  │  │  [我的群聊] 内容:                       │ │ │ │ │ │
     │  │  │  │  │  │     我的群聊内容                        │ │ │ │ │ │
     │  │  │  │  │  │                                         │ │ │ │ │ │
-    │  │  │  │  │  │  [好友通知] 内容:                       │ │ │ │ │ │
+    │  │  │  │  │  │  [通知] 内容:                            │ │ │ │ │ │
     │  │  │  │  │  │     好友通知内容                        │ │ │ │ │ │
     │  │  │  │  │  └─────────────────────────────────────────┘ │ │ │ │ │
     │  │  │  │  └─────────────────────────────────────────────┘ │ │ │ │
@@ -696,7 +700,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
                         ),
                       ),
 
-                      //右上角好友通知的红色提醒
+                      //右上角通知 tab 的红色提醒（好友申请 + 群申请合并）
                       if (index == 2)
                         Obx(() => globalData.getUnreadCount('friendNotify') > 0
                                || globalData.getUnreadCount('groupNotify') > 0
@@ -719,7 +723,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
               //内容切换动画的组件
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
-                // 三个 Tab 根节点都是 RefreshIndicator，必须加 Key，否则切换「好友通知」时子树复用错乱甚至崩溃
+                // 三个 Tab 根节点都是 RefreshIndicator，必须加 Key，否则切换「通知」tab 时子树复用错乱甚至崩溃
                 child: KeyedSubtree(
                   key: ValueKey<String>(
                       controller.tabs[controller.selectedIndex]),

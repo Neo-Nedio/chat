@@ -33,7 +33,7 @@ class ContactsLogic extends GetxController {
   String currentUserId = '';   //获取当前用户id
   List<dynamic> friendList = []; // 好友列表数据（按分组）
   List<dynamic> chatGroupList = [];
-  List<dynamic> notifyFriendList = [];
+  List<dynamic> notifyList = []; // 申请通知列表（好友申请 + 群申请合并）
 
   final _wsManager = WebSocketUtil();
   StreamSubscription? _subscription;
@@ -61,7 +61,7 @@ class ContactsLogic extends GetxController {
       update([const Key("contacts")]);
     });
     //不要放在getContent里面，不然会无限刷新
-    onNotifyFriendList();
+    onNotifyList();
     onChatGroupList();
     onFriendList();
   }
@@ -87,12 +87,12 @@ class ContactsLogic extends GetxController {
     });
   }
 
-  //通知
-  void onNotifyFriendList() {
+  //申请通知列表（好友申请 + 群申请）
+  void onNotifyList() {
     _notifyApi.list().then((res) {
       if (res['code'] == 0) {
         final data = res['data'];
-        notifyFriendList = data is List ? data : <dynamic>[];
+        notifyList = data is List ? data : <dynamic>[];
         update([const Key("contacts")]);
       }
     });
@@ -111,7 +111,7 @@ class ContactsLogic extends GetxController {
     selectedIndex = index;
     update([const Key("contacts")]);
     if (index == 2) {
-      onReadNotify(); //切换到好友通知时，把消息已读
+      onReadNotify(); //切换到通知 tab 时，把好友/群申请通知都标为已读
     }
   }
 
@@ -121,7 +121,7 @@ class ContactsLogic extends GetxController {
   }
 
   //同意申请（按 notify.type 分发：friend → 好友申请；group → 入群申请）
-  void handlerAgreeFriend(dynamic notify) async {
+  void handlerAgreeNotify(dynamic notify) async {
     final type = notify['type']?.toString();
     Map<String, dynamic> result;
     String successTip;
@@ -149,7 +149,7 @@ class ContactsLogic extends GetxController {
   }
 
   //拒绝申请（按 notify.type 分发：friend → 好友申请；group → 入群申请）
-  void handlerRejectFriend(dynamic notify) async {
+  void handlerRejectNotify(dynamic notify) async {
     final type = notify['type']?.toString();
     Map<String, dynamic> result;
     if (type == 'group') {

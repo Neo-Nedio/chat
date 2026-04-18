@@ -64,8 +64,11 @@ class NavigationPage extends CustomWidget<NavigationLogic> {
                         globalData.getUnreadCount('chat') > 0)
                       CustomTip(globalData.getUnreadCount('chat')),
                     if (controller.selectedIcons[index] == 'user' &&
-                        globalData.getUnreadCount('friendNotify') > 0)
-                      CustomTip(globalData.getUnreadCount('friendNotify')),
+                        (globalData.getUnreadCount('friendNotify') +
+                                globalData.getUnreadCount('groupNotify')) >
+                            0)
+                      CustomTip(globalData.getUnreadCount('friendNotify') +
+                          globalData.getUnreadCount('groupNotify')),
                   ],
                 ),
                 label: controller.name[index],
