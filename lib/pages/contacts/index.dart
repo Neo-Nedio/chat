@@ -588,7 +588,24 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
               // 分割线
               _buildPopupDivider(),
 
-              // 菜单项3: 创建群聊
+              // 菜单项3: 添加群聊
+              PopupMenuItem(
+                value: 3,
+                height: 40,
+                onTap: () => Get.toNamed('/add_group'),
+                child: const Row(
+                  children: [
+                    Icon(Icons.groups, size: 20),
+                    SizedBox(width: 12),
+                    Text('添加群聊', style: TextStyle(fontSize: 14)),
+                  ],
+                ),
+              ),
+
+              // 分割线
+              _buildPopupDivider(),
+
+              // 菜单项4: 创建群聊
               PopupMenuItem(
                 value: 2,
                 height: 40,
@@ -629,7 +646,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
                 return Expanded( // 每个标签平均分配宽度
                   child: Stack(
                     clipBehavior: Clip.none,
-                    children: [ //todo 动画
+                    children: [
                       AnimatedAlign(
                         duration: const Duration(milliseconds: 300),  // 动画时长300ms
                         alignment: Alignment.center,                  // 居中对齐

@@ -13,6 +13,15 @@ class ChatGroupApi {
     return _instance;
   }
 
+  //搜索群聊
+  Future<Map<String, dynamic>> searchGroup(String search) async {
+    final response = await _dio.get(
+        '/v1/api/chat-group/search',
+        queryParameters: {'search': search}
+    );
+    return response.data;
+  }
+
   //获得群列表
   Future<Map<String, dynamic>> list() async {
     final response = await _dio.get('/v1/api/chat-group/list');

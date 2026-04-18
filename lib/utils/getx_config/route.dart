@@ -5,6 +5,7 @@ import 'package:get/get_navigation/src/routes/transitions_type.dart';
 import '../../pages/add_friend/friend_info/index.dart';
 import '../../pages/add_friend/friend_request/index.dart';
 import '../../pages/add_friend/index.dart';
+import '../../pages/add_group/index.dart';
 import '../../pages/chat_frame/index.dart';
 import '../../pages/chat_list/index.dart';
 import '../../pages/contacts/chat_group_information/chat_group_member/index.dart';
@@ -190,6 +191,14 @@ class AppRoutes {
       name: '/add_friend',
       page: () => AddFriendPage(
         key: const Key('add_friend'),
+      ),
+      binding: ControllerBinding(),
+      transition: Transition.downToUp, // 从下往上（↓↑）
+    ),
+    GetPage(
+      name: '/add_group',
+      page: () => AddGroupPage(
+        key: const Key('add_group'),
       ),
       binding: ControllerBinding(),
       transition: Transition.downToUp, // 从下往上（↓↑）

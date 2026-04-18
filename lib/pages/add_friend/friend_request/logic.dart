@@ -1,5 +1,3 @@
-// ignore_for_file: curly_braces_in_flow_control_structures
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -43,7 +41,7 @@ class FriendRequestLogic extends Logic {
     friendName = _friendInfo['name'];
   }
 
-  //个性签名输入长度
+  //申请信息文本长度改变
   void applyFriendTextChanged(String value) {
     applyFriendLength = value.length;
     if (applyFriendLength >= 100) applyFriendLength = 100;
@@ -58,8 +56,9 @@ class FriendRequestLogic extends Logic {
     if (result['code'] == 0) {
       CustomFlutterToast.showSuccessToast("申请成功，等待对方验证~");
       Future.delayed(const Duration(milliseconds: 2300), () => Get.back());
-    } else
+    } else {
       CustomFlutterToast.showErrorToast(result['msg']);
+    }
   }
 
   @override

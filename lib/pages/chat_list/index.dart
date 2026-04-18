@@ -158,6 +158,24 @@ class ChatListPage extends CustomWidget<ChatListLogic> {
                 //分割线
                 _buildPopupDivider(),
 
+                //添加群聊
+                PopupMenuItem(
+                  value: 3,
+                  height: 40,
+                  onTap: () => Get.toNamed('/add_group'),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.groups, size: 20),
+                      SizedBox(width: 12),
+                      Text('添加群聊', style: TextStyle(fontSize: 14)),
+                    ],
+                  ),
+                ),
+
+                //分割线
+                _buildPopupDivider(),
+
                 //创建群聊
                 PopupMenuItem(
                   value: 2,
