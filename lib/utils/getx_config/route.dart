@@ -4,6 +4,7 @@ import 'package:get/get_navigation/src/routes/transitions_type.dart';
 
 import '../../pages/add_friend/friend_info/index.dart';
 import '../../pages/add_friend/friend_request/index.dart';
+import '../../pages/add_group/group_request/index.dart';
 import '../../pages/add_friend/index.dart';
 import '../../pages/add_group/index.dart';
 import '../../pages/chat_frame/index.dart';
@@ -214,6 +215,13 @@ class AppRoutes {
       name: '/friend_request',
       page: () => FriendRequestPage(
         key: const Key('friend_request'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/group_request',
+      page: () => GroupRequestPage(
+        key: const Key('group_request'),
       ),
       binding: ControllerBinding(),
     ),

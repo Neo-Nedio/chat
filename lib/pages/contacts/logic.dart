@@ -87,9 +87,9 @@ class ContactsLogic extends GetxController {
     });
   }
 
-  //好友通知
+  //通知
   void onNotifyFriendList() {
-    _notifyApi.friendList().then((res) {
+    _notifyApi.list().then((res) {
       if (res['code'] == 0) {
         final data = res['data'];
         notifyFriendList = data is List ? data : <dynamic>[];

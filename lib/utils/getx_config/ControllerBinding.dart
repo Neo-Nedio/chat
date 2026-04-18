@@ -6,6 +6,7 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import '../../pages/add_friend/friend_info/logic.dart';
 import '../../pages/add_friend/friend_request/logic.dart';
 import '../../pages/add_friend/logic.dart';
+import '../../pages/add_group/group_request/logic.dart';
 import '../../pages/add_group/logic.dart';
 import '../../pages/chat_frame/logic.dart';
 import '../../pages/chat_list/logic.dart';
@@ -79,6 +80,7 @@ class ControllerBinding extends Bindings {
     Get.lazyPut(() => AddGroupLogic(),fenix: true);
     Get.lazyPut(() => SearchInfoLogic(),fenix: true);
     Get.lazyPut(() => FriendRequestLogic(),fenix: true);
+    Get.lazyPut(() => GroupRequestLogic(),fenix: true);
     Get.lazyPut(() => TalkDetailsLogic(),fenix: true);
     Get.lazyPut(() => TalkCreateLogic(),fenix: true);
     Get.lazyPut(() => UserSelectLogic(),fenix: true);

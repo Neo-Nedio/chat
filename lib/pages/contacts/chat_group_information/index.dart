@@ -244,8 +244,7 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
                   Expanded(
                     child: CustomButton(
                       text: '加入群聊',
-                      //todo 加入群聊未写
-                      onTap: () {},
+                      onTap: controller.onApplyJoinGroup,
                     ),
                   ),
                 ],

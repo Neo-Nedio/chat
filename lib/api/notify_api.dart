@@ -14,8 +14,8 @@ class NotifyApi {
   }
 
   //好友通知列表
-  Future<Map<String, dynamic>> friendList() async {
-    final response = await _dio.get('/v1/api/notify/friend/list');
+  Future<Map<String, dynamic>> list() async {
+    final response = await _dio.get('/v1/api/notify/list');
     return response.data;
   }
 
@@ -25,6 +25,16 @@ class NotifyApi {
     final response = await _dio.post(
       '/v1/api/notify/friend/apply',
       data: {'userId': userId, 'content': content},
+    );
+    return response.data;
+  }
+
+  //发送群聊申请
+  Future<Map<String, dynamic>> groupApply(
+      String groupId, String content) async {
+    final response = await _dio.post(
+      '/v1/api/notify/group/apply',
+      data: {'groupId': groupId, 'content': content},
     );
     return response.data;
   }

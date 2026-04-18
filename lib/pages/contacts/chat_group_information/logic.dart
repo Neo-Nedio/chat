@@ -182,6 +182,17 @@ class ChatGroupInformationLogic extends GetxController {
     onGetGroupChatDetails();
   }
 
+  //申请加入群聊（跳转申请信息页）
+  void onApplyJoinGroup() {
+    Get.toNamed('/group_request', arguments: {
+      'groupInfo': {
+        'id': chatGroupDetails['id'],
+        'name': chatGroupDetails['name'],
+        'portrait': chatGroupDetails['portrait'],
+      },
+    });
+  }
+
   //打开对方详情
   void handlerUserTapped(dynamic toId) {
     final currentUserId = Get.find<GlobalData>().currentUserId;
