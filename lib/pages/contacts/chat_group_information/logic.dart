@@ -20,6 +20,7 @@ class ChatGroupInformationLogic extends GetxController {
   final _chatGroupMemberApi = ChatGroupMemberApi();
 
   late bool isOwner = false; // 当前用户是否是群主
+  late bool isMember = false; //是否是群成员
 
   //群聊详情
   late dynamic chatGroupDetails = {
@@ -43,13 +44,15 @@ class ChatGroupInformationLogic extends GetxController {
   void onInit() {
     () async {
       await onGetGroupChatDetails();                    // 1. 获取群详情
+      isMember = await onIsMember();                    // 2. 判断是否是群成员
+      update([const Key('chat_group_info')]);            // 触发 UI 刷新（成员/非成员视图切换）
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('userId');          // 获取当前用户 ID
       if (userId == chatGroupDetails['ownerUserId']) {   // 判断是否为群主
         isOwner = true;
       }
+      onGetGroupChatMembers();   // 3. 获取成员列表（需在 isMember 赋值后调用）
     }();
-    onGetGroupChatMembers();   // 2. 获取成员列表
     super.onInit();
   }
 
@@ -63,8 +66,19 @@ class ChatGroupInformationLogic extends GetxController {
     });
   }
 
+  //判断是否是群成员
+  Future<bool> onIsMember() async {
+    try {
+      final res = await _chatGroupMemberApi.isMember(chatGroupId);
+      return res['code'] == 0;
+    } catch (e) {
+      return false;
+    }
+  }
+
   //获取群成员列表
   void onGetGroupChatMembers() async {
+    if(!isMember) return;
     //只获取十个
     _chatGroupMemberApi.listPage(chatGroupId).then((res) {
       if (res['code'] == 0) {

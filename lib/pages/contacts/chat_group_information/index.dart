@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../components/app_bar_title/index.dart';
+import '../../../components/custom_button/index.dart';
 import '../../../components/custom_icon_button/index.dart';
 import '../../../components/custom_label_value_button/index.dart';
 import '../../../components/custom_least_button/index.dart';
@@ -119,106 +120,109 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
                         width: 60,
                         label: '群号',
                         value: controller.chatGroupDetails['chatGroupNumber']),
-                    const SizedBox(height: 1),
-                    CustomLabelValueButton(
-                        onTap: controller.setGroupRemark,
-                        width: 60,
-                        label: '群备注',
-                        hint: '未设置备注',
-                        value: controller.chatGroupDetails['groupRemark']),
-                    const SizedBox(height: 1),
-                    CustomLabelValueButton(
-                        onTap: controller.setGroupNickname,
-                        width: 60,
-                        label: '群昵称',
-                        hint: '未设置昵称',
-                        value: controller.chatGroupDetails['groupName']),
-                    const SizedBox(height: 1),
-                    CustomLabelValueButton(
-                        onTap: controller.chatGroupNotice,
-                        width: 60,
-                        label: '群公告',
-                        hint: '暂无群公告~',
-                        maxLines: 10,
-                        value: controller.chatGroupDetails['notice'] != null
-                            ? controller.chatGroupDetails['notice']['noticeContent']
-                            : '',
-                    ),
-                    const SizedBox(height: 1),
-
-                    // 成员列表区域
-                    CustomLabelValueButton(
-                      onTap: () => controller.chatGroupMember(false),
-                      width: 140,
-                      compact: false, // 宽松模式，内容换行显示
-                      label:
-                          '查看所有成员(${controller.chatGroupDetails['memberNum']})',
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 10),
-                          Wrap( //流式布局，根据内容量自动换行
-                            spacing: 5,
-                            runSpacing: 5,
-                            children: [
-                              // 成员头像列表
-                              ...controller.chatGroupMembers.map(
-                                (member) => Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    //头像
-                                    CustomPortrait(
-                                      portrait: member['portrait'],
-                                      onTap: () => controller.handlerUserTapped(member['userId']),
-                                      size: 40,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    //名字
-                                    SizedBox(
-                                      width: 40,
-                                      child: Center(
-                                        child: Text(
-                                          member['name'],
-                                          style: const TextStyle(
-                                              fontSize: 12,
-                                              overflow: TextOverflow.ellipsis),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              //邀请按钮
-                              CustomIconButton(
-                                onTap: () => controller.chatGroupMember(true),
-                                icon: Icons.add,
-                                text: '邀请成员',
-                              ),
-                              //移除按钮
-                              CustomIconButton(
-                                onTap: () => controller.chatGroupMember(false),
-                                icon: Icons.remove,
-                                text: '移除成员',
-                              ),
-                            ],
-                          ),
-                        ],
+                    //以下内容仅群成员可见：群备注、群昵称、群公告、群成员
+                    if (controller.isMember) ...[
+                      const SizedBox(height: 1),
+                      CustomLabelValueButton(
+                          onTap: controller.setGroupRemark,
+                          width: 60,
+                          label: '群备注',
+                          hint: '未设置备注',
+                          value: controller.chatGroupDetails['groupRemark']),
+                      const SizedBox(height: 1),
+                      CustomLabelValueButton(
+                          onTap: controller.setGroupNickname,
+                          width: 60,
+                          label: '群昵称',
+                          hint: '未设置昵称',
+                          value: controller.chatGroupDetails['groupName']),
+                      const SizedBox(height: 1),
+                      CustomLabelValueButton(
+                          onTap: controller.chatGroupNotice,
+                          width: 60,
+                          label: '群公告',
+                          hint: '暂无群公告~',
+                          maxLines: 10,
+                          value: controller.chatGroupDetails['notice'] != null
+                              ? controller.chatGroupDetails['notice']['noticeContent']
+                              : '',
                       ),
-                    ),
+                      const SizedBox(height: 1),
+
+                      // 成员列表区域
+                      CustomLabelValueButton(
+                        onTap: () => controller.chatGroupMember(false),
+                        width: 140,
+                        compact: false, // 宽松模式，内容换行显示
+                        label:
+                            '查看所有成员(${controller.chatGroupDetails['memberNum']})',
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 10),
+                            Wrap( //流式布局，根据内容量自动换行
+                              spacing: 5,
+                              runSpacing: 5,
+                              children: [
+                                // 成员头像列表
+                                ...controller.chatGroupMembers.map(
+                                  (member) => Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      //头像
+                                      CustomPortrait(
+                                        portrait: member['portrait'],
+                                        onTap: () => controller.handlerUserTapped(member['userId']),
+                                        size: 40,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      //名字
+                                      SizedBox(
+                                        width: 40,
+                                        child: Center(
+                                          child: Text(
+                                            member['name'],
+                                            style: const TextStyle(
+                                                fontSize: 12,
+                                                overflow: TextOverflow.ellipsis),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                //邀请按钮
+                                CustomIconButton(
+                                  onTap: () => controller.chatGroupMember(true),
+                                  icon: Icons.add,
+                                  text: '邀请成员',
+                                ),
+                                //移除按钮
+                                CustomIconButton(
+                                  onTap: () => controller.chatGroupMember(false),
+                                  icon: Icons.remove,
+                                  text: '移除成员',
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
 
                     const SizedBox(height: 20),
 
                     //底部操作按钮
                     // 群主显示"解散群聊"
-                    if (controller.isOwner)
+                    if (controller.isOwner && controller.isMember)
                       CustomLeastButton(
                         onTap: () => controller.onDissolveGroup(context),
                         text: '解散群聊',
                         textColor: const Color(0xFFFF4C4C),
                       ),
                     // 非群主显示"退出群聊"
-                    if (!controller.isOwner)
+                    if (!controller.isOwner && controller.isMember)
                       CustomLeastButton(
                         onTap: () => controller.onQuitGroup(context),
                         text: '退出群聊',
@@ -229,6 +233,25 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
           ),
         ),
       ),
+      //底部悬浮窗：不是群成员时显示"加入群聊"
+      bottomNavigationBar: !controller.isMember
+          ? Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: CustomButton(
+                      text: '加入群聊',
+                      //todo 加入群聊未写
+                      onTap: () {},
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : null,
     );
   }
 }

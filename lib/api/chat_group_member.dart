@@ -26,4 +26,12 @@ class ChatGroupMemberApi {
         data: {'chatGroupId': chatGroupId});
     return response.data;
   }
+
+  //查看是否是群成员
+  Future<Map<String, dynamic>> isMember(String chatGroupId) async {
+    final response = await _dio.get(
+        '/v1/api/chat-group-member/isMember',
+        queryParameters: {'chatGroupId': chatGroupId});
+    return response.data;
+  }
 }
