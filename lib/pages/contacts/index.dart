@@ -25,7 +25,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
   //页面
   Widget getContent(String tab) {
     switch (tab) {
-      case '好友通知':
+      case '通知':
         return RefreshIndicator(
           onRefresh: () async {
             controller.onNotifyFriendList();
@@ -697,8 +697,9 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
                       //右上角好友通知的红色提醒
                       if (index == 2)
                         Obx(() => globalData.getUnreadCount('friendNotify') > 0
+                               || globalData.getUnreadCount('groupNotify') > 0
                             ? CustomTip(
-                            globalData.getUnreadCount('friendNotify'),
+                            globalData.getUnreadCount('friendNotify') + globalData.getUnreadCount('groupNotify'),
                             right: 7,
                             top: -2)
                             : const SizedBox.shrink()),
