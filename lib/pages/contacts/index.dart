@@ -627,6 +627,23 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
                   ],
                 ),
               ),
+
+              // 分割线
+              _buildPopupDivider(),
+
+              // 菜单项5: 好友分组设置
+              PopupMenuItem(
+                value: 4,
+                height: 40,
+                onTap: controller.onLongPressGroup,
+                child: const Row(
+                  children: [
+                    Icon(Icons.groups_outlined, size: 20),
+                    SizedBox(width: 12),
+                    Text('好友分组设置', style: TextStyle(fontSize: 14)),
+                  ],
+                ),
+              ),
             ],
           )
         ],
