@@ -13,6 +13,7 @@ import '../../pages/chat_list/logic.dart';
 import '../../pages/contacts/chat_group_information/chat_group_member/logic.dart';
 import '../../pages/contacts/chat_group_information/chat_group_notice/add_chat_group_notice/logic.dart';
 import '../../pages/contacts/chat_group_information/chat_group_notice/logic.dart';
+import '../../pages/contacts/chat_group_information/group_qr_code/logic.dart';
 import '../../pages/contacts/chat_group_information/logic.dart';
 import '../../pages/contacts/chat_group_information/set_group_name/logic.dart';
 import '../../pages/contacts/chat_group_information/set_group_nickname/logic.dart';
@@ -85,6 +86,7 @@ class ControllerBinding extends Bindings {
     Get.lazyPut(() => TalkCreateLogic(),fenix: true);
     Get.lazyPut(() => UserSelectLogic(),fenix: true);
     Get.lazyPut(() => ChatGroupInformationLogic(),fenix: true);
+    Get.lazyPut(() => GroupQRCodeLogic(), fenix: true);
     Get.lazyPut(() => ImageViewerLogic(),fenix: true);
     Get.lazyPut(() => ImageViewerUpdateLogic(),fenix: true);
     Get.lazyPut(() => SetGroupNameLogic(),fenix: true);

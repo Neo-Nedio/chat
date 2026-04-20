@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../components/app_bar_title/index.dart';
 import '../../../components/custom_button/index.dart';
@@ -51,6 +52,16 @@ class ChatGroupInformationPage extends CustomWidget<ChatGroupInformationLogic> {
         centerTitle: true,
         title: const AppBarTitle('群资料'),
         backgroundColor: const Color(0xFFF9FBFF),
+        actions: [
+          //群二维码
+          IconButton(
+            icon: const Icon(Icons.qr_code, size: 28),
+            onPressed: () => Get.toNamed('/group_qr_code', arguments: {
+              'chatGroupId': controller.chatGroupId,
+              'groupInfo': controller.chatGroupDetails,
+            }),
+          ),
+        ],
       ),
       //主体内容
       body: Padding(

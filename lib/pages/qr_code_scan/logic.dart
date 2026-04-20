@@ -61,6 +61,13 @@ class QRCodeScanLogic extends GetxController {
                 arguments: {'result': friendInfo});
           }
           break;
+        case 'group':
+          //extend 里包含完整的群聊详情，直接传给群详情页（chatGroupId 由 id 字段提供）
+          final groupInfo = result['data']['extend'];
+          Get.toNamed('/chat_group_info', arguments: {
+            'chatGroupId': groupInfo['id'].toString(),
+          });
+          break;
         default:
           Get.toNamed('/qr_other_result',
               arguments: {'text': "二维码内容无法识别或已失效"});

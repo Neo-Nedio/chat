@@ -20,9 +20,14 @@ class QrApi {
   }
 
   //获取二维码 key
-  Future<Map<String, dynamic>> code() async {
+  Future<Map<String, dynamic>> code(String action,{String? groupId}) async {
     final response =
-    await _dio.get('/qr/code', queryParameters: {'action': 'mine'});
+    await _dio.get(
+        '/qr/code',
+        queryParameters: {
+        'action': action,
+        'groupId' :groupId
+        });
     return response.data;
   }
 }

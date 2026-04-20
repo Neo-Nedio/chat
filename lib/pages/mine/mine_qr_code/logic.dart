@@ -24,7 +24,7 @@ class MineQRCodeLogic extends GetxController {
 
   //获取二维码内容
   void onQrCode() {
-    _qrApi.code().then((res) {
+    _qrApi.code('mine').then((res) {
       if (res['code'] == 0) {
         qrCode = res['data'];
         update([const Key("mine_qr_code")]);
