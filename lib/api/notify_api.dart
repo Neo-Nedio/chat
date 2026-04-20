@@ -46,6 +46,13 @@ class NotifyApi {
     return response.data;
   }
 
+  //群聊通知已读
+  Future<Map<String, dynamic>> groupNotifyRead(String groupId) async {
+    final response = await _dio.get('/v1/api/notify/group/read',
+                          queryParameters: {'groupId': groupId});
+    return response.data;
+  }
+
   //系统通知列表
   Future<Map<String, dynamic>> systemListNotify() async {
     final response = await _dio.get('/v1/api/notify/system/list');

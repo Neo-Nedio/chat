@@ -6,6 +6,7 @@ import 'package:chat_mobile/api/friend_api.dart';
 import 'package:dio/dio.dart' show FormData, MultipartFile;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide FormData, MultipartFile;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,8 +15,10 @@ import '../../api/chat_group_api.dart';
 import '../../api/chat_group_member.dart';
 import '../../api/chat_list_api.dart';
 import '../../api/msg_api.dart';
+import '../../api/notify_api.dart';
 import '../../api/user_api.dart';
 import '../../api/video_api.dart';
+import '../../components/custom_button/index.dart';
 import '../../components/custom_flutter_toast/index.dart';
 import '../../utils/String.dart';
 import '../../utils/cropPicture.dart';
@@ -33,6 +36,7 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
   final _friendApi = FriendApi();
   final _chatGroupApi = ChatGroupApi();
   final _chatGroupMemberApi = ChatGroupMemberApi();
+  final _notifyApi = NotifyApi();
   final _wsManager = WebSocketUtil(); // WebSocket 管理
 
   final TextEditingController msgContentController = TextEditingController();
@@ -129,16 +133,105 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
     });
   }
 
-  //获取成员
+  //获取成员并检查公告
   void _onGetMembers() async {
-    if (chatInfo['type'] == 'group') {
-      await _chatGroupMemberApi.list(targetId).then((res) {
-        if (res['code'] == 0) {
-          members = res['data'];
-          update([const Key('chat_frame')]);
-        }
-      });
+    if (chatInfo['type'] != 'group') return;
+    final res = await _chatGroupMemberApi.list(targetId);
+    if (res['code'] == 0) {
+      members = res['data'];
+      update([const Key('chat_frame')]);
+      _checkGroupNotice(); //先获得成员再检查公告，防止成员没加载出来发生错误
     }
+  }
+
+  // 检查群公告通知
+  void _checkGroupNotice() async {
+    final me = members[_globalData.currentUserId];
+    if (me == null) return;
+
+    // 获取群详情（包含公告）
+    final res = await _chatGroupApi.details(targetId);
+    if (res['code'] != 0) return;
+
+    final notice = res['data']?['notice'];
+    if (notice == null) return;
+
+    final readTime = me['lastReadNoticeTime'];
+    final createTime = notice['createTime'];
+
+    // 从未读过 或 公告较新
+    if (readTime == null || DateTime.parse(createTime).isAfter(DateTime.parse(readTime))) {
+      _showNoticeDialog(notice['noticeContent'] ?? '');
+    }
+  }
+
+  // 公告弹窗
+  void _showNoticeDialog(String content) {
+    showDialog(
+      context: Get.context!,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 标题栏
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                ),
+                child: const Center(
+                  child: Text(
+                    '群公告',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Text(content, style: const TextStyle(fontSize: 15, height: 1.5)),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: CustomButton(
+                        text: '查看所有',
+                        type: 'minor',
+                        height: 36,
+                        onTap: () {
+                          Navigator.pop(context);
+                          _notifyApi.groupNotifyRead(targetId);
+                          Get.toNamed('/chat_group_notice', arguments: {'chatGroupId': targetId, 'isOwner': false});
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: CustomButton(
+                        text: '确定',
+                        height: 36,
+                        onTap: () {
+                          Navigator.pop(context);
+                          _notifyApi.groupNotifyRead(targetId);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   //获取历史消息
