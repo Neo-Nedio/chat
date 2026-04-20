@@ -221,7 +221,7 @@ class ContactsPage extends CustomWidget<ContactsLogic> {
       borderRadius: BorderRadius.circular(12),
       color: Colors.white,
       child: InkWell(
-        onTap: controller.onReadNotify, //消息已读
+        onTap: () => controller.toNotifyDetailsPage(notify), //跳转到对应详情页
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10.0),

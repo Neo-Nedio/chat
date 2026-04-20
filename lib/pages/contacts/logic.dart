@@ -12,6 +12,7 @@ import '../../api/chat_group_api.dart';
 import '../../api/chat_list_api.dart';
 import '../../api/friend_api.dart';
 import '../../api/notify_api.dart';
+import '../../api/user_api.dart';
 import '../../components/custom_flutter_toast/index.dart';
 import '../../utils/getx_config/GlobalData.dart';
 import '../../utils/getx_config/GlobalThemeConfig.dart';
@@ -22,6 +23,7 @@ class ContactsLogic extends GetxController {
   final _chatGroupApi = ChatGroupApi();
   final _notifyApi = NotifyApi();
   final _chatListApi = ChatListApi();
+  final _userApi = UserApi();
   //主题配置
   final GlobalThemeConfig _theme = GetInstance().find<GlobalThemeConfig>();
 
@@ -118,6 +120,74 @@ class ContactsLogic extends GetxController {
   //打开好友详情
   void handlerFriendTapped(dynamic friend) {
     Get.toNamed('/friend_info', arguments: {'friendId': friend['friendId']});
+  }
+
+  //点击通知，跳转到对应详情页面
+  // friend 类型：双方都是用户 → 跳转到对方用户详情
+  // group 类型：发送方点击 → 群聊详情；接收方（群主/管理员）点击 → 申请人用户详情
+  void toNotifyDetailsPage(dynamic notify) {
+    onReadNotify(); //先标记已读
+    final type = notify['type']?.toString() ?? 'friend';
+    final isFromCurrentUser = currentUserId == notify['fromId'];
+
+    if (type == 'group') {
+      if (isFromCurrentUser) {
+        //我是发送方，跳转到群聊详情（toId 为群id）
+        handlerGroupTapped(notify['toId']);
+      } else {
+        //我是接收方（群主/管理员），跳转到申请人用户详情
+        handlerUserTapped(notify['fromId']);
+      }
+    } else {
+      //好友申请：发送/接收方都是用户，跳转对方用户详情
+      final targetId =
+          isFromCurrentUser ? notify['toId'] : notify['fromId'];
+      handlerUserTapped(targetId);
+    }
+  }
+
+  //打开群聊详情
+  void handlerGroupTapped(dynamic toId) async {
+    if (toId == null) return;
+    //跳转前先校验群聊是否存在（未解散）
+    final res = await _chatGroupApi.isDissolveChatGroup(toId.toString());
+    if (res['code'] == 0) {
+      CustomFlutterToast.showErrorToast('该群聊不存在或已解散');
+      return;
+    }
+    Get.toNamed('/chat_group_info',
+        arguments: {'chatGroupId': toId.toString()});
+  }
+
+  //打开对方用户详情
+  void handlerUserTapped(dynamic toId) {
+    if (toId == null) return;
+    final userId = toId.toString();
+    if (userId == currentUserId) return; //不跳转自己
+
+    _friendApi.isFriend(userId).then((res) {
+      if (res['code'] == 0) {
+        if (res['data']) {
+          //双方是好友
+          Get.toNamed('/friend_info', arguments: {'friendId': userId});
+        } else {
+          //双方不是好友
+          _userApi.getInfoById(userId).then((userRes) {
+            if (userRes['code'] == 0) {
+              Get.toNamed('/search_info', arguments: {
+                'friendInfo': userRes['data'],
+                'isFriend': false,
+              });
+            } else {
+              CustomFlutterToast.showErrorToast(
+                  userRes['msg'] ?? "获取用户信息失败");
+            }
+          });
+        }
+      } else {
+        CustomFlutterToast.showErrorToast(res['msg'] ?? "打开详情失败");
+      }
+    });
   }
 
   //同意申请（按 notify.type 分发：friend → 好友申请；group → 入群申请）
