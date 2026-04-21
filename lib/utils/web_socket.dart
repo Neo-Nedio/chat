@@ -266,7 +266,10 @@ class WebSocketUtil {
     _clearHeartbeat();
     _clearTimer();
     _channel?.sink.close();
-    eventController.close();
+    /*eventController是单例,dispose在每个设置监听的地方结束时会被调用
+    比如navigation页面转向chat_frame页面，回调用dispose方法
+    如果直接eventController.close()，那其他监听器就没有eventController可用，导致错误*/
+    //eventController.close();
     _instance = null;
   }
 

@@ -785,7 +785,7 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
 
   @override
   void onClose() {
-    _subscription?.cancel();
+    _subscription?.cancel(); //移除监听器，防止退出后一直存在导致错误
     super.onClose();
     msgContentController.dispose();
     scrollController.dispose();
