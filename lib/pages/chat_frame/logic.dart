@@ -49,6 +49,7 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
   late String targetId = '';           // 聊天对象ID
   late dynamic chatInfo = {};          // 聊天信息（对方头像、名称等）
   String selfPortrait = '';
+  bool isOwner = false;
   late RxBool isRecording = false.obs; //录音状态
   late RxBool isSend = false.obs;      // 是否有内容可发送
   late RxBool isReadOnly = false.obs; //只读
@@ -66,7 +67,7 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
     chatInfo = Get.arguments?['chatInfo'] ?? {};
     targetId = chatInfo['fromId'] ?? '';
     super.onInit();
-    _onGetMembers();
+    _onGetGroup();        //获取群成员，公告，判断是否为群主
     _onGetMsgRecode();      // 获取消息记录
     _refreshAvatarsOnEnter();
     _eventListen();         // 监听 WebSocket 消息
@@ -133,27 +134,41 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
     });
   }
 
-  //获取成员并检查公告
-  void _onGetMembers() async {
+  //加载群聊信息
+  void _onGetGroup() async{
     if (chatInfo['type'] != 'group') return;
-    final res = await _chatGroupMemberApi.list(targetId);
-    if (res['code'] == 0) {
-      members = res['data'];
-      update([const Key('chat_frame')]);
-      _checkGroupNotice(); //先获得成员再检查公告，防止成员没加载出来发生错误
-    }
-  }
 
-  // 检查群公告通知
-  void _checkGroupNotice() async {
-    final me = members[_globalData.currentUserId];
-    if (me == null) return;
+    await _onGetMembers();
 
     // 获取群详情（包含公告）
     final res = await _chatGroupApi.details(targetId);
     if (res['code'] != 0) return;
+    final chatGroup = res['data'];
 
-    final notice = res['data']?['notice'];
+    //设置完 isOwner 必须 update，否则已经渲染过的 ChatMessage
+    //    不会重新生成 menuItems（禁言菜单就不会出现）
+    // 因为刚开始渲染的ChatMessage时isOwner还没被赋值为true
+    isOwner = _globalData.currentUserId == chatGroup['ownerUserId'];
+    update([const Key('chat_frame')]);
+
+    _checkGroupNotice(chatGroup); //先获得成员再检查公告，防止成员没加载出来发生错误
+  }
+
+  //获取成员并检查公告
+  Future<void> _onGetMembers() async {
+    final res = await _chatGroupMemberApi.list(targetId);
+    if (res['code'] == 0) {
+      members = res['data'];
+      update([const Key('chat_frame')]);
+    }
+  }
+
+  // 检查群公告通知
+  void _checkGroupNotice(dynamic chatGroup) async {
+    final me = members[_globalData.currentUserId];
+    if (me == null) return;
+
+    final notice = chatGroup['notice'];
     if (notice == null) return;
 
     final readTime = me['lastReadNoticeTime'];
@@ -588,6 +603,161 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
       WidgetsBinding.instance
           .addPostFrameCallback((_) => focusNode.requestFocus());
       update([const Key('chat_frame')]);
+    }
+  }
+
+  //禁言群成员回调（仅群主可调用，菜单已做权限过滤）
+  Future<void> banMember(dynamic msg) async {
+    final String memberId = msg['fromId']?.toString() ?? '';
+    if (memberId.isEmpty) {
+      CustomFlutterToast.showErrorToast('成员ID为空');
+      return;
+    }
+    if (memberId == _globalData.currentUserId) {
+      CustomFlutterToast.showErrorToast('不能禁言自己');
+      return;
+    }
+
+    // 先查询当前禁言状态，便于在弹窗中提示
+    bool currentlyBanned = false;
+    try {
+      final statusRes = await _chatGroupMemberApi.isBan(targetId, memberId);
+      if (statusRes['code'] == 0) {
+        currentlyBanned =  true;
+      }
+    } catch (_) {
+      // 查询失败不影响后续禁言操作
+    }
+
+    // 取一下被操作成员显示名，用于弹窗标题
+    final member = members[memberId];
+    String displayName = '';
+    if (member != null) {
+      displayName = (member['groupName'] ??
+              member['remark'] ??
+              member['name'] )
+          .toString();
+    }
+
+    // 时长选项：标题 + 秒数（0 = 解除禁言）
+    final List<Map<String, dynamic>> options = [
+      {'label': '1 分钟', 'duration': 60},
+      {'label': '10 分钟', 'duration': 600},
+      {'label': '1 小时', 'duration': 3600},
+      {'label': '12 小时', 'duration': 43200},
+      {'label': '1 天', 'duration': 86400},
+      {'label': '7 天', 'duration': 604800},
+    ];
+
+    //禁言的底部弹窗
+    await showModalBottomSheet(
+      context: Get.context!,
+      backgroundColor: Colors.white,
+      isScrollControlled: true, // 允许内容超过默认高度，避免溢出
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        final maxH = MediaQuery.of(ctx).size.height * 0.7; //最大高度为屏幕的0.7
+        return SafeArea(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: maxH),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                //上部分信息
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '禁言：$displayName',
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        currentlyBanned ? '当前状态：禁言中' : '当前状态：未禁言',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: currentlyBanned ? Colors.red : Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1),
+                //下部分选项
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ...options.map(
+                          (e) => ListTile(
+                            title: Text(e['label']),
+                            trailing:
+                                const Icon(Icons.chevron_right, size: 18),
+                            onTap: () {
+                              Navigator.pop(ctx);
+                              _doBan(memberId, e['duration'] as int,
+                                  e['label'] as String);
+                            },
+                          ),
+                        ),
+                        if (currentlyBanned) ...[
+                          const Divider(height: 1),
+                          ListTile(
+                            title: const Text(
+                              '解除禁言',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                            trailing: const Icon(Icons.lock_open,
+                                size: 18, color: Colors.red),
+                            onTap: () {
+                              Navigator.pop(ctx);
+                              _doBan(memberId, 0, '解除禁言');
+                            },
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+                //取消按钮
+                const Divider(height: 1),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('取消'),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  //真正发起禁言请求
+  Future<void> _doBan(String memberId, int duration, String label) async {
+    try {
+      final res =
+          await _chatGroupMemberApi.ban(targetId, memberId, duration);
+      if (res['code'] == 0) {
+        CustomFlutterToast.showSuccessToast(
+            duration == 0 ? '已解除禁言' : '已禁言：$label');
+      } else {
+        CustomFlutterToast.showErrorToast(res['msg'] ?? '操作失败');
+      }
+    } catch (e) {
+      CustomFlutterToast.showErrorToast('操作失败');
     }
   }
 

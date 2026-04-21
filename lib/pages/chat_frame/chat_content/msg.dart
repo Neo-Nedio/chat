@@ -28,6 +28,7 @@ class ChatMessage extends StatelessThemeWidget {
   final Map<String, dynamic> msg;
   final Map<String, dynamic> chatInfo;
   final Map<String, dynamic>? member;
+  final bool isOwner;
   final String? chatPortrait;
   final String? selfPortrait;
   final void Function()? onTapMsg;
@@ -39,8 +40,8 @@ class ChatMessage extends StatelessThemeWidget {
   // 点击转发回调
   final CallBack? onTapRetransmission;
 
-  // 点击删除回调
-  final CallBack? onTapDelete;
+  // 点击禁言回调
+  final CallBack? onTapBan;
 
   // 点击撤回回调
   final CallBack? onTapRetract;
@@ -57,7 +58,7 @@ class ChatMessage extends StatelessThemeWidget {
     this.selfPortrait,
     this.onTapCopy,
     this.onTapRetransmission,
-    this.onTapDelete,
+    this.onTapBan,
     this.onTapRetract,
     this.onTapCite,
     this.onTapMsg,
@@ -66,6 +67,7 @@ class ChatMessage extends StatelessThemeWidget {
     required this.msg,
     required this.chatInfo,
     required this.member,
+    required this.isOwner,
   });
 
   @override
@@ -265,7 +267,7 @@ class ChatMessage extends StatelessThemeWidget {
   }
 
   //根据消息类型返回不同的菜单项列表
-  //todo 删除 转发 引用功能未做
+  //todo 转发 引用功能未做
   List<PopMenuItemModel> menuItems(String type) => [
     // 文本消息专属菜单
     if (type == 'text')
@@ -295,11 +297,15 @@ class ChatMessage extends StatelessThemeWidget {
     //     callback: (data) {
     //       debugPrint("data: " + data);
     //     }),
-    PopMenuItemModel(
-        title: '删除',
-        icon: Icons.delete,
-        callback: onTapDelete ??
-                (data) => debugPrint("data: ${data.toString()}")),
+    // 群主 + 群聊场景，且不是自己发送的消息时，才显示禁言菜单
+    if (isOwner &&
+        chatInfo['type'] == 'group' &&
+        msg['fromId'] != globalData.currentUserId)
+      PopMenuItemModel(
+          title: '禁言',
+          icon: Icons.volume_off,
+          callback: onTapBan ??
+              (data) => debugPrint("data: ${data.toString()}")),
     // 自己发的消息才有撤回菜单
     if (msg['fromId'] == globalData.currentUserId &&
         DateTime.now().difference(DateTime.parse(msg['createTime'])).inMinutes < 3) //大于三分钟不能撤回)

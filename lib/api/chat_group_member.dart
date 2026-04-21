@@ -34,4 +34,33 @@ class ChatGroupMemberApi {
         queryParameters: {'groupId': groupId});
     return response.data;
   }
+
+  // 禁言/解除禁言群成员
+  /// [banDuration] 禁言时长（秒），0 表示解除禁言
+  Future<Map<String, dynamic>> ban(
+      String groupId, String targetId, int banDuration) async {
+    final response = await _dio.post(
+      '/v1/api/chat-group-member/ban',
+      data: {
+        'groupId': groupId,
+        'targetId': targetId,
+        'banDuration': banDuration,
+      },
+    );
+    return response.data;
+  }
+
+  // 查询某成员是否处于禁言中
+  Future<Map<String, dynamic>> isBan(String groupId, String targetId) async {
+    final response = await _dio.post(
+      '/v1/api/chat-group-member/is/ban',
+      data: {
+        'groupId': groupId,
+        'targetId': targetId,
+        // 后端 BanMemberVo 的 banDuration 标注了 @NotNull，这里填 0 占位
+        'banDuration': 0,
+      },
+    );
+    return response.data;
+  }
 }

@@ -177,12 +177,15 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                                     text: msg['msgContent']['content'])),
                                 onTapRetract: (data) =>
                                     controller.retractMsg(data, msg), //撤回
+                                onTapBan: (data) =>
+                                    controller.banMember(msg), //禁言
                                 onTapVoice: (data) => controller.onTapVoice(msg),
                                 msg: msg, //消息
                                 chatPortrait: controller.chatInfo['portrait'], //头像
                                 selfPortrait: controller.selfPortrait,
                                 chatInfo: controller.chatInfo, //聊天详情
                                 member: controller.members[msg['fromId']], //成员
+                                isOwner: controller.isOwner, //当前用户是否为群主
                               )),
                             ],
                           ),
