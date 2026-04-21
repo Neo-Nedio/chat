@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:get/get_navigation/src/routes/transitions_type.dart';
+
+import '../../pages/chat_frame/logic.dart';
 
 import '../../pages/add_friend/friend_info/index.dart';
 import '../../pages/add_friend/friend_request/index.dart';
@@ -346,7 +349,17 @@ class AppRoutes {
       page: () => ChatFramePage(
         key: const Key('chat_frame'),
       ),
-      binding: ControllerBinding(),
+      // 用 bindings 列表叠加：先跑全局 ControllerBinding，再按当前路由的
+      // chatInfo.fromId 作为 tag 注册一份独立的 ChatFrameLogic，
+      // 这样多层 chat_frame 共存时每个会话有自己的控制器，互不干扰。
+      bindings: [
+        ControllerBinding(),
+        BindingsBuilder(() {
+          final tag =
+              Get.arguments?['chatInfo']?['fromId']?.toString() ?? '';
+          Get.put<ChatFrameLogic>(ChatFrameLogic(), tag: tag);
+        }),
+      ],
     ),
     GetPage(
       name: '/file_details',

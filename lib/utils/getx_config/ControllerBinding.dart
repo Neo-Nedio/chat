@@ -98,7 +98,6 @@ class ControllerBinding extends Bindings {
     Get.lazyPut(() => CreateChatGroupLogic(), fenix: true);
     Get.lazyPut(() => SystemNotifyLogic(), fenix: true);
     Get.lazyPut(() => ChatGroupSelectUserLogic(), fenix: true);
-    Get.lazyPut(() => ChatFrameLogic(), fenix: true);
     Get.lazyPut(() => FileDetailsLogic(), fenix: true);
     Get.lazyPut(() => VideoChatLogic(), fenix: true);
     Get.lazyPut(() => AdminUserManageLogic(), fenix: true);

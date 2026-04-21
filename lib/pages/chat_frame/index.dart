@@ -31,6 +31,29 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
     with WidgetsBindingObserver {  // ← 监听系统变化（如键盘）
   ChatFramePage({super.key});
 
+  // 当前会话的 tag
+  String get _chatTag =>
+      arguments?['chatInfo']?['fromId']?.toString() ?? '';
+
+  @override
+  //不同会话拿到的是各自的 ChatFrameLogic 实例，避免串数据。
+  ChatFrameLogic get controller =>
+      Get.find<ChatFrameLogic>(tag: _chatTag);
+
+  // 重写 build：CustomWidget 基类里的 GetBuilder<T> 默认不带 tag，
+  // 会按 tag=null 去找控制器从而拿到 null 触发空检查异常；
+  // 这里显式传入 _chatTag，与路由 binding 中 Get.put 的 tag 对齐。
+  @override
+  Widget build(BuildContext context) => GetBuilder<ChatFrameLogic>(
+        tag: _chatTag,
+        id: key,
+        initState: (state) => init(context),
+        didChangeDependencies: (state) => didChangeDependencies(context),
+        didUpdateWidget: didUpdateWidget,
+        builder: (controller) => buildWidget(context),
+        dispose: (state) => close(context),
+      );
+
   @override
   void init(BuildContext context) {
     super.init(context);
@@ -144,6 +167,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: GetBuilder<ChatFrameLogic>(
+                    tag: _chatTag, // 与路由 binding 中的 tag 保持一致
                     id: const Key('chat_frame'), // 指定更新 ID
                     builder: (controller) {
                       return Stack(
