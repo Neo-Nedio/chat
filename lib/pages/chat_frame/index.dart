@@ -419,107 +419,330 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
       height: height,
       child: Column(
         children: [
-          const SizedBox(height: 10),
+          const SizedBox(height: 6),
+          //上部选择栏
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Obx(
+              () => Row(
+                children: [
+                  _buildEmojiPanelTab(0, '表情'),
+                  const SizedBox(width: 12),
+                  _buildEmojiPanelTab(1, '表情包'),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          //下部内容
           Expanded(
-            child: Stack(
-              children: [
-                //下层表情按钮
-                Container(
-                  width: MediaQuery.of(Get.context!).size.width,  // 占满屏幕宽度
-                  padding: const EdgeInsets.all(10),               // 内边距
-                  margin: const EdgeInsets.only(top: 10),          // 上边距
-                  decoration: BoxDecoration(
-                    border: Border(
-                      top: BorderSide(
-                        color: Colors.grey.withValues(alpha: 0.1),  // 淡灰色分割线
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  child: SingleChildScrollView(
-                    child: Wrap(
-                      alignment: WrapAlignment.center,  // 居中对齐
-                      spacing: 10,                       // 水平间距
-                      runSpacing: 10,                    // 垂直间距
-                      children: Emoji.emojis
-                          .map(
-                            (emoji) => GestureDetector(
-                          onTap: () {
-                            // 1. 获取当前输入框的文本
-                            final text = controller.msgContentController.text;
-                            // 2. 获取当前光标位置
-                            final selection = controller.msgContentController.selection;
-                            // 光标失焦后可能为 -1，这里兜底到文本末尾，避免 replaceRange 异常
-                            final start = (selection.start >= 0 && selection.start <= text.length)
-                                ? selection.start
-                                : text.length;
-                            final end = (selection.end >= start && selection.end <= text.length)
+            child: GetBuilder<ChatFrameLogic>(
+              tag: _chatTag,
+              id: const Key('emoji_panel'),
+              builder: (c) {
+                return Obx(
+                  () => c.emojiPanelTab.value == 0
+                      ? _buildEmojiClassicAndDelete()
+                      : _buildEmojiCustomPack(c),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  //选择栏
+  Widget _buildEmojiPanelTab(int index, String label) {
+    final selected = controller.emojiPanelTab.value == index;
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          //点击切换
+          onTap: () {
+            if (controller.emojiPanelTab.value == index) return;
+            controller.emojiPanelTab.value = index;
+            if (index == 1) { // 拉取当前用户的自定义表情
+              controller.loadCustomEmojiList();
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: selected
+                      ? theme.primaryColor
+                      : Colors.transparent,
+                  width: 2,
+                ),
+              ),
+            ),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight:
+                    selected ? FontWeight.w600 : FontWeight.normal,
+                color: selected
+                    ? theme.primaryColor
+                    : const Color(0xFF969696),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 左栏：系统表情 + 与输入框同一层的删除
+  Widget _buildEmojiClassicAndDelete() {
+    return Stack(
+      children: [
+        //下层表情按钮
+        Container(
+          width: MediaQuery.of(Get.context!).size.width, // 占满屏幕宽度
+          padding: const EdgeInsets.all(10), // 内边距
+          margin: const EdgeInsets.only(top: 10), // 上边距
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(
+                color: Colors.grey.withValues(alpha: 0.1), // 淡灰色分割线
+                width: 1.0,
+              ),
+            ),
+          ),
+          alignment: Alignment.center,
+          child: SingleChildScrollView(
+            child: Wrap(
+              alignment: WrapAlignment.center, // 居中对齐
+              spacing: 10, // 水平间距
+              runSpacing: 10, // 垂直间距
+              children: Emoji.emojis
+                  .map(
+                    (emoji) => GestureDetector(
+                      onTap: () {
+                        // 1. 获取当前输入框的文本
+                        final text = controller.msgContentController.text;
+                        // 2. 获取当前光标位置
+                        final selection =
+                            controller.msgContentController.selection;
+                        // 光标失焦后可能为 -1，这里兜底到文本末尾，避免 replaceRange 异常
+                        final start = (selection.start >= 0 &&
+                                selection.start <= text.length)
+                            ? selection.start
+                            : text.length;
+                        final end =
+                            (selection.end >= start && selection.end <= text.length)
                                 ? selection.end
                                 : start;
-                            // 3. 替换文本（在光标位置插入表情）
+                        // 3. 替换文本（在光标位置插入表情）
 /*                不同光标状态
                 状态	selection.start	selection.end	含义
                 光标在位置2	2	2	没有选中文本
                 选中位置2-4	2	4	选中了2个字符*/
-                            final newText = text.replaceRange(
-                              start,  // 开始位置
-                              end,    // 结束位置
-                              emoji,            // 插入的内容
-                            );
-                            // 4. 更新输入框
-                            controller.msgContentController.value = TextEditingValue(
-                              text: newText,
-                              selection: TextSelection.collapsed(
-                                offset: start + emoji.length,  // 新光标位置
-                              ),
-                            );
-                            //点击表情代表有了内容，可以发送
-                            controller.isSend.value = true;
-                          },
-                          child: Text(
-                            emoji,
-                            style: const TextStyle(fontSize: 24),
+                        final newText = text.replaceRange(
+                          start, // 开始位置
+                          end, // 结束位置
+                          emoji, // 插入的内容
+                        );
+                        // 4. 更新输入框
+                        controller.msgContentController.value = TextEditingValue(
+                          text: newText,
+                          selection: TextSelection.collapsed(
+                            offset: start + emoji.length, // 新光标位置
                           ),
-                        ),
-                      ).toList(),
+                        );
+                        //点击表情代表有了内容，可以发送
+                        controller.isSend.value = true;
+                      },
+                      child: Text(
+                        emoji,
+                        style: const TextStyle(fontSize: 24),
+                      ),
                     ),
-                  ),
-                ),
-                //上层删除按钮（有内容时才显示）
-                Obx(() => controller.isSend.value
-                    ? Positioned(
-                        right: 16,
-                        bottom: 16,
-                        child: GestureDetector(
-                          onTap: () {
-                            final text = controller.msgContentController.text;
-                            if (text.isEmpty) return;
-                            //skipLast(1) 跳过最后一个字符，保留前面的
-                            final newText = text.characters.skipLast(1).toString();
-                            controller.msgContentController.value = TextEditingValue(
-                              text: newText,
-                              selection: TextSelection.collapsed(offset: newText.length),
-                            );
-                            controller.isSend.value = newText.trim().isNotEmpty;
-                          },
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: const Icon(Icons.backspace_outlined, size: 20, color: Colors.black54),
-                          ),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
-                ),
-              ],
+                  )
+                  .toList(),
             ),
           ),
-        ],
+        ),
+        //上层删除按钮（有内容时才显示）
+        Obx(
+          () => controller.isSend.value
+              ? Positioned(
+                  right: 16,
+                  bottom: 16,
+                  child: GestureDetector(
+                    onTap: () {
+                      final text = controller.msgContentController.text;
+                      if (text.isEmpty) return;
+                      //skipLast(1) 跳过最后一个字符，保留前面的
+                      final newText = text.characters.skipLast(1).toString();
+                      controller.msgContentController.value = TextEditingValue(
+                        text: newText,
+                        selection:
+                            TextSelection.collapsed(offset: newText.length),
+                      );
+                      controller.isSend.value = newText.trim().isNotEmpty;
+                    },
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Icon(Icons.backspace_outlined,
+                          size: 20, color: Colors.black54),
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ),
+      ],
+    );
+  }
+
+  // 右栏：接口返回的自定义表情，点击直接发送
+  // 第 0 格固定为加号，其余为已保存的表情
+  Widget _buildEmojiCustomPack(ChatFrameLogic c) {
+    // 加载中
+    if (c.customEmojiListLoading) {
+      return Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(top: 10),
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: Colors.grey.withValues(alpha: 0.1),
+              width: 1.0,
+            ),
+          ),
+        ),
+        child: const Center(
+          child: CupertinoActivityIndicator(),
+        ),
+      );
+    }
+
+    //表情
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(top: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: Colors.grey.withValues(alpha: 0.1),
+            width: 1.0,
+          ),
+        ),
+      ),
+      child: GridView.builder(
+        itemCount: 1 + c.customEmojiList.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 6,
+          mainAxisSpacing: 6,
+          crossAxisSpacing: 6,
+          childAspectRatio: 1,
+        ),
+        itemBuilder: (context, i) {
+          if (i == 0) {
+            return _addCustomEmoji(c);
+          }
+          final raw = c.customEmojiList[i - 1];
+          final fileName = raw is Map
+              ? (raw['emoji']?.toString() ?? '')
+              : raw.toString();
+          if (fileName.isEmpty) {
+            return const SizedBox.shrink();
+          }
+          //加载表情
+          return GestureDetector(
+            onTap: () => c.sendEmojiMsg(fileName),
+            child: FutureBuilder<String>(
+              key: ValueKey(fileName),
+              future: c.getCustomEmojiImageUrl(fileName),
+              builder: (context, snap) {
+                final url = snap.data ?? '';
+                if (url.isNotEmpty) {
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: SizedBox.expand(
+                      child: CachedNetworkImage(
+                        imageUrl: url,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) { //加载中
+                          return Container(
+                            color: Colors.grey.shade200,
+                            alignment: Alignment.center,
+                            child: const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          );
+                        },
+                        errorWidget: (context, url, error) { //加载失败
+                          return Container(
+                            color: Colors.grey.shade200,
+                            alignment: Alignment.center,
+                            child: const Icon(
+                              Icons.broken_image,
+                              size: 20,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                }
+                //FutureBuilder 在加载过程中的占位符
+                return Container(
+                  color: Colors.grey.shade200,
+                  alignment: Alignment.center,
+                  child: const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CupertinoActivityIndicator(radius: 8),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // 与表情单格等大的加号，固定在宫格第 0 个，一直显示
+  Widget _addCustomEmoji(ChatFrameLogic c) {
+    return Material(
+      color: Colors.grey.shade200,
+      borderRadius: BorderRadius.circular(4),
+      child: InkWell(
+        onTap: c.pickAndUploadCustomEmoji,
+        borderRadius: BorderRadius.circular(4),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // 与 grid 子格同尺寸，用短边算图标大小
+            final w = constraints.maxWidth;
+            final h = constraints.maxHeight;
+            final s = w < h ? w : h;
+            return Center(
+              child: Icon(
+                Icons.add,
+                size: (s * 0.42).clamp(22.0, 34.0),
+                color: const Color(0xFF6B6B6B),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../api/chat_group_api.dart';
 import '../../api/chat_group_member.dart';
 import '../../api/chat_list_api.dart';
+import '../../api/emoji_api.dart';
 import '../../api/msg_api.dart';
 import '../../api/notify_api.dart';
 import '../../api/user_api.dart';
@@ -30,6 +31,8 @@ import 'index.dart';
 
 class ChatFrameLogic extends Logic<ChatFramePage> {
   final _msgApi = MsgApi();           // 消息 API
+  final _emojiApi = EmojiApi();
+  final _imagePicker = ImagePicker(); // 自定义表情相册选图
   final _chatListApi = ChatListApi(); // 聊天列表 API
   final _userApi = UserApi();
   final _videoApi = VideoApi();
@@ -53,6 +56,13 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
   late RxBool isRecording = false.obs; //录音状态
   late RxBool isSend = false.obs;      // 是否有内容可发送
   late RxBool isReadOnly = false.obs; //只读
+
+  // 表情面板：0 经典表情，1 自定义表情包
+  final RxInt emojiPanelTab = 0.obs;
+  List<dynamic> customEmojiList = [];
+  bool customEmojiListLoading = false;
+  bool _customEmojiUploading = false;
+  final Map<String, String> _customEmojiFileUrlCache = {};
 
   // 分页相关
   int num = 20;      // 每页数量
@@ -390,6 +400,162 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
     }
   }
 
+  // 相册选图并上传为自定义表情
+  Future<void> pickAndUploadCustomEmoji() async {
+    if (_customEmojiUploading) {
+      return;
+    }
+    _customEmojiUploading = true;
+    try {
+      // 1. 打开相册
+      final x = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85,
+      );
+      if (x == null) {
+        return;
+      }
+
+      // 2. 校验文件
+      final file = File(x.path);
+      if (!file.existsSync()) {
+        CustomFlutterToast.showErrorToast('文件不存在');
+        return;
+      }
+
+      // 3. 文件名（与系统返回一致时优先用 x.name，否则从路径取）
+      var name = x.name;
+      if (name.isEmpty) {
+        name = x.path.split(Platform.pathSeparator).last;
+        if (name.isEmpty) {
+          final p = x.path.replaceAll(r'\', '/');
+          final idx = p.lastIndexOf('/');
+          if (idx != -1 && idx < p.length - 1) {
+            name = p.substring(idx + 1);
+          }
+        }
+      }
+
+      // 4. Content-Type
+      var type = 'image/jpeg';
+      if (x.mimeType != null && x.mimeType!.isNotEmpty) {
+        type = x.mimeType!;
+      } else {
+        final lower = name.toLowerCase();
+        if (lower.endsWith('.png')) {
+          type = 'image/png';
+        } else if (lower.endsWith('.gif')) {
+          type = 'image/gif';
+        } else if (lower.endsWith('.webp')) {
+          type = 'image/webp';
+        } else if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) {
+          type = 'image/jpeg';
+        }
+      }
+
+      // 5. 组表单上传
+      final size = file.lengthSync();
+      final multipart = await MultipartFile.fromFile(x.path, filename: name);
+      final res = await _emojiApi.upload(
+        FormData.fromMap({
+          'name': name,
+          'type': type,
+          'size': size,
+          'file': multipart,
+        }),
+      );
+      if (res['code'] == 0) {
+        // 6. 拉取最新表情列表
+        final listRes = await _emojiApi.list();
+        if (listRes['code'] == 0 && listRes['data'] != null) {
+          customEmojiList = listRes['data'];
+        } else {
+          customEmojiList = [];
+        }
+        update([const Key('emoji_panel')]);
+        CustomFlutterToast.showSuccessToast('已添加');
+      } else {
+        CustomFlutterToast.showErrorToast(res['msg'] ?? '上传失败');
+      }
+    } catch (_) {
+      CustomFlutterToast.showErrorToast('上传失败');
+    } finally {
+      _customEmojiUploading = false;
+    }
+  }
+
+  // 拉取当前用户的自定义表情
+  Future<void> loadCustomEmojiList() async {
+    if (customEmojiListLoading) {
+      return;
+    }
+    customEmojiListLoading = true;
+    update([const Key('emoji_panel')]);
+    try {
+      final res = await _emojiApi.list();
+      if (res['code'] == 0 && res['data'] != null) {
+        final data = res['data'];
+        customEmojiList = data;
+      } else {
+        customEmojiList = [];
+      }
+    } catch (_) {
+      customEmojiList = [];
+    } finally {
+      customEmojiListLoading = false;
+      update([const Key('emoji_panel')]);
+    }
+  }
+
+  // 根据 fileName 解析可展示的图片地址（有内存缓存，供表情面板用）
+  Future<String> getCustomEmojiImageUrl(String fileName) async {
+    if (fileName.isEmpty) {
+      return '';
+    }
+    final hit = _customEmojiFileUrlCache[fileName];
+    if (hit != null && hit.isNotEmpty) {
+      return hit;
+    }
+
+    final u = await _loadCustomEmojiImageUrlOnce(fileName);
+    if (u.isNotEmpty) {
+      _customEmojiFileUrlCache[fileName] = u;
+    }
+    return u;
+  }
+
+  // 从接口取表情预览 URL
+  Future<String> _loadCustomEmojiImageUrlOnce(String fileName) async {
+    try {
+      final res = await _emojiApi.getImage(fileName);
+      if (res['code'] == 0 && res['data'] != null) {
+        return res['data'].toString();
+      }
+    } catch (_) {}
+    return '';
+  }
+
+  // 发送自定义表情消息：content 为存储中的文件名
+  void sendEmojiMsg(String fileName) {
+    if (StringUtil.isNullOrEmpty(fileName)) return;
+    final msg = {
+      'toUserId': targetId,
+      'source': chatInfo['type'],
+      'msgContent': {
+        'type': 'emoji',
+        'content': fileName,
+      }
+    };
+    _msgApi.send(msg).then((res) {
+      if (res['code'] == 0) {
+        msgListAddMsg(res['data'], forceScrollToBottom: true); // 添加消息到列表（到底部）
+        _onRead(); // 标记已读
+      } else {
+        CustomFlutterToast.showErrorToast(res['msg'] ?? '发送失败');
+      }
+    });
+  }
+
   //发送文本消息
   void sendTextMsg() async {
     if (StringUtil.isNullOrEmpty(msgContentController.text)) return;
@@ -554,6 +720,7 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
 
     // 点击文本消息（暂不处理）
     if (msgContent['type'] == 'text') return;
+    if (msgContent['type'] == 'emoji') return;
 
     final Map<String, dynamic> content = jsonDecode(msgContent['content']);
 
