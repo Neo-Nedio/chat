@@ -204,6 +204,9 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                                 onTapBan: (data) =>
                                     controller.banMember(msg), //禁言
                                 onTapVoice: (data) => controller.onTapVoice(msg),
+                                // 与表情面板共享 ChatFrameLogic 的 URL 缓存
+                                getCustomEmojiImageUrl:
+                                    controller.getCustomEmojiImageUrl,
                                 msg: msg, //消息
                                 chatPortrait: controller.chatInfo['portrait'], //头像
                                 selfPortrait: controller.selfPortrait,

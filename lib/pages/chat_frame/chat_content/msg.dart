@@ -17,6 +17,7 @@ import '../../../utils/date.dart';
 import '../../../utils/getx_config/GlobalData.dart';
 import '../../../utils/getx_config/config.dart';
 import 'call.dart';
+import 'emoji.dart';
 import 'file.dart';
 import 'image.dart';
 import 'text.dart';
@@ -52,6 +53,9 @@ class ChatMessage extends StatelessThemeWidget {
   // 点击转文字回调
   final CallBack? onTapVoice;
 
+  // 与 ChatFrameLogic 一致，用于表情预览 URL 复用同一份内存缓存
+  final Future<String> Function(String fileName) getCustomEmojiImageUrl;
+
   const ChatMessage({
     super.key,
     this.chatPortrait,
@@ -64,6 +68,7 @@ class ChatMessage extends StatelessThemeWidget {
     this.onTapMsg,
     this.reEdit,
     this.onTapVoice,
+    required this.getCustomEmojiImageUrl,
     required this.msg,
     required this.chatInfo,
     required this.member,
@@ -267,7 +272,6 @@ class ChatMessage extends StatelessThemeWidget {
   }
 
   //根据消息类型返回不同的菜单项列表
-  //todo 转发 引用功能未做
   List<PopMenuItemModel> menuItems(String type) => [
     // 文本消息专属菜单
     if (type == 'text')
@@ -291,13 +295,6 @@ class ChatMessage extends StatelessThemeWidget {
         icon: Icons.send,
         callback: onTapRetransmission ??
                 (data) => debugPrint("data: ${data.toString()}")),
-    // PopMenuItemModel(
-    //     title: '收藏',
-    //     icon: Icons.collections,
-    //     callback: (data) {
-    //       debugPrint("data: " + data);
-    //     }),
-    // 群主 + 群聊场景，且不是自己发送的消息时，才显示禁言菜单
     if (isOwner &&
         chatInfo['type'] == 'group' &&
         msg['fromId'] != globalData.currentUserId)
@@ -314,29 +311,11 @@ class ChatMessage extends StatelessThemeWidget {
           icon: Icons.reply,
           callback: onTapRetract ??
                   (data) => debugPrint("data: ${data.toString()}")),
-    // PopMenuItemModel(
-    //     title: '多选',
-    //     icon: Icons.playlist_add_check,
-    //     callback:  (data) {
-    //       debugPrint("data: ${data.toString()}");
-    //     }),
     PopMenuItemModel(
         title: '引用',
         icon: Icons.format_quote,
         callback:
         onTapCite ?? (data) => debugPrint("data: ${data.toString()}")),
-    // PopMenuItemModel(
-    //     title: '提醒',
-    //     icon: Icons.add_alert,
-    //     callback: (data) {
-    //       debugPrint("data: " + data);
-    //     }),
-    // PopMenuItemModel(
-    //     title: '搜一搜',
-    //     icon: Icons.search,
-    //     callback: (data) {
-    //       debugPrint("data: " + data);
-    //     }),
   ];
 
   //根据类型获得对应组件
@@ -346,6 +325,11 @@ class ChatMessage extends StatelessThemeWidget {
       'text': (String? username) => TextMessage(value: msg, isRight: isRight),
       'file': (String? username) => FileMessage(value: msg, isRight: isRight),
       'img': (String? username) => ImageMessage(value: msg, isRight: isRight),
+      'emoji': (String? username) => EmojiMessage(
+            value: msg,
+            isRight: isRight,
+            getCustomEmojiImageUrl: getCustomEmojiImageUrl,
+          ),
       'retraction': (String? username) => RetractionMessage(  // 撤回消息
         isRight: isRight,
         userName: username,
