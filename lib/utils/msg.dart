@@ -18,6 +18,9 @@ class MsgUtil {
         case "img":
           contentStr = '[图片]';
           break;
+        case "emoji":
+          contentStr = '[表情]';
+          break;
         case "retraction":
           contentStr = '[消息被撤回]';
           break;

@@ -535,6 +535,40 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
     return '';
   }
 
+  // 从长按菜单将图片/表情消息存到我的表情
+  Future<void> addCustomEmojiFromMessage(Map<String, dynamic> message) async {
+    final content = message['msgContent'];
+    final type = content?['type']?.toString();
+    String? emojiFileName;
+
+    if (type == 'emoji') {
+      emojiFileName = content['content']?.toString();
+    } else if (type == 'img') {
+      try {
+        emojiFileName = (jsonDecode(content['content'] ?? '') as Map?)?['name']?.toString();
+      } catch (_) {}
+    }
+
+    if (emojiFileName == null) {
+      CustomFlutterToast.showErrorToast('无法从该消息获取文件名');
+      return;
+    }
+
+    final response = await _emojiApi.add(emojiFileName);
+    if (response['code'] != 0) {
+      CustomFlutterToast.showErrorToast(response['msg'] ?? '添加失败');
+      return;
+    }
+
+    final listResponse = await _emojiApi.list();
+    if (listResponse['code'] == 0 && listResponse['data'] != null) {
+      customEmojiList = listResponse['data'];
+    }
+
+    update([const Key('emoji_panel')]);
+    CustomFlutterToast.showSuccessToast('已添加到表情');
+  }
+
   // 发送自定义表情消息：content 为存储中的文件名
   void sendEmojiMsg(String fileName) {
     if (StringUtil.isNullOrEmpty(fileName)) return;

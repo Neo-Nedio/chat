@@ -56,7 +56,10 @@ class ChatMessage extends StatelessThemeWidget {
   // 与 ChatFrameLogic 一致，用于表情预览 URL 复用同一份内存缓存
   final Future<String> Function(String fileName) getCustomEmojiImageUrl;
 
-  const ChatMessage({
+  // 将当前消息中的图片/表情存到我的表情（/emoji/add），仅用于 img、emoji
+  final void Function(Map<String, dynamic> msg)? onAddToMyEmoji;
+
+  ChatMessage({
     super.key,
     this.chatPortrait,
     this.selfPortrait,
@@ -68,6 +71,7 @@ class ChatMessage extends StatelessThemeWidget {
     this.onTapMsg,
     this.reEdit,
     this.onTapVoice,
+    this.onAddToMyEmoji,
     required this.getCustomEmojiImageUrl,
     required this.msg,
     required this.chatInfo,
@@ -289,12 +293,15 @@ class ChatMessage extends StatelessThemeWidget {
         callback:
         onTapVoice ?? (data) => debugPrint("data: ${data.toString()}"),
       ),
-    // 通用菜单（所有类型都有）
-    PopMenuItemModel(
-        title: '转发',
-        icon: Icons.send,
-        callback: onTapRetransmission ??
-                (data) => debugPrint("data: ${data.toString()}")),
+    //自定义表情：添加到我的表情（/emoji/add）
+    if ( type == 'emoji' && onAddToMyEmoji != null)
+      PopMenuItemModel(
+        title: '添加表情',
+        icon: Icons.add_reaction_outlined,
+        callback: (data) {
+          onAddToMyEmoji!(msg);
+        },
+      ),
     if (isOwner &&
         chatInfo['type'] == 'group' &&
         msg['fromId'] != globalData.currentUserId)
@@ -311,11 +318,6 @@ class ChatMessage extends StatelessThemeWidget {
           icon: Icons.reply,
           callback: onTapRetract ??
                   (data) => debugPrint("data: ${data.toString()}")),
-    PopMenuItemModel(
-        title: '引用',
-        icon: Icons.format_quote,
-        callback:
-        onTapCite ?? (data) => debugPrint("data: ${data.toString()}")),
   ];
 
   //根据类型获得对应组件

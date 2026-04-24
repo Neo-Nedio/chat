@@ -4,11 +4,13 @@ import 'package:get/get.dart';
 import '../../../components/custom_image/index.dart';
 import '../../../utils/getx_config/GlobalThemeConfig.dart';
 
+// 自定义表情消息：msgContent.type == emoji，content 为 minio 文件名
+// 与 [ImageMessage] 一样仅限制最大宽高，由图片本身比例撑开
 class EmojiMessage extends StatefulWidget {
   final dynamic value;
   final bool isRight;
 
-  // 与 [ChatFrameLogic.getCustomEmojiImageUrl] 一致，共用内存缓存
+  /// 与 [ChatFrameLogic.getCustomEmojiImageUrl] 一致，共用内存缓存
   final Future<String> Function(String fileName) getCustomEmojiImageUrl;
 
   const EmojiMessage({
@@ -45,8 +47,9 @@ class _EmojiMessageState extends State<EmojiMessage> {
 
   @override
   Widget build(BuildContext context) {
-    final maxSize = MediaQuery.sizeOf(context).width * 0.28;
+    final maxSize = MediaQuery.sizeOf(context).width * 0.4;
     return ConstrainedBox(
+      // 限制最大宽高，而不是定死，便于图片按原比例在范围内展示
       constraints: BoxConstraints(maxWidth: maxSize, maxHeight: maxSize),
       child: FutureBuilder<String>(
         future: _urlFuture,
@@ -55,16 +58,17 @@ class _EmojiMessageState extends State<EmojiMessage> {
             return CustomImage(url: snapshot.data!);
           }
           return Container(
-            width: maxSize * 0.6,
-            height: maxSize * 0.6,
-            color: widget.isRight
-                ? _theme.primaryColor.withValues(alpha: 0.2)
-                : Colors.grey.shade200,
+            width: maxSize,
+            color: widget.isRight ? _theme.primaryColor : Colors.white,
+            height: maxSize,
             alignment: Alignment.center,
             child: const SizedBox(
-              width: 28,
-              height: 28,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              width: 40,
+              height: 40,
+              child: CircularProgressIndicator(
+                color: Color(0xffffffff),
+                strokeWidth: 2,
+              ),
             ),
           );
         },

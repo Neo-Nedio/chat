@@ -207,6 +207,9 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                                 // 与表情面板共享 ChatFrameLogic 的 URL 缓存
                                 getCustomEmojiImageUrl:
                                     controller.getCustomEmojiImageUrl,
+                                onAddToMyEmoji: (m) {
+                                  controller.addCustomEmojiFromMessage(m);
+                                },
                                 msg: msg, //消息
                                 chatPortrait: controller.chatInfo['portrait'], //头像
                                 selfPortrait: controller.selfPortrait,

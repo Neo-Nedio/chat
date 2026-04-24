@@ -23,7 +23,7 @@ class EmojiApi {
   Future<Map<String, dynamic>> add(String emoji) async {
     final response = await _dio.post(
       '/v1/api/emoji/add',
-      data: {'emoji': emoji},
+      queryParameters: {'emoji': emoji},
     );
     return response.data;
   }
