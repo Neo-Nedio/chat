@@ -613,7 +613,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
   }
 
   // 右栏：接口返回的自定义表情，点击直接发送
-  // 第 0 格固定为加号，其余为已保存的表情
+  // 第 0 格加号、第 1 格减号（删除模式），其余为已保存的表情
   Widget _buildEmojiCustomPack(ChatFrameLogic c) {
     // 加载中
     if (c.customEmojiListLoading) {
@@ -648,7 +648,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
         ),
       ),
       child: GridView.builder(
-        itemCount: 1 + c.customEmojiList.length,
+        itemCount: 2 + c.customEmojiList.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 6,
           mainAxisSpacing: 6,
@@ -659,68 +659,17 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
           if (i == 0) {
             return _addCustomEmoji(c);
           }
-          final raw = c.customEmojiList[i - 1];
+          if (i == 1) {
+            return _removeCustomEmoji(c);
+          }
+          final raw = c.customEmojiList[i - 2];
           final fileName = raw is Map
               ? (raw['emoji']?.toString() ?? '')
               : raw.toString();
           if (fileName.isEmpty) {
             return const SizedBox.shrink();
           }
-          //加载表情
-          return GestureDetector(
-            onTap: () => c.sendEmojiMsg(fileName),
-            child: FutureBuilder<String>(
-              key: ValueKey(fileName),
-              future: c.getCustomEmojiImageUrl(fileName),
-              builder: (context, snap) {
-                final url = snap.data ?? '';
-                if (url.isNotEmpty) {
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: SizedBox.expand(
-                      child: CachedNetworkImage(
-                        imageUrl: url,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) { //加载中
-                          return Container(
-                            color: Colors.grey.shade200,
-                            alignment: Alignment.center,
-                            child: const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ),
-                            ),
-                          );
-                        },
-                        errorWidget: (context, url, error) { //加载失败
-                          return Container(
-                            color: Colors.grey.shade200,
-                            alignment: Alignment.center,
-                            child: const Icon(
-                              Icons.broken_image,
-                              size: 20,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  );
-                }
-                //FutureBuilder 在加载过程中的占位符
-                return Container(
-                  color: Colors.grey.shade200,
-                  alignment: Alignment.center,
-                  child: const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CupertinoActivityIndicator(radius: 8),
-                  ),
-                );
-              },
-            ),
-          );
+          return _buildCustomEmojiCell(c, fileName);
         },
       ),
     );
@@ -750,6 +699,138 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
           },
         ),
       ),
+    );
+  }
+
+  // 与加号同格，点击进入/退出删除态（此时表情格右上角出现红叉）
+  Widget _removeCustomEmoji(ChatFrameLogic c) {
+    return Obx(
+      () {
+        final active = c.customEmojiDeleteMode.value;
+        return Material(
+          color: active
+              ? theme.primaryColor.withValues(alpha: 0.12)
+              : Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(4),
+          child: InkWell(
+            onTap: c.toggleCustomEmojiDeleteMode,
+            borderRadius: BorderRadius.circular(4),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final w = constraints.maxWidth;
+                final h = constraints.maxHeight;
+                final s = w < h ? w : h;
+                return Center(
+                  child: Icon(
+                    Icons.remove,
+                    size: (s * 0.42).clamp(22.0, 34.0),
+                    color: active
+                        ? theme.primaryColor
+                        : const Color(0xFF6B6B6B),
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCustomEmojiCell(ChatFrameLogic c, String fileName) {
+    return Obx(
+      () {
+        final deleteMode = c.customEmojiDeleteMode.value;
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: deleteMode
+                    ? null
+                    : () => c.sendEmojiMsg(fileName),
+                child: FutureBuilder<String>(
+                  key: ValueKey(fileName),
+                  future: c.getCustomEmojiImageUrl(fileName),
+                  builder: (context, snap) {
+                    final url = snap.data ?? '';
+                    if (url.isNotEmpty) {
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: SizedBox.expand(
+                          child: CachedNetworkImage(
+                            imageUrl: url,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) {
+                              return Container(
+                                color: Colors.grey.shade200,
+                                alignment: Alignment.center,
+                                child: const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              );
+                            },
+                            errorWidget: (context, url, error) {
+                              return Container(
+                                color: Colors.grey.shade200,
+                                alignment: Alignment.center,
+                                child: const Icon(
+                                  Icons.broken_image,
+                                  size: 20,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      );
+                    }
+                    return Container(
+                      color: Colors.grey.shade200,
+                      alignment: Alignment.center,
+                      child: const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CupertinoActivityIndicator(radius: 8),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            //删除按钮
+            if (deleteMode)
+              Positioned(
+                top: -4,
+                right: -4,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => c.deleteCustomEmoji(fileName),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      width: 20,
+                      height: 20,
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        size: 12,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 

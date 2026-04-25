@@ -63,6 +63,7 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
   bool customEmojiListLoading = false;
   bool _customEmojiUploading = false;
   final Map<String, String> _customEmojiFileUrlCache = {};
+  final RxBool customEmojiDeleteMode = false.obs;
 
   // 分页相关
   int num = 20;      // 每页数量
@@ -504,6 +505,37 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
     } finally {
       customEmojiListLoading = false;
       update([const Key('emoji_panel')]);
+    }
+  }
+
+  void toggleCustomEmojiDeleteMode() {
+    customEmojiDeleteMode.value = !customEmojiDeleteMode.value;
+  }
+
+  Future<void> deleteCustomEmoji(String fileName) async {
+    if (StringUtil.isNullOrEmpty(fileName)) return;
+    try {
+      final res = await _emojiApi.delete(fileName);
+      if (res['code'] == 0) {
+        _customEmojiFileUrlCache.remove(fileName);
+        //获取删除后的表情列表
+        customEmojiList = customEmojiList.where((raw) {
+          final fn = raw is Map
+              ? (raw['emoji']?.toString() ?? '')
+              : raw.toString();
+          return fn != fileName;
+        }).toList();
+        //如果没有表情，自动切换为无删除模式
+        if (customEmojiList.isEmpty) {
+          customEmojiDeleteMode.value = false;
+        }
+        update([const Key('emoji_panel')]);
+        CustomFlutterToast.showSuccessToast('已删除');
+      } else {
+        CustomFlutterToast.showErrorToast(res['msg'] ?? '删除失败');
+      }
+    } catch (_) {
+      CustomFlutterToast.showErrorToast('删除失败');
     }
   }
 

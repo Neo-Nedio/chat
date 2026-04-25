@@ -28,6 +28,15 @@ class EmojiApi {
     return response.data;
   }
 
+  // 删除表情
+  Future<Map<String, dynamic>> delete(String emoji) async {
+    final response = await _dio.post(
+      '/v1/api/emoji/delete',
+      queryParameters: {'emoji': emoji},
+    );
+    return response.data;
+  }
+
   // 上传自定义表情
   Future<Map<String, dynamic>> upload(FormData formData) async {
     final response = await _dio.post(
