@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 
@@ -27,8 +27,11 @@ class RegisterPageLogic extends GetxController {
   //验证码
   final codeController = TextEditingController();
 
+  bool _showCodeInput = false;
+  bool get showCodeInput => _showCodeInput;
+
   //定时器
-  late Timer _timer;
+  Timer? _timer;
   int _countdownTime = 0;// 倒计时秒数
 
   int get countdownTime => _countdownTime;
@@ -91,23 +94,36 @@ class RegisterPageLogic extends GetxController {
     if (mailTextLength >= 16) mailTextLength = 16;
   }
 
-  //发送验证码
-  void onTapSendMail() async {
-    // 只有不在倒计时状态才能发送
-    if (countdownTime == 0) {
-      //TODO Http请求发送验证码(其他地方逻辑还有问题)
-      final String mail = mailController.text;
-
-      final emailVerificationResult = await _useApi.emailVerification(mail);
-
-      if (emailVerificationResult['code'] == 0) {
-        CustomFlutterToast.showSuccessToast("发送成功~");
-
-        countdownTime = 30;  // 设置倒计时30秒
-        _startCountdownTimer();  // 开始倒计时
-      } else {
-        CustomFlutterToast.showErrorToast(emailVerificationResult['msg']);
+  // 底部「获取验证码」：首次校验四项填全；之后为重新获取
+  Future<void> onTapGetCode() async {
+    if (!_showCodeInput) {
+      if (usernameController.text.trim().isEmpty ||
+          accountController.text.trim().isEmpty ||
+          passwordController.text.trim().isEmpty ||
+          mailController.text.trim().isEmpty) {
+        CustomFlutterToast.showErrorToast("不能为空，请填写完整！");
+        return;
       }
+    }
+    await _sendVerificationEmail();
+  }
+
+  Future<void> _sendVerificationEmail() async {
+    if (countdownTime > 0) return;
+    final String mail = mailController.text.trim();
+    if (mail.isEmpty) {
+      CustomFlutterToast.showErrorToast('请填写邮箱');
+      return;
+    }
+    final emailVerificationResult = await _useApi.emailVerification(mail);
+    if (emailVerificationResult['code'] == 0) {
+      CustomFlutterToast.showSuccessToast("发送成功~");
+      _showCodeInput = true;
+      codeController.clear();
+      countdownTime = 30; // 设置倒计时30秒
+      _startCountdownTimer(); // 开始倒计时
+    } else {
+      CustomFlutterToast.showErrorToast(emailVerificationResult['msg']);
     }
   }
 
@@ -140,24 +156,29 @@ class RegisterPageLogic extends GetxController {
         Get.back();  // 返回登录页
       }else {
         CustomFlutterToast.showErrorToast(registerResult['msg']);
+        codeController.clear();
+        update([const Key("register")]);
       }
     }
   }
 
   //开始倒计时
   void _startCountdownTimer() {
-    const oneSec = Duration(seconds: 1);           // 1秒间隔
-    callback(timer) => {                           // 回调函数
-      if (countdownTime < 1)                       // 如果倒计时结束
-        { _timer.cancel() }                         // 取消定时器
-      else                                          // 否则
-        { countdownTime = countdownTime - 1 }       // 秒数减1
-    };
-    _timer = Timer.periodic(oneSec, callback);     // 启动定时器
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (countdownTime <= 1) {
+        countdownTime = 0;
+        timer.cancel();
+        _timer = null;
+      } else {
+        countdownTime = countdownTime - 1;
+      }
+    });
   }
 
   @override
   void onClose() {
+    _timer?.cancel();
     usernameController.dispose();
     accountController.dispose();
     passwordController.dispose();

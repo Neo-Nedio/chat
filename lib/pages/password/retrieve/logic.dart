@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 
@@ -26,17 +25,20 @@ class RetrievePasswordLogic extends GetxController{
   //验证码
   final codeController = TextEditingController();
 
+  // 已发送过验证码，展示 Pinput
+  bool _showCodeInput = false;
+  bool get showCodeInput => _showCodeInput;
+
   int _countdownTime = 0;
 
   //计时器
-  late Timer _timer;
+  Timer? _timer;
 
   int get countdownTime => _countdownTime;
-
   set countdownTime(int value) {
     _countdownTime = value;
     update([
-      const Key("retrieve_password"),
+      const Key("retrieve_password"), //刷新页面
     ]);
   }
 
@@ -54,18 +56,35 @@ class RetrievePasswordLogic extends GetxController{
     update([const Key("retrieve_password")]);
   }
 
-  //发送验证码
-  void onTapSendMail() async {
-    if (countdownTime == 0) {
-      final String account = accountController.text;
-      final emailVerificationResult = await _useApi.emailVerificationByAccount(account);
-      if (emailVerificationResult['code'] == 0) {
-        CustomFlutterToast.showSuccessToast('发送成功~');
-        countdownTime = 30;
-        _startCountdownTimer();
-      } else {
-        CustomFlutterToast.showErrorToast(emailVerificationResult['msg']);
+  // 底部「获取验证码」：首次会校验账号+新密码；之后重新获取
+  Future<void> onTapGetCode() async {
+    if (!_showCodeInput) {
+      if (accountController.text.trim().isEmpty || passwordController.text.isEmpty) {
+        CustomFlutterToast.showSuccessToast('不能为空，请填写完整！');
+        return;
       }
+    }
+    await _sendVerificationEmail();
+  }
+
+  //发送验证码
+  Future<void> _sendVerificationEmail() async {
+    if (countdownTime > 0) return;
+
+    final String account = accountController.text.trim();
+    if (account.isEmpty) {
+      CustomFlutterToast.showErrorToast('请填写账号');
+      return;
+    }
+    final emailVerificationResult = await _useApi.emailVerificationByAccount(account);
+    if (emailVerificationResult['code'] == 0) {
+      CustomFlutterToast.showSuccessToast('发送成功~');
+      _showCodeInput = true;
+      codeController.clear(); //删除输入框的验证码
+      countdownTime = 30;
+      _startCountdownTimer(); //开始倒计时
+    } else {
+      CustomFlutterToast.showErrorToast(emailVerificationResult['msg']);
     }
   }
 
@@ -97,24 +116,29 @@ class RetrievePasswordLogic extends GetxController{
           Get.back();
         } else {
           CustomFlutterToast.showErrorToast(passwordForgetResult['msg']);
+          codeController.clear();
+          update([const Key("retrieve_password")]);
         }
     }
   }
 
   //开始倒计时
   void _startCountdownTimer() {
-    const oneSec = Duration(seconds: 1);
-    callback(timer) => {
-      if (countdownTime < 1)
-        {_timer.cancel()}
-      else
-        {countdownTime = countdownTime - 1}
-    };
-    _timer = Timer.periodic(oneSec, callback);
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (countdownTime <= 1) {
+        countdownTime = 0;
+        timer.cancel();
+        _timer = null;
+      } else {
+        countdownTime = countdownTime - 1;
+      }
+    });
   }
 
   @override
   void onClose() {
+    _timer?.cancel();
     accountController.dispose();
     passwordController.dispose();
     codeController.dispose();
