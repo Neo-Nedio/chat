@@ -5,6 +5,7 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 
 import '../../components/app_bar_title/index.dart';
+import '../../components/app_loading.dart';
 import '../../components/custom_image_group/index.dart';
 import '../../components/custom_portrait/index.dart';
 import '../../components/custom_text_button/index.dart';
@@ -93,14 +94,9 @@ class TalkPage extends CustomWidget<TalkLogic> {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 16),
         child: Center(
-          child: SizedBox(
-            width: 30.0,
-            height: 30.0,
-            //滚动圆圈
-            child: CircularProgressIndicator(
-              strokeWidth: 4,
-              color: theme.primaryColor,
-            ),
+          child: appLoadingDiscreteCircle(
+            color: theme.primaryColor,
+            size: 30,
           ),
         ),
       );

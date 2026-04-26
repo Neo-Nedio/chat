@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../api/msg_api.dart';
+import '../../../components/app_loading.dart';
 import '../../../components/custom_image/index.dart';
 import '../../../utils/getx_config/config.dart';
 
@@ -41,13 +42,9 @@ class ImageMessage extends StatelessThemeWidget {
               color: isRight ? theme.primaryColor : Colors.white,
               height: maxSize,
               alignment: Alignment.center,
-              child: const SizedBox(
-                width: 40,
-                height: 40,
-                child: CircularProgressIndicator(
-                  color: Color(0xffffffff),
-                  strokeWidth: 2,
-                ),
+              child: appLoadingInkDrop(
+                color: const Color(0xffffffff),
+                size: 40,
               ),
             );
           }

@@ -1,11 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chat_mobile/utils/String.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 
 import '../../api/user_api.dart';
-import '../custom_material_button/index.dart';
+import '../app_loading.dart';
 
 final _userApi = UserApi();
 // 使用 Map 存储多个头像的URL缓存
@@ -102,12 +101,10 @@ class CustomPortrait extends StatelessWidget {
                             width: size,
                             height: size,
                             color: Colors.grey[300],
-                            child: const Center(
-                              // 居中显示
-                              child: CircularProgressIndicator(
-                                // 圆形进度条
-                                color: Color(0xffffffff), // 白色
-                                strokeWidth: 2, // 线条粗细2
+                            child: Center(
+                              child: appLoadingInkDrop(
+                                color: const Color(0xffffffff),
+                                size: (size * 0.5).clamp(16.0, 28.0),
                               ),
                             ),
                           ),
@@ -140,10 +137,10 @@ class CustomPortrait extends StatelessWidget {
               //加载
               return Container(
                 color: Colors.grey[300],
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    color: Color(0xffffffff),
-                    strokeWidth: 2,
+                child: Center(
+                  child: appLoadingInkDrop(
+                    color: const Color(0xffffffff),
+                    size: (size * 0.5).clamp(16.0, 28.0),
                   ),
                 ),
               );

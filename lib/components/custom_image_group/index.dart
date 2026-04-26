@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chat_mobile/components/app_loading.dart';
 import 'package:chat_mobile/components/custom_material_button/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -87,10 +88,10 @@ class CustomImageGroup extends StatelessWidget {
                   //加载中
                   placeholder: (context, url) => Container(
                     color: Colors.grey[300],
-                    child: const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xffffffff),
-                        strokeWidth: 2,
+                    child: Center(
+                        child: appLoadingInkDrop(
+                        color: const Color(0xffffffff),
+                        size: 28,
                       ),
                     ),
                   ),
@@ -102,11 +103,11 @@ class CustomImageGroup extends StatelessWidget {
                 //加载或失败
                 return Container(
                   color: Colors.grey[300],
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      color: Color(0xffffffff),
-                      strokeWidth: 2,
-                    ),
+                  child: Center(
+                        child: appLoadingInkDrop(
+                        color: const Color(0xffffffff),
+                        size: 28,
+                      ),
                   ),
                 );
               }

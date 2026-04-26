@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../components/app_bar_title/index.dart';
+import '../../../components/app_loading.dart';
 import '../../../components/custom_button/index.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
@@ -97,7 +98,10 @@ class AdminNotifyPage extends CustomWidget<AdminNotifyLogic> {
             // 提交按钮
             Center(
               child: controller.isSubmitting
-                  ? const CircularProgressIndicator()
+                  ? appLoadingDiscreteCircle(
+                      color: theme.primaryColor,
+                      size: 32,
+                    )
                   : CustomButton(
                       text: '发布通知',
                       onTap: () => controller.onSubmit(),

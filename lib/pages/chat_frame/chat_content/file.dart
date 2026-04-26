@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../api/msg_api.dart';
+import '../../../components/app_loading.dart';
 import '../../../utils/String.dart';
 import '../../../utils/getx_config/config.dart';
 
@@ -132,13 +133,9 @@ class FileMessage extends StatelessThemeWidget {
               color: isRight ? theme.primaryColor : Colors.white,
               height: 85,
               alignment: Alignment.center,
-              child: const SizedBox(
-                height: 40,
-                width: 40,
-                child: CircularProgressIndicator(
-                  color: Color(0xffffffff),
-                  strokeWidth: 2,
-                ),
+              child: appLoadingInkDrop(
+                color: const Color(0xffffffff),
+                size: 40,
               ),
             );
           }

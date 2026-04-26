@@ -1,13 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_bottom_container/panel_container.dart';
 import 'package:chat_bottom_container/typedef.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../components/app_bar_title/index.dart';
+import '../../components/app_loading.dart';
 import '../../components/custom_button/index.dart';
 import '../../components/custom_icon_button/index.dart';
 import '../../components/custom_portrait/index.dart';
@@ -221,14 +221,17 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                           ),
                           // 加载指示器
                           if (controller.isLoading)
-                            const Positioned(
+                            Positioned(
                               top: 0,
                               left: 0,
                               right: 0,
                               child: Center(
                                 child: Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: CupertinoActivityIndicator(),
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: appLoadingDiscreteCircle(
+                                    color: theme.primaryColor,
+                                    size: 24,
+                                  ),
                                 ),
                               ),
                             ),
@@ -628,8 +631,11 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
             ),
           ),
         ),
-        child: const Center(
-          child: CupertinoActivityIndicator(),
+        child: Center(
+          child: appLoadingDiscreteCircle(
+            color: theme.primaryColor,
+            size: 28,
+          ),
         ),
       );
     }
@@ -765,12 +771,9 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                               return Container(
                                 color: Colors.grey.shade200,
                                 alignment: Alignment.center,
-                                child: const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
+                                child: appLoadingInkDrop(
+                                  color: theme.primaryColor,
+                                  size: 20,
                                 ),
                               );
                             },
@@ -791,10 +794,9 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                     return Container(
                       color: Colors.grey.shade200,
                       alignment: Alignment.center,
-                      child: const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CupertinoActivityIndicator(radius: 8),
+                      child: appLoadingInkDrop(
+                        color: theme.primaryColor,
+                        size: 20,
                       ),
                     );
                   },

@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+
+import '../../components/app_loading.dart';
 import '../../utils/getx_config/config.dart';
 import './logic.dart';
 
@@ -42,9 +44,9 @@ class ImageViewerPage extends CustomWidget<ImageViewerLogic> {
                 },
                 //加载中
                 loadingBuilder: (context, event) => Center(
-                  child: CircularProgressIndicator(
+                  child: appLoadingDiscreteCircle(
                     color: theme.primaryColor,
-                    strokeWidth: 4,
+                    size: 40,
                   ),
                 ),
               ),

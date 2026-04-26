@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../app_loading.dart';
+
 //单张图片展示组件，支持网络图片加载、缓存、点击查看大图。
 class CustomImage extends StatelessWidget {
   final String url;
@@ -27,10 +29,10 @@ class CustomImage extends StatelessWidget {
           // 加载中
           placeholder: (context, url) => Container(
             color: Colors.grey[300],
-            child: const Center(
-              child: CircularProgressIndicator(
-                color: Color(0xffffffff),
-                strokeWidth: 2,
+            child: Center(
+              child: appLoadingInkDrop(
+                color: const Color(0xffffffff),
+                size: 28,
               ),
             ),
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../api/notify_api.dart';
+import '../app_loading.dart';
 import '../CustomDialog/index.dart';
 import '../custom_flutter_toast/index.dart';
 import '../custom_image/index.dart';
@@ -156,10 +157,13 @@ class CustomNotifyContent extends StatelessWidget {
       future: _getImgUrl(),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return const SizedBox(
+          return SizedBox(
             height: 80,
             child: Center(
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: appLoadingInkDrop(
+                color: const Color(0xFF9E9E9E),
+                size: 28,
+              ),
             ),
           );
         }

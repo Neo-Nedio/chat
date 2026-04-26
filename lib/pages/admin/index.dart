@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../components/app_bar_title/index.dart';
+import '../../components/app_loading.dart';
 import '../../components/custom_search_box/index.dart';
 import '../../components/custom_user_card/index.dart';
 import '../../utils/getx_config/config.dart';
@@ -115,7 +116,12 @@ class AdminUserManagePage extends CustomWidget<AdminUserManageLogic> {
             // 内容区域
             Expanded(
               child: controller.isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? Center(
+                      child: appLoadingDiscreteCircle(
+                        color: theme.primaryColor,
+                        size: 40,
+                      ),
+                    )
                   //加载成功
                   : displayList.isEmpty
                       //无用户
@@ -171,11 +177,13 @@ class AdminUserManagePage extends CustomWidget<AdminUserManageLogic> {
                                 if (index >= displayList.length) {
                                   if (controller.hasMore) {
                                     //加载中
-                                    return const Center(
+                                    return Center(
                                       child: Padding(
-                                        padding: EdgeInsets.all(16),
-                                        child: CircularProgressIndicator(
-                                            strokeWidth: 2),
+                                        padding: const EdgeInsets.all(16),
+                                        child: appLoadingDiscreteCircle(
+                                          color: theme.primaryColor,
+                                          size: 28,
+                                        ),
                                       ),
                                     );
                                   }
