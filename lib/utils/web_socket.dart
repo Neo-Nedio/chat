@@ -81,20 +81,25 @@ class WebSocketUtil {
   bool _lockReconnect = false;
   bool _isConnected = false;
   String? _token;
-  final int _reconnectCountMax = 200;
+  final int _reconnectCountMax = 20;
   int _reconnectCount = 0;
+  Timer? _initConnectTimer;
+  int _initConnectCount = 0;
+  final int _maxInitConnect = 20;
 
 
   //连接建立
   Future<void> connect() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('x-token');
-    if (token == null) return;
+    if (token == null) {
+      _reInitConnect();
+      return;
+    }
     if (_isConnected || _channel != null) return; // 已连接则跳过
     _isConnected = true;
 
     try {
-      print('WebSocket connecting...');
       //// WebSocket 服务器地址
       final host = await Http.resolveEffectiveBaseIp();
       String wsIp = 'ws://$host:9100';
@@ -109,14 +114,33 @@ class WebSocketUtil {
         _handleMessage,  // 收到消息时调用
         onDone: _handleClose,   // 连接关闭时调用
         onError: _handleError,  // 出错时调用
-        cancelOnError: true,
+        cancelOnError: true,  //当流发生错误时是否自动取消订阅
       );
 
       _clearTimer();        // 清理之前的定时器
       _startHeartbeat();    // 启动心跳
+      _initConnectCount = 0;
+      _initConnectTimer?.cancel();
     } catch (e) {
-      // 连接失败，触发关闭处理
+      _isConnected = false;
+      _channel = null;
+      _reInitConnect();
     }
+  }
+
+  void _reInitConnect() {
+    if (_initConnectCount >= _maxInitConnect) {
+      _initConnectCount = 0;
+      return;
+    }
+    _initConnectTimer?.cancel();
+    _initConnectTimer = Timer(
+      const Duration(seconds: 5),
+          () {
+        _initConnectCount++;
+        connect();
+      },
+    );
   }
 
   //消息处理
@@ -253,6 +277,7 @@ class WebSocketUtil {
   void forceClose() {
     _clearHeartbeat();
     _clearTimer();
+    _initConnectTimer?.cancel();
     if (_channel != null) {
       _channel!.sink.close();
       _channel = null;
@@ -265,6 +290,7 @@ class WebSocketUtil {
   void dispose() {
     _clearHeartbeat();
     _clearTimer();
+    _initConnectTimer?.cancel();
     _channel?.sink.close();
     /*eventController是单例,dispose在每个设置监听的地方结束时会被调用
     比如navigation页面转向chat_frame页面，回调用dispose方法
