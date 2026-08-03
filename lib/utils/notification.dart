@@ -6,6 +6,7 @@ import '../api/user_api.dart';
 
 final _userApi = UserApi();
 
+//todo 未支持ios
 //本地通知工具类，用于在系统通知栏显示各种类型的通知消息。
 class NotificationUtil {
   //通知插件
@@ -60,17 +61,38 @@ class NotificationUtil {
 
   // 创建通知渠道（Android）
   static Future<void> createNotificationChannel() async {
-    const channel = AndroidNotificationChannel(
-      'high_importance_channel',        // 渠道ID
-      'High Importance Notifications',  // 渠道名称
+    // 1. 高重要性渠道（普通通知）
+    const highChannel = AndroidNotificationChannel(
+      'high_importance_channel',
+      'High Importance Notifications',
       description: 'This channel is used for important notifications.',
-      importance: Importance.max,      // 重要性（决定通知行为）
+      importance: Importance.max,
     );
 
-    await _notificationsPlugin
+    // 2. 进度通知渠道
+    const progressChannel = AndroidNotificationChannel(
+      'progress_channel',
+      'Progress Notifications',
+      description: 'Notifications with progress bar',
+      importance: Importance.max,
+    );
+
+    // 3. 大图通知渠道
+    const bigPictureChannel = AndroidNotificationChannel(
+      'big_picture_channel',
+      'Big Picture Notifications',
+      description: 'Notifications with big picture',
+      importance: Importance.max,
+    );
+
+    final plugin = _notificationsPlugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);//创建通知渠道
+        AndroidFlutterLocalNotificationsPlugin>();
+
+    // 创建所有渠道
+    await plugin?.createNotificationChannel(highChannel);
+    await plugin?.createNotificationChannel(progressChannel);
+    await plugin?.createNotificationChannel(bigPictureChannel);
   }
 
   // 显示普通通知
