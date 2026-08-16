@@ -96,6 +96,8 @@ class AiChatPage extends CustomWidget<AiChatLogic> {
             child: Obx(() {
               final itemCount = controller.records.length +
                   (controller.isStreaming.value ? 1 : 0);
+              //需在 itemBuilder 外读取，Obx 才能追踪到 streamingContent 的变化
+              final streamingContent = controller.streamingContent.value;
               if (itemCount == 0) {
                 return const Center(
                   child: Text(
@@ -113,7 +115,7 @@ class AiChatPage extends CustomWidget<AiChatLogic> {
                   if (index == controller.records.length) {
                     return _buildBubble({
                       'role': 'assistant',
-                      'content': controller.streamingContent.value,
+                      'content': streamingContent,
                     });
                   }
                   return _buildBubble(controller.records[index]);
