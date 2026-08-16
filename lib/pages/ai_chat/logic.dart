@@ -7,7 +7,7 @@ import '../../api/ai_api.dart';
 import '../../components/CustomDialog/index.dart';
 import '../../components/custom_flutter_toast/index.dart';
 
-class AiChatLogic extends GetxController {
+class AiChatLogic extends GetxController with WidgetsBindingObserver {
   final _aiApi = AiApi();
 
   final scaffoldKey = GlobalKey<ScaffoldState>(); // 用于自动打开侧滑栏
@@ -25,6 +25,7 @@ class AiChatLogic extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this); //监听键盘等系统指标变化
     onModelList();
     onChatRecordList();
 
@@ -41,7 +42,8 @@ class AiChatLogic extends GetxController {
       if (res['code'] == 0) {
         modelList.assignAll(res['data'] ?? []);
         //当前未选中或选中的模型已被删除时，重置为第一个
-        final exists = currentModel.value != null &&
+        final exists =
+            currentModel.value != null &&
             modelList.any((m) => m['id'] == currentModel.value!['id']);
         if (!exists) {
           currentModel.value = modelList.isNotEmpty
@@ -60,7 +62,7 @@ class AiChatLogic extends GetxController {
       final res = await _aiApi.chatRecordList();
       if (res['code'] == 0) {
         records.assignAll(res['data'] ?? []);
-        scrollToBottom();
+        scrollToBottom(animated: false); //进入页面直接定位到底部，无动画
       }
     } catch (e) {
       debugPrint('onChatRecordList error: $e');
@@ -124,8 +126,10 @@ class AiChatLogic extends GetxController {
     streamingContent.value = '';
 
     try {
-      await for (final event
-          in _aiApi.answersStream(currentModel.value!['id'], question)) {
+      await for (final event in _aiApi.answersStream(
+        currentModel.value!['id'],
+        question,
+      )) {
         switch (event.event) {
           case 'delta': //增量内容，追加到当前气泡
             streamingContent.value += event.data['content'] ?? '';
@@ -137,8 +141,7 @@ class AiChatLogic extends GetxController {
             scrollToBottom();
             break;
           case 'error': //出错，丢弃临时气泡
-            CustomFlutterToast.showErrorToast(
-                event.data['msg'] ?? 'AI 回答失败~');
+            CustomFlutterToast.showErrorToast(event.data['msg'] ?? 'AI 回答失败~');
             _resetStreaming();
             break;
         }
@@ -156,20 +159,47 @@ class AiChatLogic extends GetxController {
   }
 
   //滚动到消息列表底部
-  void scrollToBottom() {
+  //[animated] 为 false 时直接跳转（用于进入页面定位），否则平滑滚动
+  void scrollToBottom({bool animated = true}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (scrollController.hasClients) {
-        scrollController.animateTo(
-          scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-        );
+        if (animated) {
+          scrollController.animateTo(
+            scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+          );
+        } else {
+          //需要两次滚到底部，maxScrollExtent 在刚开始进入页面时会变，要两次滚到底部
+          scrollController.jumpTo(scrollController.position.maxScrollExtent);
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => scrollController.jumpTo(
+              scrollController.position.maxScrollExtent,
+            ),
+          );
+        }
       }
     });
   }
 
+  double _lastKeyboardHeight = 0; //上次键盘高度，用于判断弹出还是收起
+
+  @override
+  //系统指标变化时触发（键盘、状态栏等）
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    //键盘高度（>0 表示键盘弹出），弹出后列表可视区变短，需重新滚到底部避免内容被挡
+    final keyboardHeight = MediaQuery.of(Get.context!).viewInsets.bottom;
+    //只在键盘弹起（高度增加）时滚动；收起时高度是渐变到 0，不处理
+    if (keyboardHeight > _lastKeyboardHeight && scrollController.hasClients) {
+      scrollToBottom();
+    }
+    _lastKeyboardHeight = keyboardHeight;
+  }
+
   @override
   void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
     _streamSubscription?.cancel();
     questionController.dispose();
     scrollController.dispose();

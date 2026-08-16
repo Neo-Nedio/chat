@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gpt_markdown/gpt_markdown.dart';
 
 import '../../components/app_bar_title/index.dart';
 import '../../components/custom_button/index.dart';
@@ -25,13 +26,17 @@ class AiChatPage extends CustomWidget<AiChatLogic> {
           onPressed: () => Get.back(),
         ),
         //标题展示当前选中模型名
-        title: Obx(() => AppBarTitle(
-            controller.currentModel.value?['modelName'] ?? 'AI 助手')),
+        title: Obx(
+          () => AppBarTitle(
+            controller.currentModel.value?['modelName'] ?? 'AI 助手',
+          ),
+        ),
         //右上角抽屉打开键
         actions: [
           IconButton(
             icon: const Icon(Icons.menu, size: 24),
-            onPressed: () => controller.scaffoldKey.currentState?.openEndDrawer(),
+            onPressed: () =>
+                controller.scaffoldKey.currentState?.openEndDrawer(),
           ),
           const SizedBox(width: 4),
         ],
@@ -59,18 +64,20 @@ class AiChatPage extends CustomWidget<AiChatLogic> {
 
               //模型列表
               Expanded(
-                child: Obx(() => controller.modelList.isEmpty
-                    ? const Center(
-                        child: Text(
-                          '暂无模型，点击下方添加~',
-                          style: TextStyle(color: Colors.grey, fontSize: 14),
+                child: Obx(
+                  () => controller.modelList.isEmpty
+                      ? const Center(
+                          child: Text(
+                            '暂无模型，点击下方添加~',
+                            style: TextStyle(color: Colors.grey, fontSize: 14),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: controller.modelList.length,
+                          itemBuilder: (context, index) =>
+                              _buildModelItem(controller.modelList[index]),
                         ),
-                      )
-                    : ListView.builder(
-                        itemCount: controller.modelList.length,
-                        itemBuilder: (context, index) =>
-                            _buildModelItem(controller.modelList[index]),
-                      )),
+                ),
               ),
 
               //底部添加模型按钮
@@ -84,44 +91,47 @@ class AiChatPage extends CustomWidget<AiChatLogic> {
                   onTap: () => controller.toModelEdit(),
                 ),
               ),
-
             ],
           ),
         ),
       ),
       body: Column(
         children: [
-          //聊天内容区
+          //聊天内容区：点击空白处收起键盘
           Expanded(
-            child: Obx(() {
-              final itemCount = controller.records.length +
-                  (controller.isStreaming.value ? 1 : 0);
-              //需在 itemBuilder 外读取，Obx 才能追踪到 streamingContent 的变化
-              final streamingContent = controller.streamingContent.value;
-              if (itemCount == 0) {
-                return const Center(
-                  child: Text(
-                    '向 AI 提一个问题吧~',
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
-                  ),
+            child: GestureDetector(
+              onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+              child: Obx(() {
+                final itemCount =
+                    controller.records.length +
+                    (controller.isStreaming.value ? 1 : 0);
+                //需在 itemBuilder 外读取，Obx 才能追踪到 streamingContent 的变化
+                final streamingContent = controller.streamingContent.value;
+                if (itemCount == 0) {
+                  return const Center(
+                    child: Text(
+                      '向 AI 提一个问题吧~',
+                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                    ),
+                  );
+                }
+                return ListView.builder(
+                  controller: controller.scrollController,
+                  padding: const EdgeInsets.all(12),
+                  itemCount: itemCount,
+                  itemBuilder: (context, index) {
+                    //流式中的临时 assistant 气泡
+                    if (index == controller.records.length) {
+                      return _buildBubble({
+                        'role': 'assistant',
+                        'content': streamingContent,
+                      });
+                    }
+                    return _buildBubble(controller.records[index]);
+                  },
                 );
-              }
-              return ListView.builder(
-                controller: controller.scrollController,
-                padding: const EdgeInsets.all(12),
-                itemCount: itemCount,
-                itemBuilder: (context, index) {
-                  //流式中的临时 assistant 气泡
-                  if (index == controller.records.length) {
-                    return _buildBubble({
-                      'role': 'assistant',
-                      'content': streamingContent,
-                    });
-                  }
-                  return _buildBubble(controller.records[index]);
-                },
-              );
-            }),
+              }),
+            ),
           ),
 
           //底部输入栏：左侧聊天框 + 右侧发送按钮
@@ -133,43 +143,49 @@ class AiChatPage extends CustomWidget<AiChatLogic> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(
-                    child: CustomTextField(
-                      hintText: '向 AI 提问...',
-                      controller: controller.questionController,
-                      maxLines: 4,
-                      minLines: 1,
-                      vertical: 10,
+                    //点击输入框时滚动到底部（用 Listener 不抢输入框焦点）
+                    child: Listener(
+                      onPointerDown: (_) => controller.scrollToBottom(),
+                      child: CustomTextField(
+                        hintText: '向 AI 提问...',
+                        controller: controller.questionController,
+                        maxLines: 4,
+                        minLines: 1,
+                        vertical: 10,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Obx(() => GestureDetector(
-                        onTap: controller.isStreaming.value
-                            ? null
-                            : controller.send,
-                        child: Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: controller.isStreaming.value
-                                ? Colors.grey
-                                : theme.primaryColor,
-                          ),
-                          child: controller.isStreaming.value
-                              ? const Padding(
-                                  padding: EdgeInsets.all(12),
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Icon(
-                                  Icons.send,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
+                  Obx(
+                    () => GestureDetector(
+                      onTap: controller.isStreaming.value
+                          ? null
+                          : controller.send,
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: controller.isStreaming.value
+                              ? Colors.grey
+                              : theme.primaryColor,
                         ),
-                      )),
+                        child: controller.isStreaming.value
+                            ? const Padding(
+                                padding: EdgeInsets.all(12),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Icon(
+                                Icons.send,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -205,8 +221,9 @@ class AiChatPage extends CustomWidget<AiChatLogic> {
                     model['modelName'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                       color: const Color(0xFF1F1F1F),
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -232,8 +249,11 @@ class AiChatPage extends CustomWidget<AiChatLogic> {
               onTap: () => controller.deleteModel(model),
               child: const Padding(
                 padding: EdgeInsets.all(6),
-                child: Icon(Icons.delete_outline,
-                    size: 18, color: Color(0xFFFF4C4C)),
+                child: Icon(
+                  Icons.delete_outline,
+                  size: 18,
+                  color: Color(0xFFFF4C4C),
+                ),
               ),
             ),
           ],
@@ -257,13 +277,16 @@ class AiChatPage extends CustomWidget<AiChatLogic> {
           color: isUser ? theme.primaryColor : const Color(0xFFEDF2F9),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Text(
-          record['content'] ?? '',
-          style: TextStyle(
-            fontSize: 15,
-            color: isUser ? Colors.white : const Color(0xFF1F1F1F),
-          ),
-        ),
+        child: isUser
+            ? Text(
+                record['content'] ?? '',
+                style: const TextStyle(fontSize: 15, color: Colors.white),
+              )
+            //AI 回答按 Markdown 渲染（代码块、列表、表格等）
+            : GptMarkdown(
+                record['content'] ?? '',
+                style: const TextStyle(fontSize: 15, color: Color(0xFF1F1F1F)),
+              ),
       ),
     );
   }
