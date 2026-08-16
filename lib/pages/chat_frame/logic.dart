@@ -1000,7 +1000,6 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
     try {
       final result = await _msgApi.voiceToText(msg['id'],isGroup);
       if (result['code'] == 0) {
-        print(result['data']);
         // 替换原消息为转换成功的消息
         msgList = msgList.replace(oldValue: msg, newValue: result['data']);
         CustomFlutterToast.showSuccessToast('语音转文字成功');

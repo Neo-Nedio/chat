@@ -10,6 +10,8 @@ import '../../pages/add_friend/friend_request/index.dart';
 import '../../pages/add_group/group_request/index.dart';
 import '../../pages/add_friend/index.dart';
 import '../../pages/add_group/index.dart';
+import '../../pages/ai_chat/ai_model_edit/index.dart';
+import '../../pages/ai_chat/index.dart';
 import '../../pages/chat_frame/index.dart';
 import '../../pages/chat_list/index.dart';
 import '../../pages/contacts/chat_group_information/chat_group_member/index.dart';
@@ -393,6 +395,20 @@ class AppRoutes {
       name: '/admin_notify',
       page: () => AdminNotifyPage(
         key: const Key('admin_notify'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/ai_chat',
+      page: () => AiChatPage(
+        key: const Key('ai_chat'),
+      ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/ai_model_edit',
+      page: () => AiModelEditPage(
+        key: const Key('ai_model_edit'),
       ),
       binding: ControllerBinding(),
     ),

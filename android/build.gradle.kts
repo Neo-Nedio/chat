@@ -5,8 +5,13 @@ buildscript {
     val kotlin_version = "1.9.0"
 
     repositories {
-        google()
-        mavenCentral()
+        // google()
+        // mavenCentral()
+
+        // 使用阿里云镜像
+        maven { url = uri("https://maven.aliyun.com/repository/google") }
+        maven { url = uri("https://maven.aliyun.com/repository/public") }
+        maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
     }
 
     dependencies {
@@ -17,8 +22,12 @@ buildscript {
 
 allprojects {
     repositories {
-        google()
-        mavenCentral()
+        // google()
+        // mavenCentral()
+
+        // 使用阿里云镜像
+        maven { url = uri("https://maven.aliyun.com/repository/google") }
+        maven { url = uri("https://maven.aliyun.com/repository/public") }
     }
 }
 

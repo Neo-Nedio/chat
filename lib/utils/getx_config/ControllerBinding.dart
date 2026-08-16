@@ -8,6 +8,8 @@ import '../../pages/add_friend/friend_request/logic.dart';
 import '../../pages/add_friend/logic.dart';
 import '../../pages/add_group/group_request/logic.dart';
 import '../../pages/add_group/logic.dart';
+import '../../pages/ai_chat/ai_model_edit/logic.dart';
+import '../../pages/ai_chat/logic.dart';
 import '../../pages/chat_frame/logic.dart';
 import '../../pages/chat_list/logic.dart';
 import '../../pages/contacts/chat_group_information/chat_group_member/logic.dart';
@@ -102,5 +104,7 @@ class ControllerBinding extends Bindings {
     Get.lazyPut(() => VideoChatLogic(), fenix: true);
     Get.lazyPut(() => AdminUserManageLogic(), fenix: true);
     Get.lazyPut(() => AdminNotifyLogic(), fenix: true);
+    Get.lazyPut(() => AiChatLogic(), fenix: true);
+    Get.lazyPut(() => AiModelEditLogic(), fenix: true);
   }
 }
