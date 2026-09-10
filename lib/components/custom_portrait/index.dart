@@ -11,8 +11,8 @@ final _userApi = UserApi();
 final Map<String, String> _urlCache = {};
 
 // 供 [CustomPortrait]、[CustomUpdatePortrait] 共用，避免重复请求与双份缓存。
-Future<String> resolvePortraitUrl(String fileName) async {
-  final key = fileName.trim();
+Future<String> resolvePortraitUrl(String? fileName) async {
+  final key = (fileName ?? '').trim();
   if (key.isEmpty) return '';
   if (_urlCache.containsKey(key)) {
     return _urlCache[key]!;
@@ -31,7 +31,7 @@ Future<String> resolvePortraitUrl(String fileName) async {
 //自定义头像组件
 class CustomPortrait extends StatelessWidget {
   final double size;
-  final String portrait;
+  final String? portrait;
   final double radius;
   final VoidCallback? onTap;
   final bool openImage;//是否可以点击指向图片查看器，true时onTap无效
@@ -55,12 +55,12 @@ class CustomPortrait extends StatelessWidget {
   }
 
   //获取图片url
-  Future<String> onGetImg(String fileName) => resolvePortraitUrl(fileName);
+  Future<String> onGetImg(String? fileName) => resolvePortraitUrl(fileName);
 
   @override
   Widget build(BuildContext context) {
     //无存储
-    if (portrait.trim().isEmpty) {
+    if (portrait?.trim().isEmpty ?? true) {
       return GestureDetector(
         onTap: onTap,
         child: ClipRRect(

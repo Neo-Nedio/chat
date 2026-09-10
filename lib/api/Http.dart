@@ -6,7 +6,7 @@ import '../components/custom_flutter_toast/index.dart';
 import '../utils/getx_config/GlobalData.dart';
 
 class Http {
-  static final baseIp = '172.16.7.235';
+  static final baseIp = '114.215.172.88';
 
   // 优先 [GlobalData.baseIp]；为空则从本地键 `baseIp` 读取；仍无则用 [baseIp]
   static Future<String> resolveEffectiveBaseIp() async {

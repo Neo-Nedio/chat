@@ -76,7 +76,7 @@ class LoginPageLogic extends GetxController {
       await prefs.setString('username', loginResult['data']['username']);
       await prefs.setString('userId', loginResult['data']['userId']);
       await prefs.setString('account', loginResult['data']['account']);
-      await prefs.setString('portrait', loginResult['data']['portrait']);
+      await prefs.setString('portrait', loginResult['data']['portrait'] ?? '');
       await prefs.setString('sex', loginResult['data']['sex']);
       //跳转到首页
       Get.offAllNamed('/?sex=${loginResult['data']['sex']}');
