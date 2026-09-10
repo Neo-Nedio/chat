@@ -169,7 +169,7 @@ class AdminUserManagePage extends CustomWidget<AdminUserManageLogic> {
                                 crossAxisCount: 2,
                                 crossAxisSpacing: 10,
                                 mainAxisSpacing: 10,
-                                childAspectRatio: 0.68,
+                                childAspectRatio: 0.64,
                               ),
                               // 额外一项用于底部状态指示
                               itemCount: displayList.length + 1,
