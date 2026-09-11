@@ -154,7 +154,7 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                 if (users.isEmpty) return const SizedBox.shrink();
                 final names = users.map((e) => e['name'].toString()).join('、');
                 return Material(
-                  color: const Color(0xFFEAF3FF),
+                  color: theme.primaryColor.withValues(alpha: 0.1),
                   child: InkWell(
                     onTap: controller.joinActiveGroupCall,
                     child: Container(
@@ -167,13 +167,16 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                               names,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(color: Color(0xFF2878D4), fontSize: 14),
+                              style: TextStyle(color: theme.primaryColor, fontSize: 14),
                             ),
                           ),
-                          const Text(
+                          Text(
                             '正在通话中',
-                            style: TextStyle(color: Color(0xFF2878D4), fontSize: 14),
+                            style: TextStyle(color: theme.primaryColor, fontSize: 14),
                           ),
+                          const SizedBox(width: 6),
+                          Icon(Icons.arrow_forward_ios,
+                              size: 14, color: theme.primaryColor),
                         ],
                       ),
                     ),

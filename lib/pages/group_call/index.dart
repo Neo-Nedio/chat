@@ -20,6 +20,7 @@ class GroupCallPage extends CustomWidget<GroupCallLogic> {
       child: Scaffold(
         backgroundColor: const Color(0xFF101622),   // 深色背景
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Text(controller.groupName),   // 群名
           centerTitle: true,
           backgroundColor: Colors.transparent,
@@ -171,9 +172,9 @@ class GroupCallPage extends CustomWidget<GroupCallLogic> {
           // 挂断按钮
           FloatingActionButton(
             heroTag: 'group-call-hangup',
-            backgroundColor: Colors.redAccent,
+            backgroundColor: Colors.red,
             onPressed: () => _confirmLeave(context),
-            child: const Icon(Icons.call_end),
+            child: const Icon(Icons.call_end, color: Colors.white),
           ),
         ],
       ),
