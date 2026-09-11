@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/notify_api.dart';
+import '../../api/group_call_api.dart';
 import '../../components/custom_button/index.dart';
 import '../../components/custom_system_notify_content/index.dart';
 import '../../utils/getx_config/GlobalData.dart';
@@ -17,8 +18,10 @@ class NavigationLogic extends GetxController {
   late RxInt currentIndex = 0.obs;
   final _wsManager = WebSocketUtil();
   final _notifyApi = NotifyApi();
+  final _groupCallApi = GroupCallApi();
   StreamSubscription? _subscription;
   bool _isShowingNotifyDialog = false;
+  final Set<String> _shownGroupInvites = <String>{};
 
   GlobalData get globalData => GetInstance().find<GlobalData>();
 
@@ -68,7 +71,8 @@ class NavigationLogic extends GetxController {
       //如果是视频通话，立马移向通话界面
       if (event['type'] == 'on-receive-video') {
         var data = event['content'];
-        if (data['type'] == "invite") {
+        if (data['type'] == "invite" && !globalData.isInCall.value) {
+          globalData.isInCall.value = true;
           Get.toNamed(
             '/video_chat',
             arguments: {
@@ -79,7 +83,54 @@ class NavigationLogic extends GetxController {
           );
         }
       }
+      if (event['type'] == 'on-receive-call' &&
+          event['content']?['action'] == 'invite') {
+        _showGroupInvite(Map<String, dynamic>.from(event['content']));
+      }
     });
+  }
+
+  void _showGroupInvite(Map<String, dynamic> data) {
+    if (globalData.isInCall.value) return;
+    final sessionId = data['sessionId']?.toString() ?? '';
+    final groupId = data['groupId']?.toString() ?? '';
+    if (sessionId.isEmpty ||
+        groupId.isEmpty ||
+        !_shownGroupInvites.add(sessionId)) {
+      return;
+    }
+    final callType = data['callType'] == 'video' ? 'video' : 'audio';
+    Get.dialog(
+      AlertDialog(
+        title: const Text('群通话邀请'),
+        content: Text('群 $groupId 邀请你加入${callType == 'video' ? '视频' : '语音'}通话'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: const Text('拒绝'),
+          ),
+          FilledButton(
+            onPressed: () {
+              globalData.isInCall.value = true;
+              Get.back();
+              Get.toNamed(
+                '/group_call',
+                arguments: {
+                  'sessionId': sessionId,
+                  'groupId': groupId,
+                  'callType': callType,
+                  'groupName': '群 $groupId',
+                },
+              );
+            },
+            child: const Text('加入'),
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
   }
 
   //强制下线对话框
@@ -271,6 +322,7 @@ class NavigationLogic extends GetxController {
 
   @override
   void onClose() {
+    _subscription?.cancel();
     super.onClose();
     _wsManager.dispose();
   }

@@ -10,6 +10,7 @@ import '../../api/msg_api.dart';
 import '../../api/video_api.dart';
 import '../../components/CustomDialog/index.dart';
 import '../../components/custom_flutter_toast/index.dart';
+import '../../utils/getx_config/GlobalData.dart';
 import '../../utils/web_socket.dart';
 
 /*
@@ -41,37 +42,35 @@ class VideoChatLogic extends GetxController {
   final _msgApi = MsgApi();
 
   // 渲染器
-  final RTCVideoRenderer localRenderer = RTCVideoRenderer();   // 本地画面（自己）
-  final RTCVideoRenderer remoteRenderer = RTCVideoRenderer();  // 远程画面（对方）
+  final RTCVideoRenderer localRenderer = RTCVideoRenderer(); // 本地画面（自己）
+  final RTCVideoRenderer remoteRenderer = RTCVideoRenderer(); // 远程画面（对方）
 
   // WebRTC 核心
-  late RTCPeerConnection peerConnection;   // 点对点连接
-  late MediaStream webcamStream;           // 本地摄像头/麦克风流
+  late RTCPeerConnection peerConnection; // 点对点连接
+  late MediaStream webcamStream; // 本地摄像头/麦克风流
 
   // 通话状态
-  late String userId;          // 通话对象 ID
-  late bool isOnlyAudio;       // 是否仅音频通话
-  late bool isSender;          // 是否是发起方
-  bool toUserIsReady = false;  // 被呼叫方是否已准备就绪
+  late String userId; // 通话对象 ID
+  late bool isOnlyAudio; // 是否仅音频通话
+  late bool isSender; // 是否是发起方
+  bool toUserIsReady = false; // 被呼叫方是否已准备就绪
 
   // UI 状态
-  late dynamic userInfo = {};  // 对方用户信息（头像、昵称等）
-  Timer? timer;                // 计时器
-  RxInt time = 0.obs;          // 通话时长
+  late dynamic userInfo = {}; // 对方用户信息（头像、昵称等）
+  Timer? timer; // 计时器
+  RxInt time = 0.obs; // 通话时长
 
-  RxBool isVideoEnabled = true.obs;   // 视频是否开启
-  RxBool isAudioEnabled = true.obs;   // 音频是否开启
-  late Rx<Offset> smallWindowOffset;       // 小窗口位置（用于拖拽）
-  RxBool isRemoteFullScreen = false.obs;  // 是否远程画面全屏
+  RxBool isVideoEnabled = true.obs; // 视频是否开启
+  RxBool isAudioEnabled = true.obs; // 音频是否开启
+  late Rx<Offset> smallWindowOffset; // 小窗口位置（用于拖拽）
+  RxBool isRemoteFullScreen = false.obs; // 是否远程画面全屏
 
   StreamSubscription? _subscription;
-
-
-
 
   @override
   void onInit() async {
     super.onInit();
+    Get.find<GlobalData>().isInCall.value = true;
     // 1. 获取路由参数
     userId = Get.arguments['userId'];
     isOnlyAudio = Get.arguments['isOnlyAudio'];
@@ -107,8 +106,8 @@ class VideoChatLogic extends GetxController {
 
   //初始化渲染器(画面)
   Future<void> initializeRenderers() async {
-    await localRenderer.initialize();   // 创建本地渲染纹理
-    await remoteRenderer.initialize();  // 创建远程渲染纹理
+    await localRenderer.initialize(); // 创建本地渲染纹理
+    await remoteRenderer.initialize(); // 创建远程渲染纹理
   }
 
   //初始化 PeerConnection
@@ -164,7 +163,7 @@ class VideoChatLogic extends GetxController {
     // RTCIceConnectionState.RTCIceConnectionStateDisconnected - 断开
     // RTCIceConnectionState.RTCIceConnectionStateClosed - 已关闭
 
-    toUserIsReady = true;  // 标记连接成功，对方已准备就绪
+    toUserIsReady = true; // 标记连接成功，对方已准备就绪
 
     // 停止之前的计时器（防止重复）
     handlerDestroyTime();
@@ -189,8 +188,8 @@ class VideoChatLogic extends GetxController {
     try {
       // getUserMedia: 请求用户授权访问摄像头和麦克风
       webcamStream = await webrtc.navigator.mediaDevices.getUserMedia({
-        'audio': true,           // 请求麦克风权限
-        'video': !isOnlyAudio,  // 视频通话时请求摄像头，音频通话时不请求
+        'audio': true, // 请求麦克风权限
+        'video': !isOnlyAudio, // 视频通话时请求摄像头，音频通话时不请求
       });
 
       // 将本地流设置到渲染器，显示本地预览画面
@@ -220,14 +219,14 @@ class VideoChatLogic extends GetxController {
         var data = event['content'];
         // 根据消息类型分发处理
         switch (data['type']) {
-          case 'accept':    // 对方接受了通话请求（仅发起方收到）
-            onOffer();                // 发起方开始创建Offer
+          case 'accept': // 对方接受了通话请求（仅发起方收到）
+            onOffer(); // 发起方开始创建Offer
             break;
-          case 'offer':     // 收到SDP Offer（对方发起通话）
+          case 'offer': // 收到SDP Offer（对方发起通话）
             handleVideoOfferMsg(data);
             break;
 
-          case 'answer':    // 收到SDP Answer（对方应答）
+          case 'answer': // 收到SDP Answer（对方应答）
             handleVideoAnswerMsg(data);
             break;
 
@@ -235,12 +234,11 @@ class VideoChatLogic extends GetxController {
             handleNewICECandidateMsg(data);
             break;
 
-          case 'hangup':    // 对方挂断
-            handlerDestroyTime();      // 停止计时器
+          case 'hangup': // 对方挂断
+            handlerDestroyTime(); // 停止计时器
             CustomFlutterToast.showErrorToast('对方已挂断~');
-            Get.back();               // 关闭当前页面
+            Get.back(); // 关闭当前页面
             break;
-
         }
       }
     });
@@ -252,8 +250,8 @@ class VideoChatLogic extends GetxController {
     // SDP (Session Description Protocol): 会话描述协议
     // 包含媒体能力信息：编解码器、IP地址、端口、媒体格式等
     final RTCSessionDescription desc = RTCSessionDescription(
-      data['desc']['sdp'],    // SDP文本内容
-      data['desc']['type'],   // 类型: 'offer' 或 'answer'
+      data['desc']['sdp'], // SDP文本内容
+      data['desc']['type'], // 类型: 'offer' 或 'answer'
     );
 
     // ========== 第二步：设置远程描述 ==========
@@ -270,10 +268,7 @@ class VideoChatLogic extends GetxController {
 
     // ========== 第五步：通过信令服务器发送Answer ==========
     // 将Answer发送给对方，完成SDP交换
-    _videoApi.answer(userId, {
-      'sdp': localDesc.sdp,
-      'type': localDesc.type
-    });
+    _videoApi.answer(userId, {'sdp': localDesc.sdp, 'type': localDesc.type});
   }
 
   //处理 Answer（发起方收到应答）
@@ -297,8 +292,8 @@ class VideoChatLogic extends GetxController {
     try {
       // ICE Candidate 包含：IP地址、端口、协议类型、优先级等
       final RTCIceCandidate candidate = RTCIceCandidate(
-        data['candidate']['candidate'],    // ICE候选字符串
-        data['candidate']['sdpMid'],       // 媒体标识（如 "video" 或 "audio"）
+        data['candidate']['candidate'], // ICE候选字符串
+        data['candidate']['sdpMid'], // 媒体标识（如 "video" 或 "audio"）
         data['candidate']['sdpMLineIndex'], // 媒体行索引
       );
 
@@ -309,7 +304,6 @@ class VideoChatLogic extends GetxController {
       print('Error in handleNewICECandidateMsg: $e');
     }
   }
-
 
   //创建 Offer（发起方）
   Future<void> onOffer() async {
@@ -323,10 +317,7 @@ class VideoChatLogic extends GetxController {
       await peerConnection.setLocalDescription(offer);
 
       // 通过信令服务器发送Offer给对方
-      await _videoApi.offer(userId, {
-        'sdp': offer.sdp,
-        'type': offer.type
-      });
+      await _videoApi.offer(userId, {'sdp': offer.sdp, 'type': offer.type});
     } catch (e) {
       print('Error in onOffer: $e');
     }
@@ -346,27 +337,32 @@ class VideoChatLogic extends GetxController {
     Map<String, dynamic> msg = {
       'toUserId': userId,
       'msgContent': {
-        'type': 'call',                    // 消息类型：通话记录
+        'type': 'call', // 消息类型：通话记录
         'content': jsonEncode({
-          'type': isOnlyAudio ? "audio" : "video",  // 通话类型
-          'time': time.value                         // 通话时长（秒）
+          'type': isOnlyAudio ? "audio" : "video", // 通话类型
+          'time': time.value, // 通话时长（秒）
         }),
-      }
+      },
     };
     // ========== 第二步：发送通话记录到聊天列表 ==========
     // 这样聊天界面会显示一条"视频通话 02:30"的记录
-    _msgApi.send(msg).then((res) {
-      if (res['code'] == 0) {
-        // 将消息添加到本地消息流，实时更新聊天界面
-        WebSocketUtil.eventController
-            .add({'type': 'on-receive-msg', 'content': res['data']});
-      }
-    }).whenComplete(() {
-      // ========== 第三步：通知对方挂断 ==========
-      _videoApi.hangup(userId).then((res) {
-        Get.back();  // 关闭通话页面，返回上一页
-      });
-    });
+    _msgApi
+        .send(msg)
+        .then((res) {
+          if (res['code'] == 0) {
+            // 将消息添加到本地消息流，实时更新聊天界面
+            WebSocketUtil.eventController.add({
+              'type': 'on-receive-msg',
+              'content': res['data'],
+            });
+          }
+        })
+        .whenComplete(() {
+          // ========== 第三步：通知对方挂断 ==========
+          _videoApi.hangup(userId).then((res) {
+            Get.back(); // 关闭通话页面，返回上一页
+          });
+        });
   }
 
   // 开关视频
@@ -381,7 +377,7 @@ class VideoChatLogic extends GetxController {
     });
   }
 
-// 开关麦克风
+  // 开关麦克风
   void toggleAudio() {
     isAudioEnabled.value = !isAudioEnabled.value;
 
@@ -394,10 +390,15 @@ class VideoChatLogic extends GetxController {
 
   //挂断确认对话框
   void showExitConfirmDialog(context) {
-    CustomDialog.showTipDialog(context, text: "确定将结束本次通话，是否继续?", onOk: () {
-      onHangup();
-      Get.back(); //关闭对话框（因为对话框也是一个页面）
-    }, onCancel: () {});
+    CustomDialog.showTipDialog(
+      context,
+      text: "确定将结束本次通话，是否继续?",
+      onOk: () {
+        onHangup();
+        Get.back(); //关闭对话框（因为对话框也是一个页面）
+      },
+      onCancel: () {},
+    );
   }
 
   //小窗口拖拽边界限制
@@ -427,6 +428,7 @@ class VideoChatLogic extends GetxController {
   @override
   void onClose() {
     super.onClose();
+    Get.find<GlobalData>().isInCall.value = false;
     _subscription?.cancel();
     localRenderer.dispose();
     remoteRenderer.dispose();

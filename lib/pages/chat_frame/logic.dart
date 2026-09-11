@@ -19,6 +19,7 @@ import '../../api/msg_api.dart';
 import '../../api/notify_api.dart';
 import '../../api/user_api.dart';
 import '../../api/video_api.dart';
+import '../../api/group_call_api.dart';
 import '../../components/custom_button/index.dart';
 import '../../components/custom_flutter_toast/index.dart';
 import '../../utils/String.dart';
@@ -36,6 +37,7 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
   final _chatListApi = ChatListApi(); // 聊天列表 API
   final _userApi = UserApi();
   final _videoApi = VideoApi();
+  final _groupCallApi = GroupCallApi();
   final _friendApi = FriendApi();
   final _chatGroupApi = ChatGroupApi();
   final _chatGroupMemberApi = ChatGroupMemberApi();
@@ -673,6 +675,35 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
         CustomFlutterToast.showErrorToast(res['msg'] ?? '发起通话失败');
       }
     });
+  }
+
+  void onInviteGroupCall(String callType) async {
+    if (chatInfo['type'] != 'group') return;
+    final userIds = members.keys.map((e) => e.toString())
+        .where((id) => id != _globalData.currentUserId).toList();
+    if (userIds.isEmpty) {
+      CustomFlutterToast.showErrorToast('没有可邀请的群成员');
+      return;
+    }
+    try {
+      final res = await _groupCallApi.invite(targetId, userIds, callType);
+      if (res['code'] == 0) {
+        final sessionId = res['data']?['sessionId']?.toString();
+        if (sessionId != null && sessionId.isNotEmpty) {
+          Get.toNamed('/group_call', arguments: {
+            'sessionId': sessionId,
+            'groupId': targetId,
+            'callType': callType,
+            'isSender': true,
+            'groupName': chatInfo['name'] ?? '群通话',
+          });
+        }
+      } else {
+        CustomFlutterToast.showErrorToast(res['msg'] ?? '发起群通话失败');
+      }
+    } catch (_) {
+      CustomFlutterToast.showErrorToast('发起群通话失败');
+    }
   }
 
   //选择图片/拍照

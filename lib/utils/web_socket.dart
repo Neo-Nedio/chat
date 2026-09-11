@@ -187,6 +187,12 @@ class WebSocketUtil {
               'content': wsContent['content'],
             });
             break;
+          case 'call': // 群组 LiveKit 通话
+            eventController.add({
+              'type': 'on-receive-call',
+              'content': wsContent['content'],
+            });
+            break;
           //强制下线通知
           case 'disable':
             // 被其他设备登录或管理员禁用后，不能再自动重连。

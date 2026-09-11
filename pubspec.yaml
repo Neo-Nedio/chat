@@ -67,6 +67,7 @@ dependencies:
   record: ^6.2.0
   just_audio: ^0.9.42
   flutter_webrtc: ^0.12.3
+  livekit_client: ^2.4.1
 
   # 扫描
   mobile_scanner: ^6.0.2

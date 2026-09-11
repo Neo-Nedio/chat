@@ -894,6 +894,18 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
                       const IconData(0xe9f5, fontFamily: 'IconFont'),
                           () => controller.onInviteVideoChat(false),
                     ),
+                  if (controller.chatInfo['type'] == 'group')
+                    _buildIconButton2(
+                      '群语音',
+                      const IconData(0xe969, fontFamily: 'IconFont'),
+                          () => controller.onInviteGroupCall('audio'),
+                    ),
+                  if (controller.chatInfo['type'] == 'group')
+                    _buildIconButton2(
+                      '群视频',
+                      const IconData(0xe9f5, fontFamily: 'IconFont'),
+                          () => controller.onInviteGroupCall('video'),
+                    ),
                 ],
               ),
             ),

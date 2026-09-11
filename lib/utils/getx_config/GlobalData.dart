@@ -21,6 +21,7 @@ class GlobalData extends GetxController {
     'groupNotify': 0,
     'systemNotify': 0,
   }.obs;
+  final RxBool isInCall = false.obs;
   var currentUserId = '';
   var currentUserAccount = '';
   var baseIp = '';
@@ -38,6 +39,7 @@ class GlobalData extends GetxController {
 
   //退出登录时清空不该有的数据
   void reset() {
+    isInCall.value = false;
     chatBgUrl = null;
     currentUserId = '';
     currentUserAccount = '';
@@ -70,8 +72,9 @@ class GlobalData extends GetxController {
       unread.refresh();
       // 更新桌面角标（notify 已经是包含 friend/group/system 的总和）
       AppBadger.setCount(
-          getUnreadCount('chat'),    // 聊天未读数
-          getUnreadCount('notify')); // 通知未读总数
+        getUnreadCount('chat'), // 聊天未读数
+        getUnreadCount('notify'),
+      ); // 通知未读总数
     }
   }
 

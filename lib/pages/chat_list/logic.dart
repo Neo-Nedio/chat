@@ -12,19 +12,19 @@ import '../../utils/web_socket.dart';
 class ChatListLogic extends GetxController {
   final _chatListApi = ChatListApi();
   final _friendApi = FriendApi();
-  late List<dynamic> topList = [];     // 置顶聊天列表
-  late List<dynamic> otherList = [];   // 其他聊天列表
-  late List<dynamic> searchList = [];  // 搜索结果列表
+  late List<dynamic> topList = []; // 置顶聊天列表
+  late List<dynamic> otherList = []; // 其他聊天列表
+  late List<dynamic> searchList = []; // 搜索结果列表
 
-  final _wsManager = WebSocketUtil();        // 获取 WebSocket 单例
-  StreamSubscription? _subscription;         // 订阅对象，用于取消监听
+  final _wsManager = WebSocketUtil(); // 获取 WebSocket 单例
+  StreamSubscription? _subscription; // 订阅对象，用于取消监听
 
   GlobalData get globalData => GetInstance().find<GlobalData>();
 
   @override
   void onInit() {
     super.onInit();
-    eventListen();  // 页面初始化时开始监听
+    eventListen(); // 页面初始化时开始监听
   }
 
   void eventListen() {
@@ -32,7 +32,7 @@ class ChatListLogic extends GetxController {
     _subscription = _wsManager.eventStream.listen((event) {
       // 判断消息类型：是否是收到的聊天消息
       if (event['type'] == 'on-receive-msg') {
-        onGetChatList();                     // 刷新聊天列表
+        onGetChatList(); // 刷新聊天列表
       }
     });
   }
@@ -66,8 +66,9 @@ class ChatListLogic extends GetxController {
   }
 
   void onSearchFriend(String friendInfo) {
-    if (friendInfo.trim() == '') { // 搜索框为空
-      searchList = [];  // 清空搜索结果
+    if (friendInfo.trim() == '') {
+      // 搜索框为空
+      searchList = []; // 清空搜索结果
       update([const Key("chat_list")]);
       return;
     }
@@ -75,7 +76,7 @@ class ChatListLogic extends GetxController {
     _friendApi.search(friendInfo).then((res) {
       if (res['code'] == 0) {
         searchList = res['data'];
-      update([const Key("chat_list")]);
+        update([const Key("chat_list")]);
       }
     });
   }
