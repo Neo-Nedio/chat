@@ -67,6 +67,11 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
   final Map<String, String> _customEmojiFileUrlCache = {};
   final RxBool customEmojiDeleteMode = false.obs;
 
+  // 群聊当前正在进行的通话（由接口返回的在线成员）
+  final activeGroupCallUsers = <Map<String, dynamic>>[].obs;
+  String activeGroupCallSessionId = '';
+  String activeGroupCallType = 'audio';
+
   // 分页相关
   int num = 20;      // 每页数量
   int index = 0;     // 当前索引（不是页数，而是起始位置）
@@ -95,6 +100,51 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
           loadMore();
         }
       }
+    });
+  }
+
+  // 查询群当前是否已有通话。roomUsers 的参数沿用当前群的会话标识；
+  // 页面进入时根据群 ID 拼出群通话 sessionId；收到信令时使用真实 sessionId。
+  Future<void> refreshActiveGroupCall([String? sessionIdOverride]) async {
+    if (chatInfo['type'] != 'group') return;
+    final sessionId = (sessionIdOverride ?? 'group_$targetId').toString();
+    if (sessionId.isEmpty) return;
+    try {
+      final res = await _groupCallApi.roomUsers(sessionId);
+      final data = res['data'];
+      if (res['code'] != 0 || data is! List || data.isEmpty) {
+        activeGroupCallUsers.clear();
+        activeGroupCallSessionId = '';
+        update([const Key('chat_frame')]);
+        return;
+      }
+      activeGroupCallSessionId = sessionId;
+      activeGroupCallUsers.assignAll(data.map<Map<String, dynamic>>((raw) {
+        final item = raw is Map ? Map<String, dynamic>.from(raw) : <String, dynamic>{};
+        final id = (item['userId'] ?? item['id'] ?? raw).toString();
+        final member = members[id];
+        final memberMap = member is Map ? member : const <String, dynamic>{};
+        item['userId'] = id;
+        item['name'] = item['name'] ?? item['username'] ??
+            memberMap['name'] ?? memberMap['username'] ?? id;
+        return item;
+      }));
+      activeGroupCallType = (data.first is Map && data.first['callType'] == 'video')
+          ? 'video'
+          : activeGroupCallType;
+      update([const Key('chat_frame')]);
+    } catch (e) {
+      debugPrint('[群通话] 查询当前通话失败: $e');
+    }
+  }
+
+  void joinActiveGroupCall() {
+    if (activeGroupCallSessionId.isEmpty) return;
+    Get.toNamed('/group_call', arguments: {
+      'sessionId': activeGroupCallSessionId,
+      'groupId': targetId,
+      'callType': activeGroupCallType,
+      'groupName': chatInfo['name'] ?? '群通话',
     });
   }
 
@@ -144,6 +194,24 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
           msgListAddMsg(event['content'], forceScrollToBottom: forceScrollToBottom);
         }
       }
+      if (event['type'] == 'on-receive-call') {
+        final data = event['content'];
+        if (data?['groupId']?.toString() == targetId) {
+          if (data?['action'] == 'invite') {
+            final sessionId = data['sessionId']?.toString() ?? '';
+            if (sessionId.isNotEmpty) {
+              activeGroupCallType = data['callType'] == 'video' ? 'video' : 'audio';
+              refreshActiveGroupCall(sessionId);
+            }
+          } else if (data?['action'] == 'hangup') {
+            activeGroupCallUsers.clear();
+            activeGroupCallSessionId = '';
+            update([const Key('chat_frame')]);
+          } else {
+            refreshActiveGroupCall();
+          }
+        }
+      }
     });
   }
 
@@ -152,6 +220,7 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
     if (chatInfo['type'] != 'group') return;
 
     await _onGetMembers();
+    await refreshActiveGroupCall();
 
     // 获取群详情（包含公告）
     final res = await _chatGroupApi.details(targetId);
@@ -679,6 +748,13 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
 
   void onInviteGroupCall(String callType) async {
     if (chatInfo['type'] != 'group') return;
+    //查看是否正在通话中
+    await refreshActiveGroupCall();
+    if (activeGroupCallSessionId.isNotEmpty) {
+      joinActiveGroupCall();
+      return;
+    }
+
     final selectedUserIds = await Get.toNamed('/group_call_select', arguments: {
       'members': members,
       'currentUserId': _globalData.currentUserId,

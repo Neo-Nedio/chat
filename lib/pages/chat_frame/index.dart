@@ -148,6 +148,38 @@ class ChatFramePage extends CustomWidget<ChatFrameLogic>
 
         body: Column(
           children: [
+            if (controller.chatInfo['type'] == 'group')
+              Obx(() {
+                final users = controller.activeGroupCallUsers;
+                if (users.isEmpty) return const SizedBox.shrink();
+                final names = users.map((e) => e['name'].toString()).join('、');
+                return Material(
+                  color: const Color(0xFFEAF3FF),
+                  child: InkWell(
+                    onTap: controller.joinActiveGroupCall,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              names,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(color: Color(0xFF2878D4), fontSize: 14),
+                            ),
+                          ),
+                          const Text(
+                            '正在通话中',
+                            style: TextStyle(color: Color(0xFF2878D4), fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }),
             // 消息列表部分
             Expanded(
               child: Container(

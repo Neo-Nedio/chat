@@ -119,16 +119,8 @@ class GroupCallLogic extends GetxController {
       connected.value = true;
       loading.value = false;
 
-      // 先按 SDK 同步成员，再调接口校正一次
+      // LiveKit 连接成功后以 SDK 房间成员为准
       _syncParticipants();
-      final users = await api.roomUsers(sessionId);
-      if (users['code'] == 0 && users['data'] is List) {
-        _setParticipants(
-          (users['data'] as List)
-              .map((e) => e['userId']?.toString())
-              .whereType<String>(),
-        );
-      }
     } catch (e, s) {
       debugPrint('[群通话] 连接异常: $e');
       debugPrint('[群通话] 连接堆栈: $s');
