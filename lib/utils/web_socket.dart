@@ -72,13 +72,15 @@ class WebSocketUtil {
 
   // 事件总线，用于消息分发
   static final eventController =
-  StreamController<Map<String, dynamic>>.broadcast();
+   StreamController<Map<String, dynamic>>.broadcast();
   Stream<Map<String, dynamic>> get eventStream => eventController.stream;
 
   WebSocketChannel? _channel;
   Timer? _heartbeatTimer;
   Timer? _reconnectTimer;
   bool _lockReconnect = false;
+  //用来区分“主动关闭”和“被动断开”，从而决定要不要触发自动重连。
+  bool _manualClose = false;
   bool _isConnected = false;
   String? _token;
   final int _reconnectCountMax = 20;
@@ -87,9 +89,9 @@ class WebSocketUtil {
   int _initConnectCount = 0;
   final int _maxInitConnect = 20;
 
-
   //连接建立
   Future<void> connect() async {
+    _manualClose = false;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('x-token');
     if (token == null) {
@@ -111,14 +113,14 @@ class WebSocketUtil {
 
       // 监听 WebSocket 事件
       _channel!.stream.listen(
-        _handleMessage,  // 收到消息时调用
-        onDone: _handleClose,   // 连接关闭时调用
-        onError: _handleError,  // 出错时调用
-        cancelOnError: true,  //当流发生错误时是否自动取消订阅
+        _handleMessage, // 收到消息时调用
+        onDone: _handleClose, // 连接关闭时调用
+        onError: _handleError, // 出错时调用
+        cancelOnError: true, //当流发生错误时是否自动取消订阅
       );
 
-      _clearTimer();        // 清理之前的定时器
-      _startHeartbeat();    // 启动心跳
+      _clearTimer(); // 清理之前的定时器
+      _startHeartbeat(); // 启动心跳
       _initConnectCount = 0;
       _initConnectTimer?.cancel();
     } catch (e) {
@@ -134,13 +136,10 @@ class WebSocketUtil {
       return;
     }
     _initConnectTimer?.cancel();
-    _initConnectTimer = Timer(
-      const Duration(seconds: 5),
-          () {
-        _initConnectCount++;
-        connect();
-      },
-    );
+    _initConnectTimer = Timer(const Duration(seconds: 5), () {
+      _initConnectCount++;
+      connect();
+    });
   }
 
   //消息处理
@@ -164,37 +163,40 @@ class WebSocketUtil {
     if (wsContent.containsKey('type')) {
       // 检查认证失败情况
       if (wsContent['data'] != null && wsContent['data']['code'] == -1) {
-        _handleClose();  // token 无效，断开连接
+        _handleClose(); // token 无效，断开连接
       } else {
         // 根据消息类型分发
         switch (wsContent['type']) {
-          case 'msg':     // 聊天消息
+          case 'msg': // 聊天消息
             sendNotification(wsContent['content']);
             eventController.add({
               'type': 'on-receive-msg',
-              'content': wsContent['content']
+              'content': wsContent['content'],
             });
             break;
-          case 'notify':  // 系统通知
-            eventController.add(
-                {'type': 'on-receive-notify',
-                 'content': wsContent['content']});
+          case 'notify': // 系统通知
+            eventController.add({
+              'type': 'on-receive-notify',
+              'content': wsContent['content'],
+            });
             break;
-          case 'video':   // 视频通话
-           // 分发视频信令事件（invite/offer/answer/candidate/hangup/accept）
+          case 'video': // 视频通话
+            // 分发视频信令事件（invite/offer/answer/candidate/hangup/accept）
             eventController.add({
               'type': 'on-receive-video',
               'content': wsContent['content'],
             });
             break;
-            //强制下线通知
+          //强制下线通知
           case 'disable':
+            // 被其他设备登录或管理员禁用后，不能再自动重连。
+            forceClose();
             eventController.add({
               'type': 'on-force-logout',
               'content': wsContent['content'],
             });
             break;
-            //系统通知
+          //系统通知
           case 'system_notify':
             eventController.add({
               'type': 'on-system-notify',
@@ -204,39 +206,41 @@ class WebSocketUtil {
         }
       }
     } else {
-      _handleClose();  // 格式错误，断开连接
+      _handleClose(); // 格式错误，断开连接
     }
   }
 
   //消息发送 (send),是给服务器发信息
   void send(String message) {
     if (_channel != null) {
-      _channel!.sink.add(message);// 通过 WebSocket 发送给服务器
+      _channel!.sink.add(message); // 通过 WebSocket 发送给服务器
     }
   }
 
   //心跳机制 (startHeartbeat)
   void _startHeartbeat() {
-    _heartbeatTimer?.cancel();  // 取消旧定时器
+    _heartbeatTimer?.cancel(); // 取消旧定时器
     _heartbeatTimer = Timer.periodic(
-      const Duration(milliseconds: 9900),  // 每 9.9 秒执行一次
-          (_) => send('heart'),                // 发送心跳消息
+      const Duration(milliseconds: 9900), // 每 9.9 秒执行一次
+      (_) => send('heart'), // 发送心跳消息
     );
   }
 
   //断线重连 (handleClose + reconnect)
   void _handleClose() {
-    _clearHeartbeat();      // 停止心跳
+    _clearHeartbeat(); // 停止心跳
     if (_channel != null) {
-      _channel!.sink.close();  // 关闭通道
+      _channel!.sink.close(); // 关闭通道
       _channel = null;
     }
-    _isConnected = false;   // 标记为未连接
-    _reconnect();           // 尝试重连
+    _isConnected = false; // 标记为未连接
+    if (!_manualClose) {
+      _reconnect(); // 尝试重连
+    }
   }
 
   void _reconnect() {
-    if (_lockReconnect) return;  // 防止重复重连
+    if (_lockReconnect) return; // 防止重复重连
     _lockReconnect = true;
 
     _reconnectTimer?.cancel();
@@ -244,18 +248,15 @@ class WebSocketUtil {
     // 检查重连次数
     if (_reconnectCount >= _reconnectCountMax) {
       _reconnectCount = 0;
-      return;  // 超过最大次数，停止重连
+      return; // 超过最大次数，停止重连
     }
 
     // 5秒后尝试重连
-    _reconnectTimer = Timer(
-      const Duration(seconds: 5),
-          () {
-        connect();      // 重新连接
-        _reconnectCount++;     // 重连次数+1
-        _lockReconnect = false;
-      },
-    );
+    _reconnectTimer = Timer(const Duration(seconds: 5), () {
+      connect(); // 重新连接
+      _reconnectCount++; // 重连次数+1
+      _lockReconnect = false;
+    });
   }
 
   void _handleError(dynamic error) {
@@ -275,6 +276,7 @@ class WebSocketUtil {
 
   // 强制关闭，不触发自动重连
   void forceClose() {
+    _manualClose = true;
     _clearHeartbeat();
     _clearTimer();
     _initConnectTimer?.cancel();
@@ -302,13 +304,13 @@ class WebSocketUtil {
   void sendNotification(dynamic msg) {
     // 获取消息内容
     dynamic msgContent = msg['msgContent'];
-      //根据消息类型生成通知文本
+    //根据消息类型生成通知文本
     String contentStr = MsgUtil.getMsgContent(msgContent);
     //显示通知
-     NotificationUtil.showNotification(
-        id: 0,
-        title: msgContent['fromUserName'] ?? '',  // 发送者昵称
-        body: '${msgContent['fromUserName']}: $contentStr',  // 通知内容
-     );
+    NotificationUtil.showNotification(
+      id: 0,
+      title: msgContent['fromUserName'] ?? '', // 发送者昵称
+      body: '${msgContent['fromUserName']}: $contentStr', // 通知内容
+    );
   }
 }

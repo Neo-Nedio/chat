@@ -36,11 +36,11 @@ class NavigationLogic extends GetxController {
     //立即执行
     (() async {
       await globalData.init(); //  初始化全局数据
-      await NotificationUtil.initialize();           // 1. 初始化通知服务
+      await NotificationUtil.initialize(); // 1. 初始化通知服务
       await NotificationUtil.createNotificationChannel(); // 2. 创建通知渠道
-      await PermissionHandler.permissionRequest();   // 3. 请求通知权限
-      await connectWebSocket(); //建立 WebSocket 连接
+      await PermissionHandler.permissionRequest(); // 3. 请求通知权限
       eventListen(); //进行监听
+      await connectWebSocket(); //建立 WebSocket 连接
     })();
 
     //加载主题
@@ -54,8 +54,9 @@ class NavigationLogic extends GetxController {
   // 监听消息(收到任何消息，立马刷新)
   void eventListen() {
     _subscription = _wsManager.eventStream.listen((event) {
-      if (event['type'] == 'on-force-logout') { //强制下线
-        _showDisableDialog();
+      if (event['type'] == 'on-force-logout') {
+        //强制下线
+        _showDisableDialog(event['content']);
         return;
       }
       //监听系统通知
@@ -68,19 +69,25 @@ class NavigationLogic extends GetxController {
       if (event['type'] == 'on-receive-video') {
         var data = event['content'];
         if (data['type'] == "invite") {
-          Get.toNamed('/video_chat', arguments: {
-            'userId': data['fromId'],
-            'isSender': false,
-            'isOnlyAudio': data['isOnlyAudio'],
-          });
+          Get.toNamed(
+            '/video_chat',
+            arguments: {
+              'userId': data['fromId'],
+              'isSender': false,
+              'isOnlyAudio': data['isOnlyAudio'],
+            },
+          );
         }
       }
     });
   }
 
   //强制下线对话框
-  void _showDisableDialog() {
+  void _showDisableDialog(dynamic content) {
     final theme = Get.find<GlobalThemeConfig>();
+    final message = content is String && content.trim().isNotEmpty
+        ? content
+        : '您的账号已被管理员禁用，请联系管理员处理';
     showDialog(
       context: Get.context!,
       barrierDismissible: false,
@@ -103,10 +110,7 @@ class NavigationLogic extends GetxController {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  '您的账号已被管理员禁用，请联系管理员处理',
-                  textAlign: TextAlign.center,
-                ),
+                Text(message, textAlign: TextAlign.center),
                 const SizedBox(height: 20),
                 CustomButton(
                   text: '确定',
@@ -132,7 +136,7 @@ class NavigationLogic extends GetxController {
     final baseIp = prefs.getString('baseIp')?.trim() ?? '';
     await prefs.clear();
     prefs.setString("baseIp", baseIp);
-    _wsManager.forceClose();
+    _wsManager.forceClose(); //收到消息时，ws代码已经强制取消链接，这里重复保底，但作用不大
     Get.offAndToNamed('/login');
   }
 
@@ -164,7 +168,8 @@ class NavigationLogic extends GetxController {
             borderRadius: BorderRadius.circular(12),
           ),
           child: ConstrainedBox(
-            constraints: BoxConstraints( //约束大小
+            constraints: BoxConstraints(
+              //约束大小
               maxHeight: MediaQuery.of(context).size.height * 0.7,
             ),
             child: Column(
@@ -253,12 +258,7 @@ class NavigationLogic extends GetxController {
     _wsManager.connect();
   }
 
-  final List<String> selectedIcons = [
-    'chat',
-    'user',
-    'talk',
-    'mine',
-  ];
+  final List<String> selectedIcons = ['chat', 'user', 'talk', 'mine'];
 
   final List<String> unselectedIcons = [
     'assets/images/chat-empty.png',
@@ -267,12 +267,7 @@ class NavigationLogic extends GetxController {
     'assets/images/mine-empty.png',
   ];
 
-  final List<String> name = [
-    '消息',
-    '通讯',
-    '说说',
-    '我的',
-  ];
+  final List<String> name = ['消息', '通讯', '说说', '我的'];
 
   @override
   void onClose() {
