@@ -50,6 +50,8 @@ import '../../pages/talk/talk_details/logic.dart';
 import '../../pages/admin/admin_notify/logic.dart';
 import '../../pages/admin/logic.dart';
 import '../../pages/video_chat/logic.dart';
+import '../../pages/group_call/logic.dart';
+import '../../pages/group_call/select/logic.dart';
 import 'GlobalData.dart';
 import 'GlobalThemeConfig.dart';
 
@@ -102,6 +104,8 @@ class ControllerBinding extends Bindings {
     Get.lazyPut(() => ChatGroupSelectUserLogic(), fenix: true);
     Get.lazyPut(() => FileDetailsLogic(), fenix: true);
     Get.lazyPut(() => VideoChatLogic(), fenix: true);
+    Get.lazyPut(() => GroupCallLogic(), fenix: true);
+    Get.lazyPut(() => GroupCallSelectLogic(), fenix: true);
     Get.lazyPut(() => AdminUserManageLogic(), fenix: true);
     Get.lazyPut(() => AdminNotifyLogic(), fenix: true);
     Get.lazyPut(() => AiChatLogic(), fenix: true);

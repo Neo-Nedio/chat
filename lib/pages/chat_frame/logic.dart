@@ -679,8 +679,12 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
 
   void onInviteGroupCall(String callType) async {
     if (chatInfo['type'] != 'group') return;
-    final userIds = members.keys.map((e) => e.toString())
-        .where((id) => id != _globalData.currentUserId).toList();
+    final selectedUserIds = await Get.toNamed('/group_call_select', arguments: {
+      'members': members,
+      'currentUserId': _globalData.currentUserId,
+    });
+    if (selectedUserIds is! List || selectedUserIds.isEmpty) return;
+    final userIds = selectedUserIds.map((id) => id.toString()).toSet().toList();
     if (userIds.isEmpty) {
       CustomFlutterToast.showErrorToast('没有可邀请的群成员');
       return;

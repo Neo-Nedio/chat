@@ -54,7 +54,7 @@ import '../../pages/admin/admin_notify/index.dart';
 import '../../pages/admin/index.dart';
 import '../../pages/video_chat/index.dart';
 import '../../pages/group_call/index.dart';
-import '../../pages/group_call/logic.dart';
+import '../../pages/group_call/select/index.dart';
 import 'ControllerBinding.dart';
 
 class AppRoutes {
@@ -382,9 +382,12 @@ class AppRoutes {
     GetPage(
       name: '/group_call',
       page: () => GroupCallPage(key: const Key('group_call')),
-      binding: BindingsBuilder(() {
-        Get.put(GroupCallLogic());
-      }),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/group_call_select',
+      page: () => GroupCallSelectPage(key: const Key('group_call_select')),
+      binding: ControllerBinding(),
     ),
     GetPage(
       name: '/set_ip',
