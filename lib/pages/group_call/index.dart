@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:livekit_client/livekit_client.dart';
 
+import '../../components/custom_portrait/index.dart';
 import '../../utils/getx_config/config.dart';
 import 'logic.dart';
 
@@ -25,6 +26,13 @@ class GroupCallPage extends CustomWidget<GroupCallLogic> {
           centerTitle: true,
           backgroundColor: Colors.transparent,
           foregroundColor: Colors.white,
+          actions: [
+            IconButton(
+              tooltip: '群成员',
+              icon: const Icon(Icons.person_outline),
+              onPressed: () => _showMembersDrawer(context),
+            ),
+          ],
         ),
         body: SafeArea(
           child: Column(
@@ -35,6 +43,117 @@ class GroupCallPage extends CustomWidget<GroupCallLogic> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showMembersDrawer(BuildContext context) {
+    showGeneralDialog(
+      context: context,
+      barrierLabel: '关闭群成员',
+      barrierDismissible: true,
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 240),
+      pageBuilder: (context, animation, secondaryAnimation) => Align(
+        alignment: Alignment.centerRight,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          child: Material(
+            type: MaterialType.transparency,
+            borderRadius: const BorderRadius.horizontal(
+              left: Radius.circular(20),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Container(
+              width: MediaQuery.of(context).size.width * .9,
+              color: Colors.black.withValues(alpha: 0.82),
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
+                      child: Obx(
+                        () => Center(
+                          child: Text(
+                            '通话成员 (${controller.activeMembers.length})',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Obx(() {
+                        final activeMembers = controller.activeMembers;
+                        if (activeMembers.isEmpty) {
+                          return const Center(
+                            child: Text(
+                              '暂无通话成员',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          );
+                        }
+                        return ListView.builder(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          itemCount: activeMembers.length,
+                          itemBuilder: (_, index) {
+                            final member = activeMembers[index];
+                            return SizedBox(
+                              height: 72,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 8,
+                                ),
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 48,
+                                      height: 48,
+                                      child: CustomPortrait(
+                                        size: 48,
+                                        portrait: member['portrait']
+                                                ?.toString() ??
+                                            '',
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Text(
+                                        member['name']?.toString() ?? '',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      }),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final offset = Tween<Offset>(
+          begin: const Offset(1, 0),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
+        return SlideTransition(position: offset, child: child);
+      },
     );
   }
 

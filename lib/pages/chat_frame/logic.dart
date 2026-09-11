@@ -144,8 +144,16 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
       'sessionId': activeGroupCallSessionId,
       'groupId': targetId,
       'callType': activeGroupCallType,
-      'groupName': chatInfo['name'] ?? '群通话',
+      'groupName': _groupDisplayName,
+      'members': members,
     });
+  }
+
+  String get _groupDisplayName {
+    final remark = chatInfo['remark']?.toString().trim() ?? '';
+    if (remark.isNotEmpty) return remark;
+    final name = chatInfo['name']?.toString().trim() ?? '';
+    return name.isNotEmpty ? name : '群通话';
   }
 
   // 本人头像：先本地 prefs，没有再请求 info（chatInfo 仅用入口参数）
@@ -775,7 +783,8 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
             'groupId': targetId,
             'callType': callType,
             'isSender': true,
-            'groupName': chatInfo['name'] ?? '群通话',
+            'groupName': _groupDisplayName,
+            'members': members,
           });
         }
       } else {

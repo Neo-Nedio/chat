@@ -16,6 +16,18 @@ class GroupCallLogic extends GetxController {
   // 房间里的成员 ID（实际在线）
   final participants = <String>[].obs;
 
+  // 从群聊页传入的完整群成员，用于通话页成员抽屉
+  final members = <Map<String, dynamic>>[].obs;
+
+  // 只展示当前实际参与群通话的成员
+  List<Map<String, dynamic>> get activeMembers {
+    final activeIds = participants.toSet();
+    activeIds.add(Get.find<GlobalData>().currentUserId.toString());
+    return members
+        .where((member) => activeIds.contains(member['id']?.toString()))
+        .toList();
+  }
+
   // 页面加载中
   final loading = true.obs;
 
@@ -53,6 +65,7 @@ class GroupCallLogic extends GetxController {
     callType = args['callType'] == 'video' ? 'video' : 'audio';
     groupName = args['groupName']?.toString() ?? '群通话';
     isSender = args['isSender'] == true;
+    _readMembers(args['members']);
     Get.find<GlobalData>().isInCall.value = true;
 
     // 订阅 WebSocket 信令
@@ -60,6 +73,30 @@ class GroupCallLogic extends GetxController {
 
     // 开始连接
     _connect();
+  }
+
+  void _readMembers(dynamic source) {
+    if (source is! Map) return;
+    final result = <Map<String, dynamic>>[];
+    source.forEach((key, value) {
+      if (value is! Map) return;
+      final member = Map<String, dynamic>.from(value);
+      final id = key.toString();
+      final groupName = member['groupName']?.toString().trim() ?? '';
+      final remark = member['remark']?.toString().trim() ?? '';
+      final name = member['name']?.toString().trim() ??
+          member['username']?.toString().trim() ?? id;
+      result.add({
+        'id': id,
+        'name': groupName.isNotEmpty
+            ? groupName
+            : remark.isNotEmpty
+                ? remark
+                : name,
+        'portrait': member['portrait'] ?? member['avatar'] ?? '',
+      });
+    });
+    members.assignAll(result);
   }
 
   // 收到 WebSocket 信令
