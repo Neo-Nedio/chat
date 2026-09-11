@@ -759,12 +759,12 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
       'members': members,
       'currentUserId': _globalData.currentUserId,
     });
-    if (selectedUserIds is! List || selectedUserIds.isEmpty) return;
+    // 空列表也表示只自己加入群通话，仍然允许发起
+    if (selectedUserIds is! List) return;
     final userIds = selectedUserIds
         .map<String>((id) => id.toString())
         .toSet()
         .toList();
-    if (userIds.isEmpty) return;
     try {
       final res = await _groupCallApi.invite(targetId, userIds, callType);
       if (res['code'] == 0) {
