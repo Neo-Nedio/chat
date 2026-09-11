@@ -67,7 +67,7 @@ class SearchInfoLogic extends Logic {
 
   //初始化数据
   void initData() {
-    friendPortrait = _friendInfo['portrait'];
+    friendPortrait = _friendInfo['portrait'] ?? '';
     friendName = _friendInfo['name'];
     friendAccount = _friendInfo['account'];
     friendSignature = _friendInfo['signature'] ?? '';
