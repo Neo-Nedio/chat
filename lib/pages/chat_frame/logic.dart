@@ -685,10 +685,6 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
     });
     if (selectedUserIds is! List || selectedUserIds.isEmpty) return;
     final userIds = selectedUserIds.map((id) => id.toString()).toSet().toList();
-    if (userIds.isEmpty) {
-      CustomFlutterToast.showErrorToast('没有可邀请的群成员');
-      return;
-    }
     try {
       final res = await _groupCallApi.invite(targetId, userIds, callType);
       if (res['code'] == 0) {

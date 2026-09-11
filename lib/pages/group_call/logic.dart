@@ -80,7 +80,8 @@ class GroupCallLogic extends GetxController {
     _roomSubscription?.call();
     await currentRoom?.disconnect();
     Get.find<GlobalData>().isInCall.value = false;
-    if (Get.isOverlaysOpen) Get.back();
+    Get.back();
+    CustomFlutterToast.showErrorToast('通话已结束');
   }
 
   // 连接 LiveKit 房间
@@ -132,7 +133,7 @@ class GroupCallLogic extends GetxController {
       loading.value = false;
       Get.find<GlobalData>().isInCall.value = false;
       CustomFlutterToast.showErrorToast('加入群通话失败，请稍后重试');
-      if (Get.isOverlaysOpen) Get.back();
+      Get.back();
     }
   }
 
@@ -154,7 +155,7 @@ class GroupCallLogic extends GetxController {
     // 房间断开
     if (event is RoomDisconnectedEvent) {
       connected.value = false;
-      if (Get.isOverlaysOpen) Get.back();
+      Get.back();
     }
   }
 
@@ -196,7 +197,7 @@ class GroupCallLogic extends GetxController {
     _roomSubscription?.call();
     await currentRoom?.disconnect();
     Get.find<GlobalData>().isInCall.value = false;
-    if (Get.isOverlaysOpen) Get.back();
+    Get.back();
   }
 
   @override

@@ -20,7 +20,7 @@ class GroupCallPage extends CustomWidget<GroupCallLogic> {
       child: Scaffold(
         backgroundColor: const Color(0xFF101622),   // 深色背景
         appBar: AppBar(
-          title: Obx(() => Text(controller.groupName)),   // 群名，响应式
+          title: Text(controller.groupName),   // 群名
           centerTitle: true,
           backgroundColor: Colors.transparent,
           foregroundColor: Colors.white,
@@ -206,7 +206,13 @@ class GroupCallPage extends CustomWidget<GroupCallLogic> {
         content: const Text('你可以稍后从群聊中重新加入。'),
         actions: [
           TextButton(onPressed: Get.back, child: const Text('取消')),
-          FilledButton(onPressed: controller.leave, child: const Text('离开')),
+          FilledButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await controller.leave();
+            },
+            child: const Text('离开'),
+          ),
         ],
       ),
     );
