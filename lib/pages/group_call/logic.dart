@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:livekit_client/livekit_client.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../api/group_call_api.dart';
 import '../../components/custom_flutter_toast/index.dart';
@@ -128,7 +129,9 @@ class GroupCallLogic extends GetxController {
               .whereType<String>(),
         );
       }
-    } catch (_) {
+    } catch (e, s) {
+      debugPrint('[群通话] 连接异常: $e');
+      debugPrint('[群通话] 连接堆栈: $s');
       // 连接失败：清状态、提示、关页面
       loading.value = false;
       Get.find<GlobalData>().isInCall.value = false;

@@ -684,7 +684,11 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
       'currentUserId': _globalData.currentUserId,
     });
     if (selectedUserIds is! List || selectedUserIds.isEmpty) return;
-    final userIds = selectedUserIds.map((id) => id.toString()).toSet().toList();
+    final userIds = selectedUserIds
+        .map<String>((id) => id.toString())
+        .toSet()
+        .toList();
+    if (userIds.isEmpty) return;
     try {
       final res = await _groupCallApi.invite(targetId, userIds, callType);
       if (res['code'] == 0) {
@@ -701,7 +705,9 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
       } else {
         CustomFlutterToast.showErrorToast(res['msg'] ?? '发起群通话失败');
       }
-    } catch (_) {
+    } catch (e, s) {
+      debugPrint('[发起群通话] 异常: $e');
+      debugPrint('[发起群通话] 堆栈: $s');
       CustomFlutterToast.showErrorToast('发起群通话失败');
     }
   }
