@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/notify_api.dart';
 import '../../api/group_call_api.dart';
+import '../../api/chat_group_api.dart';
+import '../../api/chat_group_member.dart';
 import '../../components/custom_button/index.dart';
 import '../../components/custom_system_notify_content/index.dart';
 import '../../utils/getx_config/GlobalData.dart';
@@ -18,10 +20,12 @@ class NavigationLogic extends GetxController {
   late RxInt currentIndex = 0.obs;
   final _wsManager = WebSocketUtil();
   final _notifyApi = NotifyApi();
-  final _groupCallApi = GroupCallApi();
+  final _chatGroupApi = ChatGroupApi();
+  final _chatGroupMemberApi = ChatGroupMemberApi();
   StreamSubscription? _subscription;
   bool _isShowingNotifyDialog = false;
-  final Set<String> _shownGroupInvites = <String>{};
+  final Set<String> _loadingGroupInvites = <String>{};
+  final Map<String, DateTime> _recentGroupInvites = <String, DateTime>{};
 
   GlobalData get globalData => GetInstance().find<GlobalData>();
 
@@ -90,20 +94,57 @@ class NavigationLogic extends GetxController {
     });
   }
 
-  void _showGroupInvite(Map<String, dynamic> data) {
+  Future<void> _showGroupInvite(Map<String, dynamic> data) async {
     if (globalData.isInCall.value) return;
     final sessionId = data['sessionId']?.toString() ?? '';
     final groupId = data['groupId']?.toString() ?? '';
     if (sessionId.isEmpty ||
         groupId.isEmpty ||
-        !_shownGroupInvites.add(sessionId)) {
+        !_loadingGroupInvites.add(sessionId)) {
       return;
     }
+    final now = DateTime.now();
+    final lastInviteTime = _recentGroupInvites[sessionId];
+    if (lastInviteTime != null &&
+        now.difference(lastInviteTime) < const Duration(seconds: 5)) {
+      _loadingGroupInvites.remove(sessionId);
+      return;
+    }
+
+    String groupName;
+    dynamic members;
+    try {
+      final groupResult = await _chatGroupApi.details(groupId);
+      final memberResult = await _chatGroupMemberApi.list(groupId);
+      if (groupResult['code'] != 0 ||
+          groupResult['data'] is! Map ||
+          memberResult['code'] != 0 ||
+          memberResult['data'] is! Map) {
+        debugPrint('[群通话邀请] 群信息查询失败，暂不显示邀请弹窗');
+        return;
+      }
+
+      final group = groupResult['data'] as Map;
+      groupName = group['name']?.toString().trim() ?? '';
+      if (groupName.isEmpty) {
+        debugPrint('[群通话邀请] 群名称为空，暂不显示邀请弹窗');
+        return;
+      }
+      members = memberResult['data'];
+    } catch (e, s) {
+      debugPrint('[群通话邀请] 获取群信息失败，暂不显示邀请弹窗: $e');
+      debugPrint('[群通话邀请] 堆栈: $s');
+      return;
+    } finally {
+      _loadingGroupInvites.remove(sessionId);
+    }
+
+    _recentGroupInvites[sessionId] = DateTime.now();
     final callType = data['callType'] == 'video' ? 'video' : 'audio';
     Get.dialog(
       AlertDialog(
         title: const Text('群通话邀请'),
-        content: Text('群 $groupId 邀请你加入${callType == 'video' ? '视频' : '语音'}通话'),
+        content: Text('$groupName 邀请你加入${callType == 'video' ? '视频' : '语音'}通话'),
         actions: [
           TextButton(
             onPressed: () {
@@ -115,13 +156,15 @@ class NavigationLogic extends GetxController {
             onPressed: () {
               globalData.isInCall.value = true;
               Get.back();
+
               Get.toNamed(
                 '/group_call',
                 arguments: {
                   'sessionId': sessionId,
                   'groupId': groupId,
                   'callType': callType,
-                  'groupName': '群 $groupId',
+                  'groupName': groupName,
+                  'members': members ?? <String, dynamic>{},
                 },
               );
             },
