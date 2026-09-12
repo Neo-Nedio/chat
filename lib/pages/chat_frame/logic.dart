@@ -140,12 +140,14 @@ class ChatFrameLogic extends Logic<ChatFramePage> {
 
   void joinActiveGroupCall() {
     if (activeGroupCallSessionId.isEmpty) return;
-    Get.toNamed('/group_call', arguments: {
+    Get.toNamed('/group_call_active', arguments: {
       'sessionId': activeGroupCallSessionId,
       'groupId': targetId,
       'callType': activeGroupCallType,
       'groupName': _groupDisplayName,
       'members': members,
+      'users': activeGroupCallUsers.toList(),
+      'isOwner': isOwner,
     });
   }
 

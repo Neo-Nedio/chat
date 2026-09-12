@@ -54,6 +54,7 @@ import '../../pages/admin/admin_notify/index.dart';
 import '../../pages/admin/index.dart';
 import '../../pages/video_chat/index.dart';
 import '../../pages/group_call/index.dart';
+import '../../pages/group_call/active/index.dart';
 import '../../pages/group_call/select/index.dart';
 import 'ControllerBinding.dart';
 
@@ -382,6 +383,11 @@ class AppRoutes {
     GetPage(
       name: '/group_call',
       page: () => GroupCallPage(key: const Key('group_call')),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/group_call_active',
+      page: () => ActiveGroupCallPage(key: const Key('group_call_active')),
       binding: ControllerBinding(),
     ),
     GetPage(
