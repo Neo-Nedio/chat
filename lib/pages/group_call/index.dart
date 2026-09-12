@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:livekit_client/livekit_client.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as rtc;
 
 import '../../components/custom_portrait/index.dart';
 import '../../utils/getx_config/GlobalData.dart';
@@ -304,7 +305,13 @@ class GroupCallPage extends CustomWidget<GroupCallLogic> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-      if (video is VideoTrack) VideoTrackRenderer(video),
+      if (video is VideoTrack)
+        SizedBox.expand(
+          child: VideoTrackRenderer(
+            video,
+            fit: rtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+          ),
+        ),
           // 左下角显示昵称
           Positioned(
             left: 16,

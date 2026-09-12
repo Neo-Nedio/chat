@@ -141,10 +141,27 @@ class NavigationLogic extends GetxController {
 
     _recentGroupInvites[sessionId] = DateTime.now();
     final callType = data['callType'] == 'video' ? 'video' : 'audio';
+    final theme = Get.find<GlobalThemeConfig>();
     Get.dialog(
       AlertDialog(
         title: const Text('群通话邀请'),
-        content: Text('$groupName 邀请你加入${callType == 'video' ? '视频' : '语音'}通话'),
+        content: Text.rich(
+          TextSpan(
+            style: const TextStyle(color: Colors.black87),
+            children: [
+              TextSpan(
+                text: groupName,
+                style: TextStyle(
+                  color: theme.primaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              TextSpan(
+                text: ' 邀请你加入${callType == 'video' ? '视频' : '语音'}通话',
+              ),
+            ],
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () {
