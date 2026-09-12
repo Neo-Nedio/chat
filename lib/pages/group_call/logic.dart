@@ -66,6 +66,7 @@ class GroupCallLogic extends GetxController {
     if (!isVideo) return false;
     if (cameraOpen &&
         room?.localParticipant?.videoTrackPublications
+                .where((publication) => !publication.muted)
                 .map((publication) => publication.track)
                 .whereType<VideoTrack>()
                 .isNotEmpty ==
@@ -75,6 +76,7 @@ class GroupCallLogic extends GetxController {
     return participantIds.any((id) {
       final participant = room?.remoteParticipants[id];
       return participant?.videoTrackPublications
+              .where((publication) => !publication.muted)
               .map((publication) => publication.track)
               .whereType<VideoTrack>()
               .isNotEmpty ==
@@ -86,6 +88,7 @@ class GroupCallLogic extends GetxController {
   int get videoParticipantCount {
     // 自己有视频轨道就 +1
     var count = cameraEnabled.value && room?.localParticipant?.videoTrackPublications
+            .where((publication) => !publication.muted)
             .map((publication) => publication.track)
             .whereType<VideoTrack>()
             .isNotEmpty ==
@@ -96,6 +99,7 @@ class GroupCallLogic extends GetxController {
     count += participants.where((id) {
           final participant = room?.remoteParticipants[id];
           return participant?.videoTrackPublications
+                  .where((publication) => !publication.muted)
                   .map((publication) => publication.track)
                   .whereType<VideoTrack>()
                   .isNotEmpty ==
@@ -227,6 +231,8 @@ class GroupCallLogic extends GetxController {
         event is ParticipantDisconnectedEvent ||
         event is TrackSubscribedEvent ||
         event is TrackUnsubscribedEvent ||
+        event is TrackMutedEvent ||
+        event is TrackUnmutedEvent ||
         event is RoomReconnectedEvent) {
       _syncParticipants();
     }

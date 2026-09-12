@@ -284,13 +284,15 @@ class GroupCallPage extends CustomWidget<GroupCallLogic> {
   VideoTrack? _videoTrackFor(String id, String currentUserId) {
     // 自己 → 从 localParticipant 拿
     if (id == currentUserId) {
-      return controller.room?.localParticipant?.videoTrackPublications
-          .map((publication) => publication.track)
+    return controller.room?.localParticipant?.videoTrackPublications
+        .where((publication) => !publication.muted)
+        .map((publication) => publication.track)
           .whereType<VideoTrack>()
           .firstOrNull;
     }
     // 别人 → 从 remoteParticipants 拿
     return controller.room?.remoteParticipants[id]?.videoTrackPublications
+        .where((publication) => !publication.muted)
         .map((publication) => publication.track)
         .whereType<VideoTrack>()
         .firstOrNull;
@@ -300,6 +302,7 @@ class GroupCallPage extends CustomWidget<GroupCallLogic> {
   Widget _videoMemberTile(Map<String, dynamic> member) {
     final video = member['video'];
     return Container(
+      key: ValueKey(member['id']),
       color: Colors.black,       // 黑底
       alignment: Alignment.center,
       child: Stack(
