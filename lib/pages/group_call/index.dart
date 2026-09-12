@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:livekit_client/livekit_client.dart';
 
 import '../../components/custom_portrait/index.dart';
+import '../../utils/getx_config/GlobalData.dart';
 import '../../utils/getx_config/config.dart';
 import 'logic.dart';
 
@@ -35,12 +36,14 @@ class GroupCallPage extends CustomWidget<GroupCallLogic> {
           ],
         ),
         body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(child: _buildRoom(context)),   // 主体区
-              _buildControls(context),                // 底部控制栏
-            ],
-          ),
+          child: Obx(() => controller.hasVideoStream
+              ? _buildVideoRoom(context)
+              : Column(
+                  children: [
+                    Expanded(child: _buildRoom(context)), // 主体区
+                    _buildControls(context), // 底部控制栏
+                  ],
+                )),
         ),
       ),
     );
@@ -167,95 +170,151 @@ class GroupCallPage extends CustomWidget<GroupCallLogic> {
         );
       }
 
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      final activeMembers = controller.activeMembers;
+      final visibleMembers = activeMembers.take(8).toList();
+      return Stack(
         children: [
-          // 顶部圆形图标（视频/群）
-          Container(
-            width: 112,
-            height: 112,
-            decoration: BoxDecoration(
-              color: theme.primaryColor.withValues(alpha: .18),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              controller.isVideo ? Icons.videocam : Icons.group,
-              size: 48,
-              color: Colors.white,
+          Center(
+            child: Wrap(
+              spacing: 24,
+              runSpacing: 32,
+              alignment: WrapAlignment.center,
+              runAlignment: WrapAlignment.center,
+              children: visibleMembers.map(_audioMemberItem).toList(),
             ),
           ),
-          const SizedBox(height: 24),
-
-          // 状态文字：重连中 / 人数
-          Text(
-            controller.reconnecting.value
-                ? '正在重新连接…'
-                : '${controller.participants.length + 1} 人通话中',   // +1 补自己
-            style: const TextStyle(color: Colors.white, fontSize: 20),
-          ),
-          const SizedBox(height: 24),
-
-          // 成员列表（Chip）
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            alignment: WrapAlignment.center,
-            children: controller.participants
-                .map((id) => _participantChip(id))
-                .toList(),
-          ),
-
-          // 视频通话才显示视频区
-          if (controller.isVideo) ...[
-            const SizedBox(height: 24),
-            _remoteVideoTiles(),
-          ],
+          if (activeMembers.length > 8)
+            Positioned(
+              right: 20,
+              bottom: 20,
+              child: IconButton(
+                tooltip: '更多通话成员',
+                onPressed: () => _showMembersDrawer(context),
+                icon: const Icon(Icons.more_horiz, color: Colors.white),
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.white.withValues(alpha: .16),
+                  minimumSize: const Size(48, 48),
+                ),
+              ),
+            ),
         ],
       );
     });
   }
 
-  // 单个成员 Chip（显示的是 userId）
-  Widget _participantChip(String id) => Chip(
-    avatar: const Icon(Icons.person, size: 16),
-    label: Text(id, maxLines: 1, overflow: TextOverflow.ellipsis),
-    backgroundColor: Colors.white.withValues(alpha: .92),
-  );
-
-  // 远程视频：横向滚动小窗
-  Widget _remoteVideoTiles() {
-    final remote = controller.room?.remoteParticipants.values.toList() ?? [];
-    return SizedBox(
-      height: 180,
-      child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        scrollDirection: Axis.horizontal,
-        itemCount: remote.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 12),
-        itemBuilder: (_, i) {
-          // 取这个人的第一路视频
-          final video = remote[i].videoTrackPublications
-              .map((p) => p.track)
-              .whereType<VideoTrack>()
-              .firstOrNull;
-          return Container(
-            width: 130,
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(16),
+  Widget _audioMemberItem(Map<String, dynamic> member) => SizedBox(
+        width: 96,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CustomPortrait(
+              size: 72,
+              portrait: member['portrait']?.toString() ?? '',
             ),
-            clipBehavior: Clip.antiAlias,
-            child: video == null
-                ? Center(
-              // 没视频就显示 userId
-              child: Text(
-                remote[i].identity,
-                style: const TextStyle(color: Colors.white),
-              ),
-            )
-                : VideoTrackRenderer(video),   // 渲染视频
-          );
-        },
+            const SizedBox(height: 8),
+            Text(
+              member['name']?.toString() ?? '',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+            ),
+          ],
+        ),
+      );
+
+  // 构建视频通话页面
+  Widget _buildVideoRoom(BuildContext context) {
+    return Obx(() {
+      // 加载中 → 转圈
+      if (controller.loading.value) {
+        return const Center(
+          child: CircularProgressIndicator(color: Colors.white),
+        );
+      }
+
+      // 只取前 2 个视频成员
+      final videoMembers = _videoMembers().take(2).toList();
+      return Stack(
+        fit: StackFit.expand,        // 子组件铺满
+        children: [
+          // 主体：竖向排列的视频格子（最多 2 个，各占一半）
+          Column(
+            children: videoMembers
+                .map((member) => Expanded(child: _videoMemberTile(member)))
+                .toList(),
+          ),
+          // 底部：控制栏（麦克风/摄像头/挂断）
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: _buildControls(context),
+          ),
+        ],
+      );
+    });
+  }
+
+  // 收集"要展示视频的成员"列表
+  List<Map<String, dynamic>> _videoMembers() {
+    final currentUserId = Get.find<GlobalData>().currentUserId.toString();
+    // 用一个 Set 去重：自己（如果摄像头开着）+ 所有参与者
+    final ids = <String>{
+      if (controller.cameraEnabled.value) currentUserId,
+      ...controller.participants,
+    };
+    return ids.map((id) {
+      // 找到这个人的视频轨道
+      final video = _videoTrackFor(id, currentUserId);
+      // 找到这个人的资料（昵称、头像）
+      final member = controller.activeMembers.firstWhere(
+            (item) => item['id']?.toString() == id,
+        orElse: () => {'id': id, 'name': id, 'portrait': ''},
+      );
+      return {
+        ...member,
+        'video': video,      // 把视频轨道塞进去
+      };
+    }).where((member) => member['video'] is VideoTrack).toList();
+  }
+
+  // 拿某个人的视频轨道
+  VideoTrack? _videoTrackFor(String id, String currentUserId) {
+    // 自己 → 从 localParticipant 拿
+    if (id == currentUserId) {
+      return controller.room?.localParticipant?.videoTrackPublications
+          .map((publication) => publication.track)
+          .whereType<VideoTrack>()
+          .firstOrNull;
+    }
+    // 别人 → 从 remoteParticipants 拿
+    return controller.room?.remoteParticipants[id]?.videoTrackPublications
+        .map((publication) => publication.track)
+        .whereType<VideoTrack>()
+        .firstOrNull;
+  }
+
+  // 单个视频格子
+  Widget _videoMemberTile(Map<String, dynamic> member) {
+    final video = member['video'];
+    return Container(
+      color: Colors.black,       // 黑底
+      alignment: Alignment.center,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+      if (video is VideoTrack) VideoTrackRenderer(video),
+          // 左下角显示昵称
+          Positioned(
+            left: 16,
+            bottom: 24,
+            child: Text(
+              member['name']?.toString() ?? '',
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+            ),
+          ),
+        ],
       ),
     );
   }

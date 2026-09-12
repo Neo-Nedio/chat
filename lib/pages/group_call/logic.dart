@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import '../../api/group_call_api.dart';
 import '../../components/custom_flutter_toast/index.dart';
@@ -53,6 +54,55 @@ class GroupCallLogic extends GetxController {
   StreamSubscription? _wsSubscription; // WebSocket 信令订阅
 
   bool get isVideo => callType == 'video';
+
+  // 判断当前通话"有没有视频流"
+// 只要满足以下之一，就算有视频：
+//   1. 语音通话（isVideo == false）→ 直接返回 false，永远没视频
+//   2. 自己的摄像头开着 → 有视频
+//   3. 房间里任何一个远程成员有视频轨道 → 有视频
+  bool get hasVideoStream {
+    final cameraOpen = cameraEnabled.value;
+    final participantIds = participants.toList();
+    if (!isVideo) return false;
+    if (cameraOpen &&
+        room?.localParticipant?.videoTrackPublications
+                .map((publication) => publication.track)
+                .whereType<VideoTrack>()
+                .isNotEmpty ==
+            true) {
+      return true;
+    }
+    return participantIds.any((id) {
+      final participant = room?.remoteParticipants[id];
+      return participant?.videoTrackPublications
+              .map((publication) => publication.track)
+              .whereType<VideoTrack>()
+              .isNotEmpty ==
+          true;
+    });
+  }
+
+// 统计当前"发视频的人"数量（自己 + 远程有视频的人）
+  int get videoParticipantCount {
+    // 自己有视频轨道就 +1
+    var count = cameraEnabled.value && room?.localParticipant?.videoTrackPublications
+            .map((publication) => publication.track)
+            .whereType<VideoTrack>()
+            .isNotEmpty ==
+        true
+        ? 1
+        : 0;
+    // 加上参与者里有视频轨道的人数
+    count += participants.where((id) {
+          final participant = room?.remoteParticipants[id];
+          return participant?.videoTrackPublications
+                  .map((publication) => publication.track)
+                  .whereType<VideoTrack>()
+                  .isNotEmpty ==
+              true;
+        }).length;
+    return count;
+  }
 
   @override
   void onInit() {
@@ -151,6 +201,7 @@ class GroupCallLogic extends GetxController {
       await room!.localParticipant!.setMicrophoneEnabled(true); //打开麦克风
       if (isVideo) {
         await room!.localParticipant!.setCameraEnabled(true); //视频时才打开摄像头
+        cameraEnabled.value = true;
       }
 
       connected.value = true;
@@ -217,6 +268,15 @@ class GroupCallLogic extends GetxController {
   // 开关摄像头（仅视频通话）
   Future<void> toggleCamera() async {
     if (!isVideo) return;
+    if (!cameraEnabled.value && videoParticipantCount >= 2) {
+      await Get.dialog<void>(
+        const AlertDialog(
+          title: Text('无法打开视频'),
+          content: Text('最多同时显示两位成员的视频。'),
+        ),
+      );
+      return;
+    }
     final value = !cameraEnabled.value;
     await room?.localParticipant?.setCameraEnabled(value);
     cameraEnabled.value = value;
