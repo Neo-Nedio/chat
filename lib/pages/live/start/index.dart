@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:livekit_client/livekit_client.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as rtc;
 
 import '../../../components/custom_text_field/index.dart';
 import '../../../utils/getx_config/config.dart';
@@ -19,7 +20,12 @@ class LiveStartPage extends CustomWidget<LiveStartLogic> {
         children: [
           // 预览轨道：有轨道就渲染视频，没有就显示关闭图标占位
           Obx(() => controller.previewTrack.value != null
-              ? VideoTrackRenderer(controller.previewTrack.value!)
+              ? SizedBox.expand(
+            child: VideoTrackRenderer(
+              controller.previewTrack.value!,
+              fit: rtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+            ),
+          )
               : const ColoredBox(
             color: Color(0xFF151515),
             child: Center(
@@ -41,7 +47,7 @@ class LiveStartPage extends CustomWidget<LiveStartLogic> {
             left: 16,
             right: 16,
             bottom: 20,
-            height: 88,
+            height: 44,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,  // 两个按钮等高
               children: [
@@ -158,22 +164,14 @@ class LiveStartPage extends CustomWidget<LiveStartLogic> {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: Colors.white24),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            controller.isScreenSharing.value
-                ? Icons.videocam_rounded      // 当前投屏 → 可切回摄像头
-                : Icons.screen_share_rounded, // 当前摄像头 → 可切投屏
-            color: Colors.white,
-            size: 25,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            controller.isScreenSharing.value ? '切换摄像头' : '手机投屏',
-            style: const TextStyle(color: Colors.white, fontSize: 12),
-          ),
-        ],
+      child: Center(
+        child: Icon(
+          controller.isScreenSharing.value
+              ? Icons.videocam_rounded      // 当前投屏 → 可切回摄像头
+              : Icons.screen_share_rounded, // 当前摄像头 → 可切投屏
+          color: Colors.white,
+          size: 25,
+        ),
       ),
     ),
   );
@@ -184,11 +182,11 @@ class LiveStartPage extends CustomWidget<LiveStartLogic> {
       color: const Color(0xFFFF82B5),
       borderRadius: BorderRadius.circular(18),
     ),
-    child: const Column(
+    child: const Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(Icons.videocam_rounded, color: Colors.white, size: 30),
-        SizedBox(height: 4),
+        SizedBox(width: 8),
         Text(
           '开启直播',
           style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
