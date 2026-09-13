@@ -55,8 +55,10 @@ class MinePage extends CustomWidget<MineLogic> {
   Widget buildWidget(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FBFF), // 浅蓝色背景
-      body: Column(
+      body: Stack(
         children: [
+          Column(
+            children: [
           //上方头像与用户区域
           Container(
             decoration:  BoxDecoration(
@@ -175,6 +177,37 @@ class MinePage extends CustomWidget<MineLogic> {
                   _leastSelectButton('退出', controller.handlerLogout,
                       color: theme.errorColor),
                 ],
+              ),
+            ),
+          ),
+            ],
+          ),
+
+          //右下角 AI 悬浮入口
+          Positioned(
+            right: 20,
+            bottom: 24,
+            child: GestureDetector(
+              onTap: () => Get.toNamed('/ai_chat'),
+              child: Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: theme.primaryColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.primaryColor.withValues(alpha: 0.35),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.smart_toy,
+                  color: Colors.white,
+                  size: 26,
+                ),
               ),
             ),
           ),
