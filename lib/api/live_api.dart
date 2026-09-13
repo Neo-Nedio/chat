@@ -23,6 +23,15 @@ class LiveApi {
     return response.data;
   }
 
+  // 直播间背景字段是文件名，展示前通过接口换取预览 URL。
+  Future<Map<String, dynamic>> getBackground(String fileName) async {
+    final response = await _dio.get(
+      '/v1/api/live-room/get/background',
+      queryParameters: {'fileName': fileName},
+    );
+    return response.data;
+  }
+
   Future<Map<String, dynamic>> uploadBackground(File file) async {
     final name = file.path.split(Platform.pathSeparator).last;
     final type = _mimeType(name);

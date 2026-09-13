@@ -17,6 +17,11 @@ Future<String> resolvePortraitUrl(String? fileName) async {
   if (_urlCache.containsKey(key)) {
     return _urlCache[key]!;
   }
+  final uri = Uri.tryParse(key);
+  if (uri?.hasScheme == true) {
+    _urlCache[key] = key;
+    return key;
+  }
   final res = await _userApi.getPortrait(key);
   if (res['code'] == 0 && res['data'] != null) {
     final url = res['data'].toString().trim();

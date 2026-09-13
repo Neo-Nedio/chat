@@ -1,9 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart' as rtc;
 
+import '../../../components/custom_live_background/index.dart';
+import '../../../components/custom_portrait/index.dart';
 import '../../../components/custom_text_field/index.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
@@ -105,10 +106,30 @@ class LiveStartPage extends CustomWidget<LiveStartLogic> {
           fit: StackFit.expand,
           alignment: Alignment.bottomCenter,
           children: [
-                _CoverImage(
-                  background: controller.background,
-                  portrait: controller.portrait,
-                ),
+                Obx(() {
+                  final background = controller.background;
+                  final portrait = controller.portrait;
+                  if (background.isNotEmpty) {
+                    return CustomLiveBackground(
+                      background: background,
+                      width: 96,
+                      height: 96,
+                    );
+                  }
+                  if (portrait.isNotEmpty) {
+                    return CustomPortrait(
+                      portrait: portrait,
+                      size: 96,
+                      radius: 12,
+                    );
+                  }
+                  return Image.asset(
+                    'assets/images/default-portrait.jpeg',
+                    width: 96,
+                    height: 96,
+                    fit: BoxFit.cover,
+                  );
+                }),
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
@@ -282,36 +303,4 @@ class LiveStartPage extends CustomWidget<LiveStartLogic> {
       },
     );
   }
-}
-
-// 封面图：imageUrl 为空退到 portrait，再失败用默认图
-class _CoverImage extends StatelessWidget {
-  final String background;
-  final String portrait;
-
-  const _CoverImage({required this.background, required this.portrait});
-
-  @override
-  Widget build(BuildContext context) {
-    if (background.isEmpty) return _portraitImage();
-    return CachedNetworkImage(
-      imageUrl: background,
-      fit: BoxFit.cover,
-      errorWidget: (context, url, error) => _portraitImage(),
-    );
-  }
-
-  Widget _portraitImage() {
-    if (portrait.isEmpty) return _defaultImage();
-    return CachedNetworkImage(
-      imageUrl: portrait,
-      fit: BoxFit.cover,
-      errorWidget: (context, url, error) => _defaultImage(),
-    );
-  }
-
-  Widget _defaultImage() => Image.asset(
-    'assets/images/default-portrait.jpeg',
-    fit: BoxFit.cover,
-  );
 }

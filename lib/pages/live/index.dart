@@ -1,8 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../components/app_loading.dart';
+import '../../components/custom_live_background/index.dart';
+import '../../components/custom_portrait/index.dart';
 import '../../utils/getx_config/config.dart';
 import 'logic.dart';
 
@@ -109,7 +110,6 @@ class _LiveRoomCard extends StatelessWidget {
     // 取字段并做空值兜底
     final background = room['background']?.toString().trim() ?? '';
     final portrait = room['portrait']?.toString().trim() ?? '';
-    final imageUrl = background.isNotEmpty ? background : portrait;  // 优先用 background
     final title = room['title']?.toString().trim() ?? '';
     final count = room['participantCount'] ?? 0;
 
@@ -121,19 +121,29 @@ class _LiveRoomCard extends StatelessWidget {
           child: Stack(
             alignment: Alignment.bottomLeft,
             children: [
-              CachedNetworkImage(                  // 封面图
-                imageUrl: imageUrl,
-                width: double.infinity,
-                fit: BoxFit.fitWidth,              // 宽度撑满，高度按比例
-                placeholder: (context, url) => AspectRatio(   // 加载中占位
-                  aspectRatio: 1,
-                  child: Container(
-                    color: const Color(0xFFE8EEF7),
-                    alignment: Alignment.center,
-                    child: appLoadingInkDrop(color: Colors.white, size: 24),
-                  ),
-                ),
-                errorWidget: (context, url, error) => _fallbackImage(portrait),  // 失败兜底
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.maxWidth;
+                  if (background.isNotEmpty) {
+                    return CustomLiveBackground(
+                      background: background,
+                      width: width,
+                      fit: BoxFit.fitWidth,
+                    );
+                  }
+                  if (portrait.isNotEmpty) {
+                    return CustomPortrait(
+                      portrait: portrait,
+                      size: width,
+                      radius: 12,
+                    );
+                  }
+                  return Image.asset(
+                    'assets/images/default-portrait.jpeg',
+                    width: width,
+                    fit: BoxFit.fitWidth,
+                  );
+                },
               ),
               Container(                           // 左下角观看人数标签
                 margin: const EdgeInsets.all(8),
@@ -164,24 +174,4 @@ class _LiveRoomCard extends StatelessWidget {
     );
   }
 
-  // 封面加载失败时的兜底：portrait 也为空直接本地默认图，否则再试 portrait
-  Widget _fallbackImage(String portrait) {
-    if (portrait.isEmpty) {
-      return Image.asset(
-        'assets/images/default-portrait.jpeg',
-        width: double.infinity,
-        fit: BoxFit.cover,
-      );
-    }
-    return CachedNetworkImage(
-      imageUrl: portrait,
-      width: double.infinity,
-      fit: BoxFit.fitWidth,
-      errorWidget: (context, url, error) => Image.asset(
-        'assets/images/default-portrait.jpeg',
-        width: double.infinity,
-        fit: BoxFit.cover,
-      ),
-    );
-  }
 }
