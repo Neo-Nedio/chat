@@ -51,20 +51,10 @@ class AboutPage extends CustomWidget<AboutLogic> {
                     "assets/images/logo-about.png",
                     width: 80,
                   ),
-                  const SizedBox(height: 10),
-                  //文字图片
-                  Image.asset(
-                    "assets/images/linyu.png",
-                    height: 30,
-                  ),
                   const SizedBox(height: 30),
                   //作者
                   const CustomLabelValue(
-                      label: '作者', value: "Heath", width: 80),
-                  const SizedBox(height: 1),
-                  //QQ
-                  const CustomLabelValue(
-                      label: 'QQ群', value: "729158695", width: 80),
+                      label: '作者', value: "Neo", width: 80),
                   const SizedBox(height: 1),
                   //github
                   const CustomLabelValue(
