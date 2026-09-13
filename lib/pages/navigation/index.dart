@@ -99,11 +99,11 @@ class NavigationPage extends CustomWidget<NavigationLogic> {
                 ],
               ),
 
-              //圆形 AI 按钮，悬浮在凹槽中间并向上凸出
+              //圆形 直播间 按钮，悬浮在凹槽中间并向上凸出
               Positioned(
                 top: -22,
                 child: GestureDetector(
-                  onTap: () => Get.toNamed('/ai_chat'),
+                  onTap: () => Get.toNamed('/live'),
                   child: Container(
                     width: 56,
                     height: 56,
@@ -124,7 +124,7 @@ class NavigationPage extends CustomWidget<NavigationLogic> {
                       ],
                     ),
                     child: const Icon(
-                      Icons.auto_awesome,
+                      Icons.live_tv_outlined,
                       color: Colors.white,
                       size: 26,
                     ),

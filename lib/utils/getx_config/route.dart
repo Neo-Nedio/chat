@@ -33,6 +33,7 @@ import '../../pages/file_details/index.dart';
 import '../../pages/image_viewer/image_viewer_update/index.dart';
 import '../../pages/image_viewer/index.dart';
 import '../../pages/login/index.dart';
+import '../../pages/live/index.dart';
 import '../../pages/mine/about/index.dart';
 import '../../pages/mine/edit/index.dart';
 import '../../pages/mine/index.dart';
@@ -421,6 +422,11 @@ class AppRoutes {
       page: () => AiChatPage(
         key: const Key('ai_chat'),
       ),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/live',
+      page: () => LivePage(key: const Key('live')),
       binding: ControllerBinding(),
     ),
     GetPage(

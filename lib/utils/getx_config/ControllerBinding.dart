@@ -31,6 +31,7 @@ import '../../pages/file_details/logic.dart';
 import '../../pages/image_viewer/image_viewer_update/logic.dart';
 import '../../pages/image_viewer/logic.dart';
 import '../../pages/login/logic.dart';
+import '../../pages/live/logic.dart';
 import '../../pages/mine/about/logic.dart';
 import '../../pages/mine/edit/logic.dart';
 import '../../pages/mine/logic.dart';
@@ -65,6 +66,7 @@ class ControllerBinding extends Bindings {
     //fenix: true 是 GetX 中 lazyPut 的一个参数，意思是允许控制器在销毁后重新创建。
     Get.lazyPut(() => NavigationLogic(), fenix: true);
     Get.lazyPut(() => LoginPageLogic(), fenix: true);
+    Get.lazyPut(() => LiveLogic(), fenix: true);
     Get.lazyPut(() => RegisterPageLogic(), fenix: true);
     Get.lazyPut(() => RetrievePasswordLogic(), fenix: true);
     Get.lazyPut(() => UpdatePasswordLogic(), fenix: true);
