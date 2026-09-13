@@ -3,9 +3,8 @@ import 'package:get/get.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart' as rtc;
 
-import '../../../components/custom_live_background/index.dart';
-import '../../../components/custom_portrait/index.dart';
 import '../../../components/custom_text_field/index.dart';
+import '../../../components/custom_update_live_cover/index.dart';
 import '../../../utils/getx_config/config.dart';
 import 'logic.dart';
 
@@ -94,60 +93,18 @@ class LiveStartPage extends CustomWidget<LiveStartLogic> {
     ),
   );
 
-  // 封面区：点击换封面，底部叠一条"更换封面"提示
-  Widget _buildCover(BuildContext context) => GestureDetector(
-    onTap: controller.pickCover,
-    child: SizedBox(
-      width: 96,
-      height: 96,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Stack(
-          fit: StackFit.expand,
-          alignment: Alignment.bottomCenter,
-          children: [
-                Obx(() {
-                  final background = controller.background;
-                  final portrait = controller.portrait;
-                  if (background.isNotEmpty) {
-                    return CustomLiveBackground(
-                      background: background,
-                      width: 96,
-                      height: 96,
-                    );
-                  }
-                  if (portrait.isNotEmpty) {
-                    return CustomPortrait(
-                      portrait: portrait,
-                      size: 96,
-                      radius: 12,
-                    );
-                  }
-                  return Image.asset(
-                    'assets/images/default-portrait.jpeg',
-                    width: 96,
-                    height: 96,
-                    fit: BoxFit.cover,
-                  );
-                }),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                width: double.infinity,
-                color: Colors.black.withValues(alpha: 0.55),
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: const Text(
-                  '更换封面',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: 12),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+  // 封面区：点击时由组件解析 URL，再进入图片更换页
+  Widget _buildCover(BuildContext context) => Obx(() => SizedBox(
+    width: 96,
+    height: 96,
+    child: CustomUpdateLiveCover(
+      background: controller.background,
+      portrait: controller.portrait,
+      size: 96,
+      radius: 12,
+      onTap: controller.pickCover,
     ),
-  );
+  ));
 
   // 标题区：标题为空显示占位文案，右侧编辑按钮弹底部弹窗
   Widget _buildTitleArea(BuildContext context) => Row(
@@ -198,6 +155,7 @@ class LiveStartPage extends CustomWidget<LiveStartLogic> {
   );
 
   // 开启直播按钮（目前只有 UI，没绑 onTap）
+  // todo 开启直播和打开直播间 还没做
   Widget _buildStartButton() => Container(
     decoration: BoxDecoration(
       color: const Color(0xFFFF82B5),

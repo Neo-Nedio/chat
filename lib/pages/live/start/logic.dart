@@ -26,8 +26,6 @@ class LiveStartLogic extends GetxController {
 
   String get background => room['background']?.toString().trim() ?? '';
   String get portrait => room['portrait']?.toString().trim() ?? '';
-  String get coverUrl => background.isNotEmpty ? background : portrait;  // 封面优先 background
-
   @override
   void onInit() {
     super.onInit();
@@ -146,10 +144,10 @@ class LiveStartLogic extends GetxController {
   }
 
   // 跳图片选择页更换封面，确认后回调 uploadBackground
-  Future<void> pickCover() async {
+  void pickCover(String imageUrl) {
     if (isUploadingCover.value) return;
-    await Get.toNamed('/image_viewer_update', arguments: {
-      'imageUrl': coverUrl,
+    Get.toNamed('/image_viewer_update', arguments: {
+      'imageUrl': imageUrl,
       'text': '更换封面',
       'onConfirm': uploadBackground,
       'isUpdate': true,
