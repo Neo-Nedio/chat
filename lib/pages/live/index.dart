@@ -27,39 +27,66 @@ class LivePage extends CustomWidget<LiveLogic> {
         )),
         centerTitle: true,
       ),
-      body: Obx(() {                               // 监听响应式状态
-        if (controller.isLoading.value) {          // 加载中
-          return Center(child: appLoadingInkDrop(color: theme.primaryColor, size: 32));
-        }
-        if (controller.rooms.isEmpty) {            // 空列表
-          return const Center(child: Text('当前没有直播间', style: TextStyle(
-            color: Color(0xFF8A96A8), fontSize: 15,
-          )));
-        }
+      body: Stack(
+        children: [
+          Obx(() {                               // 监听响应式状态
+            if (controller.isLoading.value) {          // 加载中
+              return Center(child: appLoadingInkDrop(color: theme.primaryColor, size: 32));
+            }
+            if (controller.rooms.isEmpty) {            // 空列表
+              return const Center(child: Text('当前没有直播间', style: TextStyle(
+                color: Color(0xFF8A96A8), fontSize: 15,
+              )));
+            }
 
-        // 按奇偶下标把房间分到左右两列
-        final left = <Map<String, dynamic>>[];
-        final right = <Map<String, dynamic>>[];
-        for (var i = 0; i < controller.rooms.length; i++) {
-          (i.isEven ? left : right).add(controller.rooms[i]);
-        }
-        return RefreshIndicator(                   // 下拉刷新
-          color: theme.primaryColor,
-          onRefresh: controller.loadRooms,
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),  // 内容不足也能下拉
-            padding: const EdgeInsets.fromLTRB(12, 4, 12, 24),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,  // 两列顶部对齐
-              children: [
-                Expanded(child: _buildColumn(left)),          // 左列
-                const SizedBox(width: 8),                     // 列间距
-                Expanded(child: _buildColumn(right)),         // 右列
-              ],
+            // 按奇偶下标把房间分到左右两列
+            final left = <Map<String, dynamic>>[];
+            final right = <Map<String, dynamic>>[];
+            for (var i = 0; i < controller.rooms.length; i++) {
+              (i.isEven ? left : right).add(controller.rooms[i]);
+            }
+            return RefreshIndicator(                   // 下拉刷新
+              color: theme.primaryColor,
+              onRefresh: controller.loadRooms,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),  // 内容不足也能下拉
+                padding: const EdgeInsets.fromLTRB(12, 4, 12, 24),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,  // 两列顶部对齐
+                  children: [
+                    Expanded(child: _buildColumn(left)),          // 左列
+                    const SizedBox(width: 8),                     // 列间距
+                    Expanded(child: _buildColumn(right)),         // 右列
+                  ],
+                ),
+              ),
+            );
+          }),
+          Positioned(
+            right: 20,
+            bottom: 24,
+            child: GestureDetector(
+              onTap: () => Get.toNamed('/live/start'),
+              child: Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: theme.primaryColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.primaryColor.withValues(alpha: 0.35),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.videocam, color: Colors.white, size: 28),
+              ),
             ),
           ),
-        );
-      }),
+        ],
+      ),
     );
   }
 

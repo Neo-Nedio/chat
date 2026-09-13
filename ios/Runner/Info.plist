@@ -73,8 +73,10 @@
           <string>http</string>
           <string>https</string>
         </array>
-        <key>NSPhotoLibraryAddUsageDescription</key>
+	<key>NSPhotoLibraryAddUsageDescription</key>
             <string>需要访问相册权限以保存图片</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>需要访问相册以选择直播封面</string>
 	<key>NSCameraUsageDescription</key>
 	<string>群通话需要使用摄像头</string>
 	<key>NSMicrophoneUsageDescription</key>

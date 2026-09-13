@@ -34,6 +34,7 @@ import '../../pages/image_viewer/image_viewer_update/index.dart';
 import '../../pages/image_viewer/index.dart';
 import '../../pages/login/index.dart';
 import '../../pages/live/index.dart';
+import '../../pages/live/start/index.dart';
 import '../../pages/mine/about/index.dart';
 import '../../pages/mine/edit/index.dart';
 import '../../pages/mine/index.dart';
@@ -427,6 +428,11 @@ class AppRoutes {
     GetPage(
       name: '/live',
       page: () => LivePage(key: const Key('live')),
+      binding: ControllerBinding(),
+    ),
+    GetPage(
+      name: '/live/start',
+      page: () => LiveStartPage(key: const Key('live_start')),
       binding: ControllerBinding(),
     ),
     GetPage(
